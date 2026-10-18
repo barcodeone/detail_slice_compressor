@@ -927,18 +927,33 @@
       });
     }
 
-    // Auto-run if ?autotest=1 in URL
-    window.addEventListener('DOMContentLoaded', async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('autotest') === '1') {
-        console.log('[E2E] Auto-test started...');
-        await window.__E2E__.simulateUpload(1200, 8000);
-        setTimeout(() => {
-          window.__E2E__.clickPreset('smartstore');
-          window.__E2E__.startProcessing();
-        }, 1000);
+    // Auto-resizing for iframe embedding & clean mobile UX
+    function notifyParentHeight() {
+      if (window.self !== window.top) {
+        const height = Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight,
+          document.body.offsetHeight
+        );
+        window.parent.postMessage({ type: 'TOOL_RESIZE', height: height + 10 }, '*');
       }
-    });
+    }
+
+    // Embed Mode: If inside iframe, hide redundant outer header & footer for clean mobile UI
+    if (window.self !== window.top) {
+      const headerEl = document.querySelector('header');
+      const footerEl = document.querySelector('footer');
+      const affiliateEl = document.getElementById('affiliateSection');
+      if (headerEl) headerEl.style.display = 'none';
+      if (footerEl) footerEl.style.display = 'none';
+      if (affiliateEl) affiliateEl.style.display = 'none'; // 워드프레스 바깥에 이미 있으므로 내부 제휴 섹션 숨김
+    }
+
+    window.addEventListener('load', notifyParentHeight);
+    window.addEventListener('resize', notifyParentHeight);
+    if (window.ResizeObserver) {
+      new ResizeObserver(notifyParentHeight).observe(document.body);
+    }
   </script>
 </body>
 </html>
