@@ -1,0 +1,18 @@
+{
+  "name": "detail-slice-compressor",
+  "version": "1.0.0",
+  "description": "오픈마켓 셀러를 위한 상세페이지 분할 및 초경량 WebP 압축기",
+  "scripts": {
+    "start": "serve public -l 3000",
+    "dev": "serve public -l 3000"
+  },
+  "keywords": [
+    "webp",
+    "image-slice",
+    "smartstore",
+    "coupang",
+    "seller-tool"
+  ],
+  "author": "Antigravity",
+  "license": "MIT"
+}

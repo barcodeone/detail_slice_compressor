@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>상세페이지 초고속 분할 &amp; 초경량 WebP 압축기 | 오픈마켓 셀러 필수툴</title>
+  <meta name="description" content="네이버 스마트스토어, 쿠팡 등 오픈마켓 상세페이지를 브라우저에서 100% 무인 서버리스로 초고속 분할하고 고압축 WebP로 변환하여 ZIP으로 즉시 다운로드합니다.">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Libraries: JSZip & FileSaver -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+  <!-- Font & Lucide Icons CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+    .gradient-border {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(168, 85, 247, 0.2));
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+          <i data-lucide="scissors" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-indigo-900">
+            상세페이지 분할 &amp; 초경량 압축기
+          </h1>
+          <p class="text-xs text-slate-500 font-medium hidden sm:block">
+            100% 브라우저 메모리 최적화 · 서버 전송 없는 안전한 무인 처리
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button 
+          id="btnLoadTestSample"
+          type="button"
+          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition-colors"
+          title="세로 8,000px 가상 상세페이지 이미지 자동 생성 및 로드"
+        >
+          <i data-lucide="flask-conical" class="w-3.5 h-3.5"></i>
+          <span>테스트 이미지 로드 (8,000px)</span>
+        </button>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          서버리스 보안 안심
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-8 space-y-8">
+
+    <!-- Hero / Feature Summary Banner -->
+    <div class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+      <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 max-w-2xl space-y-3">
+        <div class="inline-flex items-center gap-2 text-xs font-semibold tracking-wider text-indigo-300 uppercase bg-indigo-950/60 px-3 py-1 rounded-lg border border-indigo-700/50">
+          <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i> Smart Slicer &amp; WebP Optimizer
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          30,000px 초대형 이미지도 <br class="hidden sm:inline">크래시 없이 초경량 압축 분할
+        </h2>
+        <p class="text-sm text-indigo-100 leading-relaxed">
+          스마트스토어(860px), 쿠팡(780px/1000px) 규격에 맞게 자동 리사이즈 및 분할하고, 
+          차세대 고압축 WebP로 변환해 로딩 속도를 극대화합니다.
+        </p>
+      </div>
+    </div>
+
+    <!-- Upload & Setup Container -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+      <!-- Left Column: Drag & Drop Zone and Source Preview (7 cols) -->
+      <div class="lg:col-span-7 space-y-4">
+        <!-- Dropzone Box -->
+        <div 
+          id="dropzone"
+          class="group relative border-2 border-dashed border-slate-300 hover:border-indigo-500 bg-white rounded-2xl p-8 sm:p-10 text-center transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
+        >
+          <input 
+            type="file" 
+            id="fileInput" 
+            accept="image/jpeg,image/png,image/webp" 
+            class="hidden" 
+          />
+          
+          <div class="flex flex-col items-center justify-center space-y-3 pointer-events-none">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+              <i data-lucide="upload-cloud" class="w-8 h-8"></i>
+            </div>
+            <div class="space-y-1">
+              <p class="text-base font-bold text-slate-800">
+                상세페이지 이미지를 드래그하거나 클릭하여 업로드
+              </p>
+              <p class="text-xs text-slate-500">
+                JPG, PNG, WebP 지원 (최대 50,000px 이상 대용량 이미지 지원)
+              </p>
+            </div>
+            <div class="inline-flex items-center gap-2 text-xs font-medium text-indigo-600 bg-indigo-50/80 px-3 py-1.5 rounded-full">
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
+              이미지가 외부 서버로 전송되지 않습니다
+            </div>
+          </div>
+        </div>
+
+        <!-- Image Info & Preview Card (Hidden initially) -->
+        <div id="imageInfoCard" class="hidden bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 shrink-0">
+                <i data-lucide="image" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <p id="fileNameDisplay" class="text-sm font-bold text-slate-800 truncate">sample.jpg</p>
+                <p id="fileMetaDisplay" class="text-xs text-slate-500">1200 x 8000 px · 3.4 MB</p>
+              </div>
+            </div>
+            <button id="btnRemoveImage" class="text-slate-400 hover:text-rose-500 p-1.5 rounded-lg hover:bg-rose-50 transition-colors" title="이미지 제거">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- Preview & Slicing Outline -->
+          <div class="flex gap-4 items-center bg-slate-50 rounded-xl p-3">
+            <div class="w-20 h-28 bg-white border border-slate-200 rounded-lg overflow-hidden flex items-center justify-center shadow-inner shrink-0 relative">
+              <img id="previewImg" class="max-h-full max-w-full object-contain" alt="미리보기" />
+            </div>
+            <div class="flex-1 text-xs space-y-1.5">
+              <div class="flex justify-between">
+                <span class="text-slate-500">예상 분할 조각 수:</span>
+                <span id="calcSliceCount" class="font-bold text-indigo-600 text-sm">0 조각</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">출력 해상도(조각당):</span>
+                <span id="calcOutputDim" class="font-medium text-slate-700">-</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">출력 포맷:</span>
+                <span id="calcFormatSummary" class="font-medium text-slate-700">WebP (85%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Settings & Execution Controls (5 cols) -->
+      <div class="lg:col-span-5 space-y-5">
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-6">
+
+          <!-- Section 1: Presets -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <label class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                <i data-lucide="layout-grid" class="w-4 h-4 text-indigo-600"></i>
+                플랫폼 프리셋 규격
+              </label>
+              <span class="text-[11px] text-slate-400">원클릭 최적화</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5" id="presetButtons">
+              <!-- Smartstore -->
+              <button 
+                type="button" 
+                data-preset="smartstore"
+                class="preset-btn active flex flex-col items-start p-3 rounded-xl border text-left transition-all duration-150 border-indigo-600 bg-indigo-50/50 text-indigo-900 ring-2 ring-indigo-500/20"
+              >
+                <div class="flex items-center gap-1.5 text-xs font-bold mb-1">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  스마트스토어
+                </div>
+                <div class="text-[11px] text-slate-600">가로 860px</div>
+                <div class="text-[10px] text-slate-400">세로 4,000px 단위</div>
+              </button>
+
+              <!-- Coupang Standard -->
+              <button 
+                type="button" 
+                data-preset="coupang-std"
+                class="preset-btn flex flex-col items-start p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-left transition-all duration-150 text-slate-700"
+              >
+                <div class="flex items-center gap-1.5 text-xs font-bold mb-1">
+                  <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                  쿠팡 기본
+                </div>
+                <div class="text-[11px] text-slate-600">가로 780px</div>
+                <div class="text-[10px] text-slate-400">세로 3,000px 단위</div>
+              </button>
+
+              <!-- Coupang High-Res -->
+              <button 
+                type="button" 
+                data-preset="coupang-high"
+                class="preset-btn flex flex-col items-start p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-left transition-all duration-150 text-slate-700"
+              >
+                <div class="flex items-center gap-1.5 text-xs font-bold mb-1">
+                  <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                  쿠팡 고해상도
+                </div>
+                <div class="text-[11px] text-slate-600">가로 1,000px</div>
+                <div class="text-[10px] text-slate-400">세로 3,000px 단위</div>
+              </button>
+
+              <!-- Original Keep -->
+              <button 
+                type="button" 
+                data-preset="original"
+                class="preset-btn flex flex-col items-start p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-left transition-all duration-150 text-slate-700"
+              >
+                <div class="flex items-center gap-1.5 text-xs font-bold mb-1">
+                  <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                  원본 가로 유지
+                </div>
+                <div class="text-[11px] text-slate-600">가로 원본 크기</div>
+                <div class="text-[10px] text-slate-400">세로 3,000px 단위</div>
+              </button>
+            </div>
+
+            <!-- Manual Custom Tweaks Collapsible -->
+            <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+              <span class="text-slate-500">상세 수치 직접 조정</span>
+              <button id="toggleCustomSettings" class="text-indigo-600 font-semibold hover:underline">
+                설정 열기 ▼
+              </button>
+            </div>
+            
+            <div id="customSettingsArea" class="hidden mt-3 grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+              <div>
+                <label class="block text-slate-600 font-medium mb-1">가로 폭 (px)</label>
+                <input type="number" id="inputTargetWidth" value="860" min="200" max="4000" step="10" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:outline-none" />
+              </div>
+              <div>
+                <label class="block text-slate-600 font-medium mb-1">자르기 높이 (px)</label>
+                <input type="number" id="inputSliceHeight" value="4000" min="500" max="10000" step="100" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:outline-none" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Output Format & Quality -->
+          <div class="space-y-4 pt-2 border-t border-slate-100">
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                <i data-lucide="file-output" class="w-4 h-4 text-indigo-600"></i>
+                출력 포맷 및 압축률
+              </label>
+            </div>
+
+            <!-- Radio options for WebP / JPG -->
+            <div class="grid grid-cols-2 gap-3">
+              <label class="flex items-center gap-2 p-2.5 rounded-xl border border-indigo-500 bg-indigo-50/30 cursor-pointer text-xs font-semibold text-slate-800">
+                <input type="radio" name="formatOption" value="image/webp" checked class="text-indigo-600 focus:ring-indigo-500" />
+                <span>WebP <span class="text-[10px] text-indigo-600 font-normal">(초경량 권장)</span></span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white cursor-pointer text-xs font-semibold text-slate-800">
+                <input type="radio" name="formatOption" value="image/jpeg" class="text-indigo-600 focus:ring-indigo-500" />
+                <span>JPG / JPEG <span class="text-[10px] text-slate-500 font-normal">(호환성)</span></span>
+              </label>
+            </div>
+
+            <!-- Quality Slider -->
+            <div class="space-y-1.5">
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-600 font-medium">화질 압축 품질:</span>
+                <span id="qualityDisplay" class="font-bold text-indigo-600">85%</span>
+              </div>
+              <input 
+                type="range" 
+                id="qualityRange" 
+                min="50" 
+                max="100" 
+                value="85" 
+                step="1"
+                class="w-full accent-indigo-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
+              />
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>용량 우선 (50%)</span>
+                <span>균형 (85%)</span>
+                <span>무손실급 (100%)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Process Button & Progress -->
+          <div class="pt-3 border-t border-slate-100 space-y-3">
+            <button 
+              id="btnStartProcess" 
+              disabled
+              class="w-full py-3.5 px-4 rounded-xl font-bold text-sm text-white bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] disabled:bg-slate-300 disabled:cursor-not-allowed transition-all duration-150 flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/25"
+            >
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span id="btnProcessText">분할 &amp; WebP 압축 다운로드</span>
+            </button>
+
+            <!-- Progress Bar Area -->
+            <div id="progressContainer" class="hidden space-y-2 pt-2">
+              <div class="flex justify-between text-xs font-semibold text-slate-700">
+                <span id="progressStatus">조각 슬라이싱 처리 중...</span>
+                <span id="progressPercent">0%</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden p-0.5 border border-slate-200">
+                <div id="progressBar" class="bg-gradient-to-r from-indigo-500 to-violet-600 h-full rounded-full transition-all duration-150 w-0"></div>
+              </div>
+            </div>
+
+            <!-- Success Box -->
+            <div id="successNotice" class="hidden p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 space-y-1">
+              <div class="flex items-center gap-1.5 font-bold">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+                <span id="successMsg">ZIP 다운로드가 완료되었습니다!</span>
+              </div>
+              <p id="successSub" class="text-emerald-700 text-[11px]">
+                압축파일이 자동으로 브라우저에 다운로드되었습니다.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Section 4: Seller Essential Affiliate Showcase (Coupang Partners & Sellers) -->
+    <section class="mt-12 pt-10 border-t border-slate-200 space-y-6" id="affiliateSection">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+        <div>
+          <span class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 uppercase tracking-wider">
+            <i data-lucide="package-check" class="w-3.5 h-3.5"></i> Seller Toolkit
+          </span>
+          <h3 class="text-xl font-extrabold text-slate-900 mt-1">
+            스마트스토어 &amp; 쿠팡 셀러 필수 추천 패키지 3종
+          </h3>
+          <p class="text-xs text-slate-500">
+            상세페이지 작업 후 배송 및 물류 업무 효율을 200% 높여주는 베스트 아이템
+          </p>
+        </div>
+        <span class="text-[11px] text-slate-400 bg-slate-100 px-2.5 py-1 rounded-md self-start sm:self-auto">
+          셀러 재구매율 TOP 3
+        </span>
+      </div>
+
+      <!-- 3 Recommendation Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+        <!-- Card 1: 택배박스 -->
+        <div class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-indigo-400 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="w-full h-36 bg-amber-50/60 rounded-xl flex items-center justify-center text-amber-700 border border-amber-100/80 group-hover:scale-[1.02] transition-transform">
+              <div class="flex flex-col items-center gap-2">
+                <i data-lucide="box" class="w-12 h-12 text-amber-600"></i>
+                <span class="text-xs font-semibold text-amber-800">우체국 규격 골판지 박스</span>
+              </div>
+            </div>
+            <div>
+              <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 mb-1.5">
+                포장 필수재
+              </span>
+              <h4 class="font-bold text-slate-900 text-sm group-hover:text-indigo-600 transition-colors">
+                우체국 표준 규격 택배박스 (1호~5호 모음)
+              </h4>
+              <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                강화 B골 원단으로 찌그러짐 없는 튼튼한 내구성. 소량부터 대량까지 실속형 셀러 최저가 보장.
+              </p>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+            <div class="text-xs font-extrabold text-slate-900">
+              특가 최저가 <span class="text-[11px] font-normal text-slate-500">/ 묶음배송</span>
+            </div>
+            <a 
+              href="https://link.coupang.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1 text-xs font-semibold text-white bg-slate-900 hover:bg-indigo-600 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              상품 보기 <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 2: 감열 롤 라벨지 -->
+        <div class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-indigo-400 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="w-full h-36 bg-blue-50/60 rounded-xl flex items-center justify-center text-blue-700 border border-blue-100/80 group-hover:scale-[1.02] transition-transform">
+              <div class="flex flex-col items-center gap-2">
+                <i data-lucide="printer" class="w-12 h-12 text-blue-600"></i>
+                <span class="text-xs font-semibold text-blue-800">송장 감열 라벨지 (50x30 / 100x150)</span>
+              </div>
+            </div>
+            <div>
+              <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 mb-1.5">
+                송장 출력 1위
+              </span>
+              <h4 class="font-bold text-slate-900 text-sm group-hover:text-indigo-600 transition-colors">
+                바코드 송장 전용 감열 롤 라벨지 (5030 규격)
+              </h4>
+              <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                번짐 없는 선명한 인쇄, 방수 및 스크래치 방지 코팅. Xprinter, Bixolon 등 전 기종 완벽 호환.
+              </p>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+            <div class="text-xs font-extrabold text-slate-900">
+              롤당 가성비 최고 <span class="text-[11px] font-normal text-slate-500">/ 로켓배송</span>
+            </div>
+            <a 
+              href="https://link.coupang.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1 text-xs font-semibold text-white bg-slate-900 hover:bg-indigo-600 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              상품 보기 <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 3: 완충재 / 에어캡 -->
+        <div class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-indigo-400 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="w-full h-36 bg-emerald-50/60 rounded-xl flex items-center justify-center text-emerald-700 border border-emerald-100/80 group-hover:scale-[1.02] transition-transform">
+              <div class="flex flex-col items-center gap-2">
+                <i data-lucide="shield" class="w-12 h-12 text-emerald-600"></i>
+                <span class="text-xs font-semibold text-emerald-800">초강력 에어캡 완충재 뽁뽁이</span>
+              </div>
+            </div>
+            <div>
+              <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 mb-1.5">
+                파손 방지
+              </span>
+              <h4 class="font-bold text-slate-900 text-sm group-hover:text-indigo-600 transition-colors">
+                2중 공기 방어 롤 에어캡 뽁뽁이 완충재
+              </h4>
+              <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                도톰한 2중 공기막으로 반품/파손율 제로 도전. 친환경 분해성 소재로 고객 만족도 상승.
+              </p>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+            <div class="text-xs font-extrabold text-slate-900">
+              대용량 실속 롤 <span class="text-[11px] font-normal text-slate-500">/ 무료배송</span>
+            </div>
+            <a 
+              href="https://link.coupang.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1 text-xs font-semibold text-white bg-slate-900 hover:bg-indigo-600 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              상품 보기 <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 공정위 필수 문구 -->
+      <div class="text-center pt-2">
+        <p class="text-[11px] text-slate-400 bg-slate-100/80 inline-block px-3 py-1 rounded-full border border-slate-200">
+          이 포스팅은 쿠팡 파트너스 활동의 일환으로 수수료를 제공받습니다.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <div class="flex items-center gap-2">
+        <i data-lucide="scissors" class="w-4 h-4 text-indigo-600"></i>
+        <span class="font-semibold text-slate-700">Detail Slice Compressor</span>
+        <span>·</span>
+        <span>오픈마켓 셀러 최적화 도구</span>
+      </div>
+      <div>
+        브라우저 Canvas 기반 로컬 연산 · 이미지 보안 100% 보장
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Logic Script -->
+  <script>
+    // State management
+    const state = {
+      file: null,
+      imageElement: null,
+      originalWidth: 0,
+      originalHeight: 0,
+      targetWidth: 860,
+      sliceHeight: 4000,
+      format: 'image/webp',
+      quality: 0.85,
+      isOriginalWidth: false,
+      isProcessing: false,
+    };
+
+    // DOM Elements
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const imageInfoCard = document.getElementById('imageInfoCard');
+    const previewImg = document.getElementById('previewImg');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const fileMetaDisplay = document.getElementById('fileMetaDisplay');
+    const calcSliceCount = document.getElementById('calcSliceCount');
+    const calcOutputDim = document.getElementById('calcOutputDim');
+    const calcFormatSummary = document.getElementById('calcFormatSummary');
+    const btnRemoveImage = document.getElementById('btnRemoveImage');
+    
+    const presetButtons = document.querySelectorAll('.preset-btn');
+    const toggleCustomSettings = document.getElementById('toggleCustomSettings');
+    const customSettingsArea = document.getElementById('customSettingsArea');
+    const inputTargetWidth = document.getElementById('inputTargetWidth');
+    const inputSliceHeight = document.getElementById('inputSliceHeight');
+    
+    const qualityRange = document.getElementById('qualityRange');
+    const qualityDisplay = document.getElementById('qualityDisplay');
+    const formatRadios = document.querySelectorAll('input[name="formatOption"]');
+    
+    const btnStartProcess = document.getElementById('btnStartProcess');
+    const btnProcessText = document.getElementById('btnProcessText');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressStatus = document.getElementById('progressStatus');
+    const progressPercent = document.getElementById('progressPercent');
+    const successNotice = document.getElementById('successNotice');
+    const successMsg = document.getElementById('successMsg');
+    const successSub = document.getElementById('successSub');
+
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Event: Dropzone & File Input
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('border-indigo-600', 'bg-indigo-50/30');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('border-indigo-600', 'bg-indigo-50/30');
+      }, false);
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      if (dt.files && dt.files.length > 0) {
+        handleFileSelect(dt.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        handleFileSelect(e.target.files[0]);
+      }
+    });
+
+    btnRemoveImage.addEventListener('click', () => {
+      clearImage();
+    });
+
+    // File Selection Handler
+    function handleFileSelect(file) {
+      if (!file.type.startsWith('image/')) {
+        alert('이미지 파일(JPG, PNG, WebP)만 업로드할 수 있습니다.');
+        return;
+      }
+      
+      state.file = file;
+      fileNameDisplay.textContent = file.name;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          state.imageElement = img;
+          state.originalWidth = img.naturalWidth;
+          state.originalHeight = img.naturalHeight;
+
+          // Display image info
+          const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+          fileMetaDisplay.textContent = `${img.naturalWidth.toLocaleString()} × ${img.naturalHeight.toLocaleString()} px · ${sizeMB} MB`;
+          previewImg.src = e.target.result;
+          
+          imageInfoCard.classList.remove('hidden');
+          btnStartProcess.disabled = false;
+          successNotice.classList.add('hidden');
+
+          if (state.isOriginalWidth) {
+            state.targetWidth = state.originalWidth;
+            inputTargetWidth.value = state.originalWidth;
+          }
+
+          updateCalculations();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearImage() {
+      state.file = null;
+      state.imageElement = null;
+      state.originalWidth = 0;
+      state.originalHeight = 0;
+      fileInput.value = '';
+      previewImg.src = '';
+      imageInfoCard.classList.add('hidden');
+      btnStartProcess.disabled = true;
+      progressContainer.classList.add('hidden');
+      successNotice.classList.add('hidden');
+      updateCalculations();
+    }
+
+    // Presets
+    const presetConfigs = {
+      'smartstore': { width: 860, slice: 4000, isOriginal: false },
+      'coupang-std': { width: 780, slice: 3000, isOriginal: false },
+      'coupang-high': { width: 1000, slice: 3000, isOriginal: false },
+      'original': { width: null, slice: 3000, isOriginal: true }
+    };
+
+    presetButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        presetButtons.forEach(b => {
+          b.classList.remove('active', 'border-indigo-600', 'bg-indigo-50/50', 'text-indigo-900', 'ring-2', 'ring-indigo-500/20');
+          b.classList.add('border-slate-200', 'bg-white', 'text-slate-700');
+        });
+
+        btn.classList.add('active', 'border-indigo-600', 'bg-indigo-50/50', 'text-indigo-900', 'ring-2', 'ring-indigo-500/20');
+        btn.classList.remove('border-slate-200', 'bg-white', 'text-slate-700');
+
+        const presetKey = btn.getAttribute('data-preset');
+        const config = presetConfigs[presetKey];
+        if (config) {
+          state.isOriginalWidth = config.isOriginal;
+          state.sliceHeight = config.slice;
+          inputSliceHeight.value = config.slice;
+
+          if (config.isOriginal) {
+            state.targetWidth = state.originalWidth || 1000;
+            inputTargetWidth.value = state.targetWidth;
+          } else {
+            state.targetWidth = config.width;
+            inputTargetWidth.value = config.width;
+          }
+
+          updateCalculations();
+        }
+      });
+    });
+
+    // Custom Settings Toggle & Inputs
+    toggleCustomSettings.addEventListener('click', () => {
+      const isHidden = customSettingsArea.classList.toggle('hidden');
+      toggleCustomSettings.textContent = isHidden ? '설정 열기 ▼' : '설정 접기 ▲';
+    });
+
+    inputTargetWidth.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      if (val > 0) {
+        state.targetWidth = val;
+        state.isOriginalWidth = false;
+        clearPresetActiveStyles();
+        updateCalculations();
+      }
+    });
+
+    inputSliceHeight.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      if (val > 0) {
+        state.sliceHeight = val;
+        clearPresetActiveStyles();
+        updateCalculations();
+      }
+    });
+
+    function clearPresetActiveStyles() {
+      presetButtons.forEach(b => {
+        b.classList.remove('active', 'border-indigo-600', 'bg-indigo-50/50', 'text-indigo-900', 'ring-2', 'ring-indigo-500/20');
+        b.classList.add('border-slate-200', 'bg-white', 'text-slate-700');
+      });
+    }
+
+    // Format & Quality Controls
+    formatRadios.forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        state.format = e.target.value;
+        updateCalculations();
+      });
+    });
+
+    qualityRange.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      state.quality = val / 100;
+      qualityDisplay.textContent = `${val}%`;
+      updateCalculations();
+    });
+
+    // Calculations Summary
+    function updateCalculations() {
+      const formatExt = state.format === 'image/webp' ? 'WebP' : 'JPG';
+      calcFormatSummary.textContent = `${formatExt} (${Math.round(state.quality * 100)}%)`;
+
+      if (!state.imageElement || state.originalWidth === 0) {
+        calcSliceCount.textContent = '0 조각';
+        calcOutputDim.textContent = '-';
+        return;
+      }
+
+      const effectiveTargetWidth = state.isOriginalWidth ? state.originalWidth : state.targetWidth;
+      const scale = effectiveTargetWidth / state.originalWidth;
+      const totalScaledHeight = Math.round(state.originalHeight * scale);
+      const sliceCount = Math.ceil(totalScaledHeight / state.sliceHeight);
+
+      calcSliceCount.textContent = `${sliceCount} 조각`;
+      calcOutputDim.textContent = `가로 ${effectiveTargetWidth}px × 세로 최대 ${state.sliceHeight}px`;
+    }
+
+    // Core Processing & Memory-Optimized Slicing Logic
+    btnStartProcess.addEventListener('click', async () => {
+      if (state.isProcessing || !state.imageElement) return;
+
+      state.isProcessing = true;
+      btnStartProcess.disabled = true;
+      progressContainer.classList.remove('hidden');
+      successNotice.classList.add('hidden');
+      
+      const effectiveTargetWidth = state.isOriginalWidth ? state.originalWidth : state.targetWidth;
+      const scale = effectiveTargetWidth / state.originalWidth;
+      const totalScaledHeight = Math.round(state.originalHeight * scale);
+      const sliceCount = Math.ceil(totalScaledHeight / state.sliceHeight);
+
+      updateProgress(0, `분할 준비 중 (총 ${sliceCount}개 조각)...`);
+
+      try {
+        const zip = new JSZip();
+        const baseName = (state.file.name || 'detail').replace(/\.[^/.]+$/, "");
+        const ext = state.format === 'image/webp' ? 'webp' : 'jpg';
+
+        // Reusable single offscreen slice canvas to optimize memory
+        // Even for 50,000px images, only a single slice (e.g. 860 x 4000) exists in memory at any moment
+        const sliceCanvas = document.createElement('canvas');
+        const sliceCtx = sliceCanvas.getContext('2d', { alpha: false });
+
+        for (let i = 0; i < sliceCount; i++) {
+          const scaledSliceTop = i * state.sliceHeight;
+          const currentScaledHeight = Math.min(state.sliceHeight, totalScaledHeight - scaledSliceTop);
+
+          // Corresponding source rectangle from original image
+          const srcX = 0;
+          const srcY = scaledSliceTop / scale;
+          const srcWidth = state.originalWidth;
+          const srcHeight = currentScaledHeight / scale;
+
+          // Resize offscreen canvas to current slice dimensions
+          sliceCanvas.width = effectiveTargetWidth;
+          sliceCanvas.height = currentScaledHeight;
+
+          // High quality smoothing
+          sliceCtx.imageSmoothingEnabled = true;
+          sliceCtx.imageSmoothingQuality = 'high';
+
+          // Draw the slice
+          sliceCtx.drawImage(
+            state.imageElement,
+            srcX, srcY, srcWidth, srcHeight,
+            0, 0, effectiveTargetWidth, currentScaledHeight
+          );
+
+          // Convert to Blob asynchronously
+          const sliceBlob = await new Promise(resolve => {
+            sliceCanvas.toBlob(resolve, state.format, state.quality);
+          });
+
+          // Add to ZIP
+          const sliceIndex = String(i + 1).padStart(2, '0');
+          const sliceFileName = `${baseName}_${sliceIndex}.${ext}`;
+          zip.file(sliceFileName, sliceBlob);
+
+          // Report progress (up to 85% for slicing, remaining 15% for ZIP compilation)
+          const sliceProgress = Math.round(((i + 1) / sliceCount) * 85);
+          updateProgress(sliceProgress, `슬라이스 ${i + 1}/${sliceCount} 압축 중...`);
+
+          // Allow UI thread to breathe
+          await new Promise(r => setTimeout(r, 10));
+        }
+
+        // Clean up canvas
+        sliceCanvas.width = 1;
+        sliceCanvas.height = 1;
+
+        // Generate ZIP file
+        updateProgress(90, 'ZIP 압축 패키징 중...');
+        
+        const zipBlob = await zip.generateAsync({
+          type: 'blob',
+          compression: 'DEFLATE',
+          compressionOptions: { level: 6 }
+        }, (meta) => {
+          const zipProgress = 85 + Math.round((meta.percent / 100) * 15);
+          updateProgress(zipProgress, `ZIP 압축 중 (${Math.round(meta.percent)}%)...`);
+        });
+
+        // Trigger Download
+        const zipFileName = `${baseName}_sliced_${effectiveTargetWidth}px.zip`;
+        saveAs(zipBlob, zipFileName);
+
+        updateProgress(100, '모든 작업 완료!');
+        
+        successMsg.textContent = `${sliceCount}개 조각 분할 & 다운로드 완료!`;
+        const zipMB = (zipBlob.size / (1024 * 1024)).toFixed(2);
+        successSub.textContent = `파일명: ${zipFileName} (압축 총 용량: ${zipMB} MB)`;
+        successNotice.classList.remove('hidden');
+
+      } catch (err) {
+        console.error('Error slicing image:', err);
+        alert('이미지 처리 중 오류가 발생했습니다: ' + err.message);
+      } finally {
+        state.isProcessing = false;
+        btnStartProcess.disabled = false;
+      }
+    });
+
+    function updateProgress(percent, statusText) {
+      progressBar.style.width = `${percent}%`;
+      progressPercent.textContent = `${percent}%`;
+      if (statusText) progressStatus.textContent = statusText;
+    }
+
+    // Expose automation helper for E2E testing
+    window.__E2E__ = {
+      state,
+      handleFileSelect,
+      simulateUpload: async function(width = 1200, height = 8000) {
+        // Create synthetic test canvas with text & pattern
+        const testCanvas = document.createElement('canvas');
+        testCanvas.width = width;
+        testCanvas.height = height;
+        const ctx = testCanvas.getContext('2d');
+
+        // Draw gradient background
+        const grad = ctx.createLinearGradient(0, 0, 0, height);
+        grad.addColorStop(0, '#3b82f6');
+        grad.addColorStop(0.5, '#10b981');
+        grad.addColorStop(1, '#6366f1');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, width, height);
+
+        // Draw periodic markers every 500px
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 36px sans-serif';
+        for (let y = 300; y < height; y += 800) {
+          ctx.fillText(`DETAIL PAGE SECTION AT Y=${y}px`, 100, y);
+        }
+
+        const blob = await new Promise(res => testCanvas.toBlob(res, 'image/jpeg', 0.9));
+        const file = new File([blob], 'test_detail_8000px.jpg', { type: 'image/jpeg' });
+        
+        handleFileSelect(file);
+        return file;
+      },
+      clickPreset: function(presetKey) {
+        const btn = document.querySelector(`button[data-preset="${presetKey}"]`);
+        if (btn) btn.click();
+      },
+      startProcessing: function() {
+        btnStartProcess.click();
+      }
+    };
+
+    const btnLoadTestSample = document.getElementById('btnLoadTestSample');
+    if (btnLoadTestSample) {
+      btnLoadTestSample.addEventListener('click', async () => {
+        btnLoadTestSample.disabled = true;
+        btnLoadTestSample.innerHTML = '<span class="animate-spin inline-block w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full"></span> 생성 중...';
+        await window.__E2E__.simulateUpload(1200, 8000);
+        btnLoadTestSample.disabled = false;
+        btnLoadTestSample.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5"></i> <span>로드 완료</span>';
+        lucide.createIcons();
+      });
+    }
+
+    // Auto-run if ?autotest=1 in URL
+    window.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('autotest') === '1') {
+        console.log('[E2E] Auto-test started...');
+        await window.__E2E__.simulateUpload(1200, 8000);
+        setTimeout(() => {
+          window.__E2E__.clickPreset('smartstore');
+          window.__E2E__.startProcessing();
+        }, 1000);
+      }
+    });
+  </script>
+</body>
+</html>
