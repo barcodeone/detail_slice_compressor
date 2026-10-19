@@ -247,39 +247,85 @@
             </div>
           </div>
 
-          <!-- 3. Smart Background Removal (Cutout/누끼) Toggle -->
-          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <!-- 3. Smart Background Removal (Cutout/누끼) Section -->
+          <div class="p-3.5 rounded-xl bg-indigo-50/50 border border-indigo-200/80 space-y-3">
             <div class="flex items-center justify-between">
-              <label for="toggleCutout" class="text-xs font-bold text-slate-800 flex items-center gap-1.5 cursor-pointer">
-                <i data-lucide="wand-2" class="w-4 h-4 text-violet-600"></i>
-                스마트 밝은 배경 자동 누끼(투명화)
+              <label for="toggleCutout" class="text-xs font-bold text-slate-900 flex items-center gap-1.5 cursor-pointer">
+                <i data-lucide="scissors" class="w-4 h-4 text-indigo-600"></i>
+                외곽선 스마트 누끼 (배경 투명화)
               </label>
-              <input type="checkbox" id="toggleCutout" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer" />
+              <input type="checkbox" id="toggleCutout" checked class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer" />
             </div>
-            <p class="text-[11px] text-slate-500 leading-relaxed">
-              상품 뒷배경이 흰색이나 밝은 단색인 경우 외곽선을 자동 분리해 투명하게 처리합니다.
-            </p>
+            
+            <div id="cutoutOptionsBox" class="space-y-2 pt-1 border-t border-indigo-100">
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-600 font-medium">누끼 민감도 (배경 제거 강도):</span>
+                <span id="toleranceDisplay" class="font-bold text-indigo-700">35</span>
+              </div>
+              <input 
+                type="range" 
+                id="cutoutTolerance" 
+                min="10" 
+                max="90" 
+                value="35" 
+                step="1"
+                class="w-full accent-indigo-600 cursor-pointer h-1.5 bg-indigo-100 rounded-lg"
+              />
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>약하게 (흰색만)</span>
+                <span>표준 (권장 35)</span>
+                <span>강하게 (그림자/미색까지)</span>
+              </div>
+              <p class="text-[11px] text-slate-500 leading-snug">
+                🛡️ <b>상품 보호:</b> 외곽선부터 추적하여 지우므로 흰색 옷, 흰색 제품 내부에는 구멍이 뚫리지 않습니다.
+              </p>
+            </div>
           </div>
 
-          <!-- 4. Padding / Scale Slider -->
-          <div class="space-y-1.5 pt-1">
-            <div class="flex justify-between items-center text-xs">
-              <span class="text-slate-600 font-medium">상품 크기 비율 (여백 조절):</span>
-              <span id="scaleDisplay" class="font-bold text-indigo-600">90%</span>
+          <!-- 4. Padding / Zoom & Position Controls -->
+          <div class="space-y-3 pt-1">
+            <div class="space-y-1.5">
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-700 font-bold flex items-center gap-1">
+                  <i data-lucide="zoom-in" class="w-3.5 h-3.5 text-indigo-600"></i>
+                  사진 크기 및 줌 확대 (50% ~ 250%):
+                </span>
+                <span id="scaleDisplay" class="font-bold text-indigo-600 text-sm">90%</span>
+              </div>
+              <input 
+                type="range" 
+                id="scaleRange" 
+                min="50" 
+                max="250" 
+                value="90" 
+                step="1"
+                class="w-full accent-indigo-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
+              />
+              <div class="flex justify-between text-[10px] text-slate-400 font-medium">
+                <span>축소 (50%)</span>
+                <span>기본 정방형 (100%)</span>
+                <span>2.5배 확대 (250%)</span>
+              </div>
             </div>
-            <input 
-              type="range" 
-              id="scaleRange" 
-              min="60" 
-              max="100" 
-              value="90" 
-              step="1"
-              class="w-full accent-indigo-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
-            />
-            <div class="flex justify-between text-[10px] text-slate-400">
-              <span>여백 넓게 (60%)</span>
-              <span>권장 최적 (90%)</span>
-              <span>여백 없이 꽉 채움 (100%)</span>
+
+            <!-- Position Offset Controls (Pan) -->
+            <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <div class="flex justify-between items-center text-xs">
+                <span class="font-bold text-slate-700 text-[11px] flex items-center gap-1">
+                  <i data-lucide="move" class="w-3 h-3 text-slate-500"></i> 상품 위치 미세 이동 (상하/좌우)
+                </span>
+                <button type="button" id="btnResetPos" class="text-[10px] text-indigo-600 hover:underline font-semibold">중앙 정렬</button>
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <label class="text-[10px] text-slate-500 block mb-0.5">좌우(X): <span id="posXDisplay">0px</span></label>
+                  <input type="range" id="posXRange" min="-300" max="300" value="0" step="5" class="w-full accent-indigo-500 h-1.5 bg-slate-200 rounded cursor-pointer" />
+                </div>
+                <div>
+                  <label class="text-[10px] text-slate-500 block mb-0.5">상하(Y): <span id="posYDisplay">0px</span></label>
+                  <input type="range" id="posYRange" min="-300" max="300" value="0" step="5" class="w-full accent-indigo-500 h-1.5 bg-slate-200 rounded cursor-pointer" />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -481,7 +527,10 @@
       bgStyle: 'white',
       customColor: '#f8fafc',
       scale: 0.90,
-      autoCutout: false,
+      offsetX: 0,
+      offsetY: 0,
+      autoCutout: true,
+      tolerance: 35,
       outFormat: 'image/jpeg',
       quality: 0.92
     };
@@ -499,8 +548,16 @@
     const bgRadios = document.querySelectorAll('input[name="bgStyle"]');
     const customColorPicker = document.getElementById('customColorPicker');
     const toggleCutout = document.getElementById('toggleCutout');
+    const cutoutOptionsBox = document.getElementById('cutoutOptionsBox');
+    const cutoutTolerance = document.getElementById('cutoutTolerance');
+    const toleranceDisplay = document.getElementById('toleranceDisplay');
     const scaleRange = document.getElementById('scaleRange');
     const scaleDisplay = document.getElementById('scaleDisplay');
+    const posXRange = document.getElementById('posXRange');
+    const posXDisplay = document.getElementById('posXDisplay');
+    const posYRange = document.getElementById('posYRange');
+    const posYDisplay = document.getElementById('posYDisplay');
+    const btnResetPos = document.getElementById('btnResetPos');
     const outFormatRadios = document.querySelectorAll('input[name="outFormat"]');
     const btnDownload = document.getElementById('btnDownload');
     const btnDownloadText = document.getElementById('btnDownloadText');
@@ -563,17 +620,48 @@
       renderCanvas();
     });
 
-    // Smart Cutout
+    // Smart Cutout Toggle & Tolerance
     toggleCutout.addEventListener('change', (e) => {
       state.autoCutout = e.target.checked;
+      if (cutoutOptionsBox) {
+        cutoutOptionsBox.style.opacity = state.autoCutout ? '1' : '0.4';
+        cutoutOptionsBox.style.pointerEvents = state.autoCutout ? 'auto' : 'none';
+      }
       renderCanvas();
     });
 
-    // Scale / Padding
+    cutoutTolerance.addEventListener('input', (e) => {
+      state.tolerance = parseInt(e.target.value, 10);
+      toleranceDisplay.textContent = state.tolerance;
+      renderCanvas();
+    });
+
+    // Scale / Zoom Slider (50% ~ 250%)
     scaleRange.addEventListener('input', (e) => {
       const val = parseInt(e.target.value, 10);
       state.scale = val / 100;
       scaleDisplay.textContent = `${val}%`;
+      renderCanvas();
+    });
+
+    // Position Pan Controls (X, Y)
+    posXRange.addEventListener('input', (e) => {
+      state.offsetX = parseInt(e.target.value, 10);
+      posXDisplay.textContent = `${state.offsetX}px`;
+      renderCanvas();
+    });
+    posYRange.addEventListener('input', (e) => {
+      state.offsetY = parseInt(e.target.value, 10);
+      posYDisplay.textContent = `${state.offsetY}px`;
+      renderCanvas();
+    });
+    btnResetPos.addEventListener('click', () => {
+      state.offsetX = 0;
+      state.offsetY = 0;
+      posXRange.value = 0;
+      posYRange.value = 0;
+      posXDisplay.textContent = '0px';
+      posYDisplay.textContent = '0px';
       renderCanvas();
     });
 
@@ -610,6 +698,103 @@
       btnDownload.disabled = true;
     }
 
+    // Boundary Flood-Fill Cutout Algorithm (진짜 스마트 외곽 누끼)
+    function applySmartBoundaryCutout(ctx, width, height, tolerance) {
+      const imgData = ctx.getImageData(0, 0, width, height);
+      const data = imgData.data;
+      const w = width;
+      const h = height;
+
+      // Sample 4 corners for background reference color
+      const corners = [
+        0,                                   // Top-Left
+        (w - 1) * 4,                         // Top-Right
+        ((h - 1) * w) * 4,                   // Bottom-Left
+        ((h - 1) * w + (w - 1)) * 4          // Bottom-Right
+      ];
+
+      let bgR = 0, bgG = 0, bgB = 0;
+      corners.forEach(idx => {
+        bgR += data[idx];
+        bgG += data[idx + 1];
+        bgB += data[idx + 2];
+      });
+      bgR = Math.round(bgR / 4);
+      bgG = Math.round(bgG / 4);
+      bgB = Math.round(bgB / 4);
+
+      // Max color distance threshold based on tolerance (10 ~ 90)
+      const maxDist = tolerance * 2.8;
+      const visited = new Uint8Array(w * h);
+      const queue = new Int32Array(w * h);
+      let head = 0;
+      let tail = 0;
+
+      // Push all 4 outer border pixels into queue
+      for (let x = 0; x < w; x++) {
+        // Top border
+        queue[tail++] = x;
+        visited[x] = 1;
+        // Bottom border
+        const bIdx = (h - 1) * w + x;
+        queue[tail++] = bIdx;
+        visited[bIdx] = 1;
+      }
+      for (let y = 1; y < h - 1; y++) {
+        // Left border
+        const lIdx = y * w;
+        queue[tail++] = lIdx;
+        visited[lIdx] = 1;
+        // Right border
+        const rIdx = y * w + (w - 1);
+        queue[tail++] = rIdx;
+        visited[rIdx] = 1;
+      }
+
+      // BFS Flood-fill from outer edges inwards
+      while (head < tail) {
+        const cur = queue[head++];
+        const cx = cur % w;
+        const cy = Math.floor(cur / w);
+        const idx = cur * 4;
+
+        const r = data[idx];
+        const g = data[idx + 1];
+        const b = data[idx + 2];
+
+        // Euclidean color distance from background
+        const dist = Math.sqrt((r - bgR) ** 2 + (g - bgG) ** 2 + (b - bgB) ** 2);
+
+        // Also check if pixel is near-white or light neutral
+        const isLight = (r + g + b) / 3 > (255 - tolerance * 1.2);
+
+        if (dist <= maxDist || isLight) {
+          // Transparent (Cutout this background pixel)
+          data[idx + 3] = 0;
+
+          // Check 4-way neighbors
+          if (cx > 0) {
+            const n = cur - 1;
+            if (!visited[n]) { visited[n] = 1; queue[tail++] = n; }
+          }
+          if (cx < w - 1) {
+            const n = cur + 1;
+            if (!visited[n]) { visited[n] = 1; queue[tail++] = n; }
+          }
+          if (cy > 0) {
+            const n = cur - w;
+            if (!visited[n]) { visited[n] = 1; queue[tail++] = n; }
+          }
+          if (cy < h - 1) {
+            const n = cur + w;
+            if (!visited[n]) { visited[n] = 1; queue[tail++] = n; }
+          }
+        }
+      }
+
+      ctx.putImageData(imgData, 0, 0);
+    }
+
     // Core Canvas Rendering Engine
     function renderCanvas() {
       if (!state.image) return;
@@ -629,57 +814,39 @@
         ctx.fillStyle = state.customColor;
         ctx.fillRect(0, 0, size, size);
       } else if (state.bgStyle === 'blur') {
-        // Draw zoomed & blurred background from original image
         ctx.save();
         ctx.filter = 'blur(28px) brightness(1.05)';
-        // Draw stretched to cover
-        const maxDim = Math.max(state.image.naturalWidth, state.image.naturalHeight);
         ctx.drawImage(state.image, -50, -50, size + 100, size + 100);
         ctx.restore();
-        // Light overlay for softness
         ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
         ctx.fillRect(0, 0, size, size);
       }
       // 'transparent' leaves canvas clear
 
-      // 2. Calculate Centered Proportional Box
+      // 2. Calculate Proportional Box with Zoom & Pan Offset
       const imgW = state.image.naturalWidth;
       const imgH = state.image.naturalHeight;
       const maxAvailable = size * state.scale;
 
       const ratio = Math.min(maxAvailable / imgW, maxAvailable / imgH);
-      const drawW = imgW * ratio;
-      const drawH = imgH * ratio;
-      const drawX = (size - drawW) / 2;
-      const drawY = (size - drawH) / 2;
+      const drawW = Math.round(imgW * ratio);
+      const drawH = Math.round(imgH * ratio);
+      const drawX = Math.round((size - drawW) / 2 + state.offsetX);
+      const drawY = Math.round((size - drawH) / 2 + state.offsetY);
 
-      // 3. Render Product Image (with optional smart cutout)
+      // 3. Render Product Image (with Boundary Smart Cutout if enabled)
       if (state.autoCutout) {
-        // Offscreen canvas for cutout processing
         const offCanvas = document.createElement('canvas');
         offCanvas.width = drawW;
         offCanvas.height = drawH;
-        const offCtx = offCanvas.getContext('2d');
+        const offCtx = offCanvas.getContext('2d', { willReadFrequently: true });
         offCtx.drawImage(state.image, 0, 0, drawW, drawH);
 
-        const imgData = offCtx.getImageData(0, 0, drawW, drawH);
-        const data = imgData.data;
+        // Apply advanced boundary flood-fill cutout
+        applySmartBoundaryCutout(offCtx, drawW, drawH, state.tolerance);
 
-        // Sample corner colors for background threshold
-        const threshold = 230; // Bright/white threshold
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i];
-          const g = data[i + 1];
-          const b = data[i + 2];
-          // If pixel is near pure white or very light gray
-          if (r > threshold && g > threshold && b > threshold) {
-            data[i + 3] = 0; // Transparent
-          }
-        }
-        offCtx.putImageData(imgData, 0, 0);
         ctx.drawImage(offCanvas, drawX, drawY);
       } else {
-        // Standard high-quality centered rendering
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(state.image, drawX, drawY, drawW, drawH);
