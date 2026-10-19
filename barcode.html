@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code 128 바코드 & QR코드 일괄 생성기 | 오픈마켓 재고관리·물류 라벨 인쇄 툴</title>
+  <meta name="description" content="스마트스토어, 쿠팡 로켓배송, 물류창고 재고관리에 필요한 Code 128 바코드와 QR코드를 무료로 일괄 생성하고 A4 라벨지 규격으로 즉시 인쇄하세요.">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- JsBarcode CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <!-- QRCode CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+    
+    * {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    /* A4 라벨 인쇄 전용 스타일 */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printArea, #printArea * {
+        visibility: visible;
+      }
+      #printArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      .no-print {
+        display: none !important;
+      }
+      @page {
+        size: A4;
+        margin: 10mm;
+      }
+    }
+
+    /* 바코드 라벨 박스 스타일 */
+    .barcode-label-card {
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 10px;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      break-inside: avoid;
+    }
+    @media print {
+      .barcode-label-card {
+        border: 0.5px solid #e2e8f0;
+        border-radius: 4px;
+        padding: 6px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
+
+  <!-- Header -->
+  <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 no-print">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+          <i data-lucide="scan-barcode" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">
+            Code 128 바코드 &amp; QR 일괄 생성기
+          </h1>
+          <p class="text-[11px] text-slate-500 font-medium">
+            스마트스토어 · 쿠팡 로켓그로스 · 물류 창고 라벨 인쇄
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          브라우저 100% 연산 (데이터 유출 0%)
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 space-y-8">
+    
+    <!-- Hero / Intro -->
+    <div class="text-center max-w-2xl mx-auto space-y-2 no-print">
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
+        📦 이커머스 셀러 물류·재고관리 필수 도구
+      </span>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        바코드·QR코드 무료 생성 &amp; A4 라벨 인쇄
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+        쿠팡 로켓배송 입고 라벨, 스마트스토어 자체 상품 바코드, 쇼핑몰 상세페이지 이동 QR코드를 
+        단 1초 만에 일괄 생성하고 규격 라벨지로 바로 출력하세요.
+      </p>
+    </div>
+
+    <!-- Mode Tab Selector -->
+    <div class="flex justify-center no-print">
+      <div class="bg-slate-200/80 p-1 rounded-2xl flex max-w-md w-full shadow-inner">
+        <button id="tabSingle" type="button" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-2 bg-white text-indigo-700 shadow-sm">
+          <i data-lucide="barcode" class="w-4 h-4"></i>
+          단일 바코드 생성
+        </button>
+        <button id="tabBulk" type="button" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900">
+          <i data-lucide="layers" class="w-4 h-4"></i>
+          대량 일괄 생성 (라벨 인쇄)
+        </button>
+      </div>
+    </div>
+
+    <!-- Core Tool Container -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start no-print">
+      
+      <!-- Left Column: Controls & Input -->
+      <div class="lg:col-span-5 bg-white rounded-3xl p-6 border border-slate-200 shadow-xl shadow-slate-200/50 space-y-6">
+        
+        <!-- Format Selector (Code128 vs QR) -->
+        <div class="space-y-2">
+          <label class="block text-xs font-bold text-slate-700">생성 유형 선택</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center gap-2 p-3 rounded-xl border border-indigo-200 bg-indigo-50/40 cursor-pointer text-xs font-bold text-indigo-900">
+              <input type="radio" name="codeType" value="CODE128" checked class="text-indigo-600 focus:ring-indigo-500">
+              <i data-lucide="barcode" class="w-4 h-4 text-indigo-600"></i>
+              <span>Code 128 (바코드)</span>
+            </label>
+            <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 hover:border-slate-300 bg-white cursor-pointer text-xs font-bold text-slate-700">
+              <input type="radio" name="codeType" value="QR" class="text-indigo-600 focus:ring-indigo-500">
+              <i data-lucide="qr-code" class="w-4 h-4 text-indigo-600"></i>
+              <span>QR 코드 (URL/텍스트)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 1. Single Mode Form -->
+        <div id="singleModeForm" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">바코드 / QR 값 (데이터)</label>
+            <div class="relative">
+              <input 
+                type="text" 
+                id="singleValue" 
+                value="CP-ROCKET-202601" 
+                placeholder="예: SKU-001 또는 https://m.site.com" 
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 text-xs font-mono-code text-slate-900 tracking-wide font-medium"
+              >
+              <button id="btnRandomSingle" type="button" class="absolute right-2 top-2 px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[10px] font-bold">
+                예시 생성
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">영문 대소문자, 숫자, 기호(-, _) 모두 지원합니다.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">상단 라벨 문구 (상품명/옵션명 - 선택사항)</label>
+            <input 
+              type="text" 
+              id="singleLabel" 
+              value="프리미엄 무선 블루투스 이어폰 (블랙)" 
+              placeholder="예: 상품명, 옵션명 또는 브랜드명" 
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 text-xs text-slate-900 font-medium"
+            >
+          </div>
+        </div>
+
+        <!-- 2. Bulk Mode Form (Hidden by default) -->
+        <div id="bulkModeForm" class="space-y-4 hidden">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs font-bold text-slate-700">대량 데이터 입력 (한 줄에 1개씩)</label>
+              <button id="btnBulkSample" type="button" class="text-[11px] text-indigo-600 hover:underline font-bold">
+                샘플 10개 불러오기
+              </button>
+            </div>
+            <textarea 
+              id="bulkData" 
+              rows="6" 
+              placeholder="한 줄에 '바코드값' 또는 '바코드값 | 상품명' 형식으로 입력하세요.&#10;예시:&#10;SKU-2026-A01 | 베이직 반팔티 화이트 M&#10;SKU-2026-A02 | 베이직 반팔티 화이트 L&#10;SKU-2026-B01 | 베이직 반팔티 블랙 M"
+              class="w-full p-3 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 text-xs font-mono-code text-slate-900 leading-relaxed"
+            ></textarea>
+            <p class="text-[11px] text-slate-400 mt-1">
+              💡 엑셀에서 <code class="bg-slate-100 px-1 py-0.5 rounded text-indigo-600">바코드</code>, <code class="bg-slate-100 px-1 py-0.5 rounded text-indigo-600">상품명</code> 2개 열을 복사하여 붙여넣어도 자동 인식됩니다.
+            </p>
+          </div>
+
+          <!-- Quick Serial Generator -->
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+            <span class="text-xs font-bold text-slate-700 flex items-center gap-1">
+              <i data-lucide="wand-2" class="w-3.5 h-3.5 text-indigo-600"></i> 자동 일련번호 대량 생성기
+            </span>
+            <div class="grid grid-cols-3 gap-2 text-xs">
+              <div>
+                <label class="text-[10px] text-slate-500 block mb-0.5">접두사(Prefix)</label>
+                <input type="text" id="serialPrefix" value="CP2026-" class="w-full px-2 py-1.5 rounded border border-slate-300 text-xs font-mono-code font-bold">
+              </div>
+              <div>
+                <label class="text-[10px] text-slate-500 block mb-0.5">시작 번호</label>
+                <input type="number" id="serialStart" value="1001" class="w-full px-2 py-1.5 rounded border border-slate-300 text-xs font-mono-code">
+              </div>
+              <div>
+                <label class="text-[10px] text-slate-500 block mb-0.5">생성 개수</label>
+                <input type="number" id="serialCount" value="24" min="1" max="200" class="w-full px-2 py-1.5 rounded border border-slate-300 text-xs font-mono-code">
+              </div>
+            </div>
+            <button id="btnGenerateSerials" type="button" class="w-full py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-lg transition-colors">
+              일련번호 목록 채우기 ➔
+            </button>
+          </div>
+        </div>
+
+        <!-- Visual Customization Options -->
+        <div class="border-t border-slate-100 pt-4 space-y-3">
+          <span class="block text-xs font-bold text-slate-700">라벨 상세 설정</span>
+
+          <!-- Barcode Height / Scale -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-600 font-medium">바코드 높이:</span>
+                <span id="barcodeHeightDisplay" class="font-bold text-indigo-600">50px</span>
+              </div>
+              <input type="range" id="barcodeHeight" min="30" max="100" value="50" class="w-full accent-indigo-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg">
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-600 font-medium">선 굵기:</span>
+                <span id="barcodeWidthDisplay" class="font-bold text-indigo-600">2</span>
+              </div>
+              <input type="range" id="barcodeWidth" min="1" max="4" value="2" step="0.5" class="w-full accent-indigo-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg">
+            </div>
+          </div>
+
+          <!-- Toggles -->
+          <div class="flex flex-wrap gap-4 pt-1 text-xs">
+            <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-700">
+              <input type="checkbox" id="chkShowText" checked class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+              <span>바코드 아래 번호 표기</span>
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-700">
+              <input type="checkbox" id="chkShowTitle" checked class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+              <span>상단 상품명 표기</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- A4 Label Print Preset (Bulk Mode) -->
+        <div id="printLayoutBox" class="border-t border-slate-100 pt-4 space-y-2 hidden">
+          <label class="block text-xs font-bold text-slate-700">A4 라벨지 인쇄 규격 (칸 수)</label>
+          <select id="labelPreset" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-800 bg-white">
+            <option value="24" selected>A4 24칸 (3열 8행 - 70.0 × 36.0 mm 표준 바코드 라벨)</option>
+            <option value="16">A4 16칸 (2열 8행 - 99.1 × 34.0 mm 큰 바코드 라벨)</option>
+            <option value="40">A4 40칸 (4열 10행 - 52.5 × 29.7 mm 소형 부착 라벨)</option>
+            <option value="65">A4 65칸 (5열 13행 - 38.1 × 21.2 mm 초소형 가격택/부품 라벨)</option>
+          </select>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="border-t border-slate-100 pt-4 space-y-2.5">
+          <!-- Single Mode Buttons -->
+          <div id="singleActions" class="flex gap-2">
+            <button id="btnDownloadSinglePng" type="button" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-1.5">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              PNG 이미지 저장
+            </button>
+            <button id="btnDownloadSingleSvg" type="button" class="py-3 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1">
+              <i data-lucide="file-code" class="w-4 h-4"></i>
+              SVG 벡터
+            </button>
+          </div>
+
+          <!-- Bulk Mode Buttons -->
+          <div id="bulkActions" class="space-y-2 hidden">
+            <button id="btnPrintA4" type="button" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2">
+              <i data-lucide="printer" class="w-4 h-4"></i>
+              A4 라벨지 맞춤 즉시 인쇄 (Print)
+            </button>
+            <div class="flex gap-2">
+              <button id="btnDownloadZip" type="button" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5">
+                <i data-lucide="archive" class="w-3.5 h-3.5"></i>
+                전체 PNG 개별 저장
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Live Preview Area -->
+      <div class="lg:col-span-7 space-y-4">
+        
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xl shadow-slate-200/50 space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+              <i data-lucide="eye" class="w-4 h-4 text-indigo-600"></i>
+              <h3 class="text-xs sm:text-sm font-bold text-slate-900">실시간 라벨 미리보기</h3>
+            </div>
+            <span id="previewCountBadge" class="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-100">
+              1개 라벨
+            </span>
+          </div>
+
+          <!-- Single Preview Container -->
+          <div id="singlePreviewBox" class="flex flex-col items-center justify-center p-8 bg-slate-50/80 rounded-2xl border border-slate-200 min-h-[300px]">
+            <div class="barcode-label-card max-w-sm w-full shadow-md bg-white p-6 space-y-3">
+              <div id="prevSingleTitle" class="text-xs font-bold text-slate-800 text-center break-all line-clamp-2">
+                프리미엄 무선 블루투스 이어폰 (블랙)
+              </div>
+              
+              <!-- Target Canvas or SVG for Barcode/QR -->
+              <div class="flex items-center justify-center w-full overflow-hidden py-1">
+                <canvas id="singleCanvas" class="max-w-full h-auto"></canvas>
+                <div id="singleQrBox" class="hidden flex justify-center"></div>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-4 text-center">
+              💡 실제 바코드 스캐너(스마트폰 카메라, 전용 2D 스캐너)로 스캔 테스트가 가능합니다.
+            </p>
+          </div>
+
+          <!-- Bulk Preview Container (A4 Sheet Preview) -->
+          <div id="bulkPreviewBox" class="hidden space-y-3">
+            <div class="flex justify-between items-center text-xs text-slate-500 px-1">
+              <span>A4 용지 출력 가상 배치</span>
+              <span id="sheetInfoText">총 24개 라벨 (1페이지)</span>
+            </div>
+            <div id="bulkGridContainer" class="p-4 bg-slate-100/80 rounded-2xl border border-slate-200 max-h-[500px] overflow-y-auto grid gap-3">
+              <!-- Dynamically populated barcode cards -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Print Only Secret Container -->
+    <div id="printArea" class="hidden">
+      <div id="printGrid" class="grid gap-2"></div>
+    </div>
+
+    <!-- Seller Affiliate Section: Barcode & Warehouse Equipment -->
+    <section class="mt-12 pt-8 border-t border-slate-200 space-y-5 no-print" id="affiliateSection">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+        <div>
+          <span class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 uppercase tracking-wider">
+            <i data-lucide="package-check" class="w-3.5 h-3.5"></i> Seller Logistics Kit
+          </span>
+          <h3 class="text-xl font-extrabold text-slate-900 mt-1">
+            출고 시간 80% 단축하는 물류·바코드 필수 장비 3종
+          </h3>
+          <p class="text-xs text-slate-500">
+            쿠팡 로켓배송 입고, 스마트스토어 송장 출력, 물류창고 바코드 스캔을 가장 빠르고 정확하게 처리하세요.
+          </p>
+        </div>
+        <span class="text-[11px] text-slate-400 bg-slate-100 px-2.5 py-1 rounded-md self-start sm:self-auto">
+          물류 장비 베스트 3
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- Item 1: 감열식 바코드 라벨 프린터 -->
+        <div class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-indigo-400 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="w-full h-36 bg-indigo-50/60 rounded-xl flex items-center justify-center text-indigo-700 border border-indigo-100/80 group-hover:scale-[1.02] transition-transform">
+              <div class="flex flex-col items-center gap-2">
+                <i data-lucide="printer" class="w-12 h-12 text-indigo-600"></i>
+                <span class="text-xs font-semibold text-indigo-800">초고속 감열식 라벨 프린터</span>
+              </div>
+            </div>
+            <div>
+              <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800 mb-1.5">잉크 필요 없음</span>
+              <h4 class="font-bold text-slate-900 text-sm group-hover:text-indigo-600 transition-colors">
+                쿠팡 로켓·스마트스토어 겸용 감열 바코드 송장 프린터
+              </h4>
+              <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                잉크나 토너 없이 열로 인쇄하는 고속 감열 프린터. 바코드 라벨부터 택배 송장까지 1초 만에 깔끔 출력.
+              </p>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+            <div class="text-xs font-extrabold text-slate-900">셀러 1순위 <span class="text-[11px] font-normal text-slate-500">/ 로켓배송</span></div>
+            <a href="https://link.coupang.com" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-xs font-semibold text-white bg-slate-900 hover:bg-indigo-600 px-3 py-1.5 rounded-lg transition-colors">
+              상품 보기 <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Item 2: 무선 2D 바코드 / QR 스캐너 -->
+        <div class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-indigo-400 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="w-full h-36 bg-amber-50/60 rounded-xl flex items-center justify-center text-amber-700 border border-amber-100/80 group-hover:scale-[1.02] transition-transform">
+              <div class="flex flex-col items-center gap-2">
+                <i data-lucide="scan-line" class="w-12 h-12 text-amber-600"></i>
+                <span class="text-xs font-semibold text-amber-800">무선 블루투스 2D 바코드 스캐너</span>
+              </div>
+            </div>
+            <div>
+              <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 mb-1.5">1초 100% 인식</span>
+              <h4 class="font-bold text-slate-900 text-sm group-hover:text-indigo-600 transition-colors">
+                창고·매장 재고관리용 무선 충전식 2D/QR 바코드 스캐너
+              </h4>
+              <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                PC, 태블릿, 스마트폰 무선 연동 지원. 훼손되거나 비닐 안쪽 바코드도 번개처럼 인식하는 고감도 센서.
+              </p>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+            <div class="text-xs font-extrabold text-slate-900">업무 효율 3배 <span class="text-[11px] font-normal text-slate-500">/ 무료배송</span></div>
+            <a href="https://link.coupang.com" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-xs font-semibold text-white bg-slate-900 hover:bg-indigo-600 px-3 py-1.5 rounded-lg transition-colors">
+              상품 보기 <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Item 3: 방수 감열 라벨지 & 폼텍 A4 칸 라벨지 -->
+        <div class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-indigo-400 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="w-full h-36 bg-emerald-50/60 rounded-xl flex items-center justify-center text-emerald-700 border border-emerald-100/80 group-hover:scale-[1.02] transition-transform">
+              <div class="flex flex-col items-center gap-2">
+                <i data-lucide="tag" class="w-12 h-12 text-emerald-600"></i>
+                <span class="text-xs font-semibold text-emerald-800">방수 감열 바코드 라벨지 롤/A4</span>
+              </div>
+            </div>
+            <div>
+              <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 mb-1.5">선명한 인쇄</span>
+              <h4 class="font-bold text-slate-900 text-sm group-hover:text-indigo-600 transition-colors">
+                찢어지지 않는 방수/방유 감열식 바코드 스티커 라벨지
+              </h4>
+              <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                물, 기름, 스크래치에 강한 특수 코팅 라벨. 강력한 접착력으로 택배 박스 및 비닐 포장에 완벽 고정.
+              </p>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+            <div class="text-xs font-extrabold text-slate-900">가성비 대용량 <span class="text-[11px] font-normal text-slate-500">/ 로켓배송</span></div>
+            <a href="https://link.coupang.com" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-xs font-semibold text-white bg-slate-900 hover:bg-indigo-600 px-3 py-1.5 rounded-lg transition-colors">
+              상품 보기 <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center pt-2">
+        <p class="text-[11px] text-slate-400 bg-slate-100/80 inline-block px-3 py-1 rounded-full border border-slate-200">
+          이 포스팅은 쿠팡 파트너스 활동의 일환으로 수수료를 제공받습니다.
+        </p>
+      </div>
+    </section>
+
+    <!-- SEO Information Section -->
+    <article class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 space-y-6 text-slate-700 leading-relaxed no-print">
+      <div>
+        <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mb-2">
+          📌 Code 128 바코드란? 이커머스 셀러 표준 규격 가이드
+        </h3>
+        <p class="text-xs sm:text-sm">
+          <strong>Code 128</strong>은 전 세계 물류 및 이커머스에서 가장 널리 쓰이는 고밀도 1차원 바코드 표준입니다.
+          숫자뿐만 아니라 영문 대소문자, 특수기호까지 모두 인코딩할 수 있어 쿠팡 밀크런/로켓그로스, 
+          네이버 풀필먼트(NFA), 자체 SKU 관리에서 표준 바코드로 채택되고 있습니다.
+        </p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left border-collapse border border-slate-200 rounded-xl overflow-hidden">
+          <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+            <tr>
+              <th class="p-3 border-r border-slate-200">플랫폼 / 용도</th>
+              <th class="p-3 border-r border-slate-200">권장 바코드 규격</th>
+              <th class="p-3 border-r border-slate-200">추천 라벨지 규격</th>
+              <th class="p-3">필수 주의사항</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-slate-600">
+            <tr>
+              <td class="p-3 font-semibold text-slate-900 border-r border-slate-200">쿠팡 로켓그로스 (입고 바코드)</td>
+              <td class="p-3 border-r border-slate-200 font-mono-code font-bold text-indigo-700">Code 128</td>
+              <td class="p-3 border-r border-slate-200">A4 24칸 (70×36mm) 또는 감열 60×40mm</td>
+              <td class="p-3">바코드 좌우 여백(Quiet Zone) 최소 5mm 확보 필수</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-900 border-r border-slate-200">네이버 풀필먼트 (NFA)</td>
+              <td class="p-3 border-r border-slate-200 font-mono-code font-bold text-indigo-700">Code 128 / EAN-13</td>
+              <td class="p-3 border-r border-slate-200">A4 24칸 / 16칸 라벨지</td>
+              <td class="p-3">상품명과 옵션명이 라벨 상단에 선명히 인쇄되어야 함</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-900 border-r border-slate-200">자체 쇼핑몰 SKU / 재고관리</td>
+              <td class="p-3 border-r border-slate-200 font-mono-code font-bold text-indigo-700">Code 128 / QR코드</td>
+              <td class="p-3 border-r border-slate-200">A4 40칸 / 65칸 소형 라벨지</td>
+              <td class="p-3">QR코드 적용 시 모바일 상품 페이지 URL 다이렉트 연동 가능</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="space-y-3 pt-2">
+        <h4 class="text-sm font-bold text-slate-900">❓ 자주 묻는 질문 (FAQ)</h4>
+        <div class="space-y-2 text-xs">
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+            <span class="font-bold text-indigo-700 block mb-1">Q. A4 일반 복사지에 인쇄해서 테이프로 붙여도 되나요?</span>
+            <p>네, 일반 A4 복사지에 인쇄 후 투명 테이프로 붙여도 바코드 스캐너로 정상 인식됩니다. 단, 출고량이 많아지면 폼텍/프린텍 A4 칸 라벨지 스티커 또는 전용 감열식 라벨 프린터를 사용하시는 것이 포장 시간을 5배 이상 절약할 수 있습니다.</p>
+          </div>
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+            <span class="font-bold text-indigo-700 block mb-1">Q. 스마트폰 카메라로도 스캔이 가능한가요?</span>
+            <p>최신 스마트폰 카메라나 네이버 앱, 카카오톡 렌즈 기능으로 본 도구에서 생성된 Code 128 바코드와 QR코드를 스캔하면 인코딩된 상품 번호나 웹페이지 URL이 즉시 인식됩니다.</p>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-6 mt-10 no-print">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <div class="flex items-center gap-2">
+        <i data-lucide="scan-barcode" class="w-4 h-4 text-indigo-600"></i>
+        <span class="font-semibold text-slate-700">Code 128 &amp; QR Barcode Suite</span>
+        <span>·</span>
+        <span>오픈마켓 물류 규격 라벨 솔루션</span>
+      </div>
+      <div>
+        100% Client-Side Engine · 외부 서버 전송 없는 안전한 바코드 생성
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script Logic -->
+  <script>
+    lucide.createIcons();
+
+    // App State
+    const state = {
+      mode: 'single', // 'single' | 'bulk'
+      codeType: 'CODE128', // 'CODE128' | 'QR'
+      singleValue: 'CP-ROCKET-202601',
+      singleTitle: '프리미엄 무선 블루투스 이어폰 (블랙)',
+      barcodeHeight: 50,
+      barcodeWidth: 2,
+      showText: true,
+      showTitle: true,
+      labelPreset: '24', // '24', '16', '40', '65'
+      bulkItems: []
+    };
+
+    // DOM References
+    const tabSingle = document.getElementById('tabSingle');
+    const tabBulk = document.getElementById('tabBulk');
+    const singleModeForm = document.getElementById('singleModeForm');
+    const bulkModeForm = document.getElementById('bulkModeForm');
+    const singleActions = document.getElementById('singleActions');
+    const bulkActions = document.getElementById('bulkActions');
+    const printLayoutBox = document.getElementById('printLayoutBox');
+    const singlePreviewBox = document.getElementById('singlePreviewBox');
+    const bulkPreviewBox = document.getElementById('bulkPreviewBox');
+    const previewCountBadge = document.getElementById('previewCountBadge');
+
+    const singleValueInput = document.getElementById('singleValue');
+    const singleLabelInput = document.getElementById('singleLabel');
+    const btnRandomSingle = document.getElementById('btnRandomSingle');
+    const bulkDataTextarea = document.getElementById('bulkData');
+    const btnBulkSample = document.getElementById('btnBulkSample');
+    const btnGenerateSerials = document.getElementById('btnGenerateSerials');
+
+    const barcodeHeightInput = document.getElementById('barcodeHeight');
+    const barcodeHeightDisplay = document.getElementById('barcodeHeightDisplay');
+    const barcodeWidthInput = document.getElementById('barcodeWidth');
+    const barcodeWidthDisplay = document.getElementById('barcodeWidthDisplay');
+    const chkShowText = document.getElementById('chkShowText');
+    const chkShowTitle = document.getElementById('chkShowTitle');
+    const labelPresetSelect = document.getElementById('labelPreset');
+
+    const singleCanvas = document.getElementById('singleCanvas');
+    const singleQrBox = document.getElementById('singleQrBox');
+    const prevSingleTitle = document.getElementById('prevSingleTitle');
+    const bulkGridContainer = document.getElementById('bulkGridContainer');
+    const sheetInfoText = document.getElementById('sheetInfoText');
+
+    const btnDownloadSinglePng = document.getElementById('btnDownloadSinglePng');
+    const btnDownloadSingleSvg = document.getElementById('btnDownloadSingleSvg');
+    const btnPrintA4 = document.getElementById('btnPrintA4');
+    const btnDownloadZip = document.getElementById('btnDownloadZip');
+    const printArea = document.getElementById('printArea');
+    const printGrid = document.getElementById('printGrid');
+
+    // 1. Tab Switching
+    tabSingle.addEventListener('click', () => switchTab('single'));
+    tabBulk.addEventListener('click', () => switchTab('bulk'));
+
+    function switchTab(mode) {
+      state.mode = mode;
+      if (mode === 'single') {
+        tabSingle.className = "flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-2 bg-white text-indigo-700 shadow-sm";
+        tabBulk.className = "flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900";
+        singleModeForm.classList.remove('hidden');
+        bulkModeForm.classList.add('hidden');
+        singleActions.classList.remove('hidden');
+        bulkActions.classList.add('hidden');
+        printLayoutBox.classList.add('hidden');
+        singlePreviewBox.classList.remove('hidden');
+        bulkPreviewBox.classList.add('hidden');
+        previewCountBadge.textContent = '1개 라벨';
+        renderSingle();
+      } else {
+        tabBulk.className = "flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-2 bg-white text-indigo-700 shadow-sm";
+        tabSingle.className = "flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900";
+        singleModeForm.classList.add('hidden');
+        bulkModeForm.classList.remove('hidden');
+        singleActions.classList.add('hidden');
+        bulkActions.classList.remove('hidden');
+        printLayoutBox.classList.remove('hidden');
+        singlePreviewBox.classList.add('hidden');
+        bulkPreviewBox.classList.remove('hidden');
+        parseAndRenderBulk();
+      }
+    }
+
+    // 2. Code Type Radios (CODE128 vs QR)
+    document.querySelectorAll('input[name="codeType"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        state.codeType = e.target.value;
+        if (state.mode === 'single') renderSingle();
+        else parseAndRenderBulk();
+      });
+    });
+
+    // 3. Single Mode Inputs
+    singleValueInput.addEventListener('input', (e) => {
+      state.singleValue = e.target.value || 'ITEM-001';
+      renderSingle();
+    });
+    singleLabelInput.addEventListener('input', (e) => {
+      state.singleTitle = e.target.value;
+      prevSingleTitle.textContent = state.singleTitle;
+      prevSingleTitle.style.display = (state.showTitle && state.singleTitle) ? 'block' : 'none';
+      renderSingle();
+    });
+    btnRandomSingle.addEventListener('click', () => {
+      const r = Math.floor(100000 + Math.random() * 900000);
+      singleValueInput.value = `CP-ROCKET-${r}`;
+      state.singleValue = singleValueInput.value;
+      renderSingle();
+    });
+
+    // 4. Customization Slider Events
+    barcodeHeightInput.addEventListener('input', (e) => {
+      state.barcodeHeight = parseInt(e.target.value, 10);
+      barcodeHeightDisplay.textContent = `${state.barcodeHeight}px`;
+      if (state.mode === 'single') renderSingle();
+      else renderBulkGrid();
+    });
+    barcodeWidthInput.addEventListener('input', (e) => {
+      state.barcodeWidth = parseFloat(e.target.value);
+      barcodeWidthDisplay.textContent = state.barcodeWidth;
+      if (state.mode === 'single') renderSingle();
+      else renderBulkGrid();
+    });
+    chkShowText.addEventListener('change', (e) => {
+      state.showText = e.target.checked;
+      if (state.mode === 'single') renderSingle();
+      else renderBulkGrid();
+    });
+    chkShowTitle.addEventListener('change', (e) => {
+      state.showTitle = e.target.checked;
+      prevSingleTitle.style.display = (state.showTitle && state.singleTitle) ? 'block' : 'none';
+      if (state.mode === 'single') renderSingle();
+      else renderBulkGrid();
+    });
+    labelPresetSelect.addEventListener('change', (e) => {
+      state.labelPreset = e.target.value;
+      renderBulkGrid();
+    });
+
+    // 5. Render Single Barcode / QR
+    function renderSingle() {
+      prevSingleTitle.textContent = state.singleTitle;
+      prevSingleTitle.style.display = (state.showTitle && state.singleTitle) ? 'block' : 'none';
+
+      if (state.codeType === 'CODE128') {
+        singleCanvas.classList.remove('hidden');
+        singleQrBox.classList.add('hidden');
+        try {
+          JsBarcode(singleCanvas, state.singleValue || 'BARCODE', {
+            format: 'CODE128',
+            width: state.barcodeWidth,
+            height: state.barcodeHeight,
+            displayValue: state.showText,
+            fontSize: 14,
+            font: 'monospace',
+            margin: 10,
+            background: '#ffffff',
+            lineColor: '#000000'
+          });
+        } catch (err) {
+          console.warn('JsBarcode render error:', err);
+        }
+      } else {
+        // QR Code
+        singleCanvas.classList.add('hidden');
+        singleQrBox.classList.remove('hidden');
+        singleQrBox.innerHTML = '';
+        const qrCanvas = document.createElement('canvas');
+        QRCode.toCanvas(qrCanvas, state.singleValue || 'https://', {
+          width: state.barcodeHeight * 2.8,
+          margin: 2,
+          color: { dark: '#000000', light: '#ffffff' }
+        }, (error) => {
+          if (!error) singleQrBox.appendChild(qrCanvas);
+        });
+      }
+    }
+
+    // 6. Download Single PNG
+    btnDownloadSinglePng.addEventListener('click', () => {
+      // Create unified canvas with title and barcode
+      const exportCanvas = document.createElement('canvas');
+      const exportCtx = exportCanvas.getContext('2d');
+
+      if (state.codeType === 'CODE128') {
+        const bW = singleCanvas.width;
+        const bH = singleCanvas.height;
+        const titleH = (state.showTitle && state.singleTitle) ? 36 : 0;
+        
+        exportCanvas.width = Math.max(bW + 20, 240);
+        exportCanvas.height = bH + titleH + 20;
+
+        exportCtx.fillStyle = '#ffffff';
+        exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+        if (titleH > 0) {
+          exportCtx.fillStyle = '#1e293b';
+          exportCtx.font = 'bold 13px Pretendard, sans-serif';
+          exportCtx.textAlign = 'center';
+          exportCtx.fillText(state.singleTitle, exportCanvas.width / 2, 24, exportCanvas.width - 20);
+        }
+
+        const dx = (exportCanvas.width - bW) / 2;
+        exportCtx.drawImage(singleCanvas, dx, titleH + 10);
+      } else {
+        const qrCan = singleQrBox.querySelector('canvas');
+        if (!qrCan) return;
+        const qSize = qrCan.width;
+        const titleH = (state.showTitle && state.singleTitle) ? 36 : 0;
+        const textH = state.showText ? 24 : 0;
+
+        exportCanvas.width = qSize + 40;
+        exportCanvas.height = qSize + titleH + textH + 30;
+
+        exportCtx.fillStyle = '#ffffff';
+        exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+        if (titleH > 0) {
+          exportCtx.fillStyle = '#1e293b';
+          exportCtx.font = 'bold 13px Pretendard, sans-serif';
+          exportCtx.textAlign = 'center';
+          exportCtx.fillText(state.singleTitle, exportCanvas.width / 2, 24, exportCanvas.width - 20);
+        }
+
+        exportCtx.drawImage(qrCan, 20, titleH + 10);
+
+        if (state.showText) {
+          exportCtx.fillStyle = '#334155';
+          exportCtx.font = '12px JetBrains Mono, monospace';
+          exportCtx.textAlign = 'center';
+          exportCtx.fillText(state.singleValue, exportCanvas.width / 2, titleH + qSize + 22);
+        }
+      }
+
+      const link = document.createElement('a');
+      link.download = `${state.singleValue.replace(/[^a-zA-Z0-9_-]/g, '_')}_barcode.png`;
+      link.href = exportCanvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // 7. Download Single SVG
+    btnDownloadSingleSvg.addEventListener('click', () => {
+      if (state.codeType === 'CODE128') {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        JsBarcode(svg, state.singleValue, {
+          format: 'CODE128',
+          width: state.barcodeWidth,
+          height: state.barcodeHeight,
+          displayValue: state.showText
+        });
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = `${state.singleValue}_barcode.svg`;
+        link.href = url;
+        link.click();
+      } else {
+        alert('SVG는 현재 Code 128 바코드에서 지원됩니다. PNG를 다운로드해 주세요.');
+      }
+    });
+
+    // 8. Bulk Mode Parsing & Rendering
+    function parseAndRenderBulk() {
+      const raw = bulkDataTextarea.value.trim();
+      if (!raw) {
+        state.bulkItems = [];
+        bulkGridContainer.innerHTML = '<div class="col-span-full text-center text-xs text-slate-400 py-10">데이터를 입력하거나 샘플을 불러오세요.</div>';
+        previewCountBadge.textContent = '0개 라벨';
+        return;
+      }
+
+      const lines = raw.split('\n').filter(l => l.trim().length > 0);
+      state.bulkItems = lines.map(line => {
+        let val = '';
+        let title = '';
+        if (line.includes('\t')) {
+          // Tab separated (Excel paste)
+          const parts = line.split('\t');
+          val = parts[0].trim();
+          title = parts[1] ? parts[1].trim() : '';
+        } else if (line.includes('|')) {
+          const parts = line.split('|');
+          val = parts[0].trim();
+          title = parts[1] ? parts[1].trim() : '';
+        } else {
+          val = line.trim();
+        }
+        return { val, title };
+      });
+
+      previewCountBadge.textContent = `${state.bulkItems.length}개 라벨`;
+      renderBulkGrid();
+    }
+
+    bulkDataTextarea.addEventListener('input', parseAndRenderBulk);
+
+    // Sample Bulk Data Loader
+    btnBulkSample.addEventListener('click', () => {
+      const samples = [
+        'CP-ROK-1001 | 베이직 라운드 티셔츠 (화이트/M)',
+        'CP-ROK-1002 | 베이직 라운드 티셔츠 (화이트/L)',
+        'CP-ROK-1003 | 베이직 라운드 티셔츠 (블랙/M)',
+        'CP-ROK-1004 | 베이직 라운드 티셔츠 (블랙/L)',
+        'CP-ROK-2001 | 스마트 고속 무선 충전기 15W',
+        'CP-ROK-2002 | 마그네틱 메탈 폰 거치대',
+        'CP-ROK-3001 | 오가닉 핸드메이드 캔들 200g',
+        'CP-ROK-3002 | 천연 디퓨저 선물세트 라벤더',
+        'CP-ROK-4001 | 실리콘 내열 주방 조리도구 5종',
+        'CP-ROK-4002 | 스테인리스 보온보냉 텀블러 500ml'
+      ];
+      bulkDataTextarea.value = samples.join('\n');
+      parseAndRenderBulk();
+    });
+
+    // Auto Serial Generator
+    btnGenerateSerials.addEventListener('click', () => {
+      const prefix = document.getElementById('serialPrefix').value;
+      const start = parseInt(document.getElementById('serialStart').value, 10) || 1;
+      const count = parseInt(document.getElementById('serialCount').value, 10) || 24;
+
+      const lines = [];
+      for (let i = 0; i < count; i++) {
+        const num = String(start + i).padStart(4, '0');
+        lines.push(`${prefix}${num} | 라벨 품번 ${num}`);
+      }
+      bulkDataTextarea.value = lines.join('\n');
+      parseAndRenderBulk();
+    });
+
+    // 9. Render Bulk Grid Preview & Print Sheet
+    function renderBulkGrid() {
+      if (state.bulkItems.length === 0) return;
+
+      const preset = state.labelPreset;
+      let cols = 3;
+      if (preset === '16') cols = 2;
+      else if (preset === '24') cols = 3;
+      else if (preset === '40') cols = 4;
+      else if (preset === '65') cols = 5;
+
+      // Update grid styles
+      bulkGridContainer.className = `p-4 bg-slate-100/80 rounded-2xl border border-slate-200 max-h-[500px] overflow-y-auto grid grid-cols-1 sm:grid-cols-${cols} gap-2.5`;
+      bulkGridContainer.innerHTML = '';
+
+      // Print Area Grid setup
+      printGrid.className = `grid grid-cols-${cols} gap-2`;
+      printGrid.innerHTML = '';
+
+      sheetInfoText.textContent = `A4 ${preset}칸 규격 · 총 ${state.bulkItems.length}개 라벨 (${Math.ceil(state.bulkItems.length / parseInt(preset, 10))}페이지 출력 예정)`;
+
+      state.bulkItems.forEach((item, idx) => {
+        // UI Preview Card
+        const card = createLabelElement(item, false);
+        bulkGridContainer.appendChild(card);
+
+        // Print Sheet Card
+        const printCard = createLabelElement(item, true);
+        printGrid.appendChild(printCard);
+      });
+    }
+
+    function createLabelElement(item, isForPrint) {
+      const div = document.createElement('div');
+      div.className = 'barcode-label-card';
+
+      // Title
+      if (state.showTitle && item.title) {
+        const t = document.createElement('div');
+        t.className = isForPrint 
+          ? 'text-[9px] font-bold text-slate-800 line-clamp-1 mb-0.5' 
+          : 'text-[11px] font-bold text-slate-800 line-clamp-1 mb-1';
+        t.textContent = item.title;
+        div.appendChild(t);
+      }
+
+      // Barcode / QR
+      if (state.codeType === 'CODE128') {
+        const canvas = document.createElement('canvas');
+        canvas.className = 'max-w-full h-auto';
+        try {
+          JsBarcode(canvas, item.val, {
+            format: 'CODE128',
+            width: isForPrint ? Math.max(state.barcodeWidth * 0.8, 1) : state.barcodeWidth,
+            height: isForPrint ? Math.max(state.barcodeHeight * 0.7, 24) : state.barcodeHeight,
+            displayValue: state.showText,
+            fontSize: isForPrint ? 10 : 12,
+            font: 'monospace',
+            margin: isForPrint ? 2 : 4,
+            background: '#ffffff',
+            lineColor: '#000000'
+          });
+        } catch (e) {
+          console.warn('Barcode error on:', item.val);
+        }
+        div.appendChild(canvas);
+      } else {
+        const qrCanvas = document.createElement('canvas');
+        const qSize = isForPrint ? 70 : 90;
+        QRCode.toCanvas(qrCanvas, item.val, {
+          width: qSize,
+          margin: 1,
+          color: { dark: '#000000', light: '#ffffff' }
+        });
+        div.appendChild(qrCanvas);
+
+        if (state.showText) {
+          const valText = document.createElement('div');
+          valText.className = 'text-[9px] font-mono-code text-slate-600 mt-0.5 break-all';
+          valText.textContent = item.val;
+          div.appendChild(valText);
+        }
+      }
+
+      return div;
+    }
+
+    // 10. Print Functionality
+    btnPrintA4.addEventListener('click', () => {
+      if (state.bulkItems.length === 0) {
+        alert('인쇄할 바코드 데이터를 먼저 입력해주세요.');
+        return;
+      }
+      printArea.classList.remove('hidden');
+      window.print();
+      printArea.classList.add('hidden');
+    });
+
+    // 11. Bulk Download (Download each PNG sequentially)
+    btnDownloadZip.addEventListener('click', () => {
+      if (state.bulkItems.length === 0) {
+        alert('저장할 바코드가 없습니다.');
+        return;
+      }
+      const canvases = bulkGridContainer.querySelectorAll('canvas');
+      if (canvases.length === 0) return;
+
+      alert(`총 ${canvases.length}개의 바코드 이미지를 순차적으로 다운로드합니다.`);
+      canvases.forEach((can, i) => {
+        setTimeout(() => {
+          const link = document.createElement('a');
+          const val = state.bulkItems[i] ? state.bulkItems[i].val : `barcode_${i+1}`;
+          link.download = `${val}_barcode.png`;
+          link.href = can.toDataURL('image/png');
+          link.click();
+        }, i * 250);
+      });
+    });
+
+    // Init First Render
+    renderSingle();
+  </script>
+</body>
+</html>
