@@ -426,6 +426,35 @@
 
   </main>
 
+  <!-- Mobile Safe Image Save Modal -->
+  <div id="mobileSaveModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl space-y-4 border border-slate-100 animate-in fade-in zoom-in duration-150">
+      <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+        <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h3 class="text-lg font-extrabold text-slate-900">대표 썸네일 변환 완료!</h3>
+        <p class="text-xs text-indigo-600 font-bold mt-1 bg-indigo-50 py-1.5 px-3 rounded-lg border border-indigo-100">
+          💡 모바일 저장 팁: 아래 이미지를 1초간 꾹 눌러 [사진에 저장]을 선택하세요!
+        </p>
+      </div>
+
+      <div class="p-2 bg-slate-50 rounded-2xl border border-slate-200 checkerboard-bg">
+        <img id="mobilePreviewImg" src="" alt="변환된 정방형 썸네일" class="w-full h-auto max-h-60 object-contain rounded-xl shadow-sm mx-auto" />
+      </div>
+
+      <div class="flex flex-col gap-2 pt-1">
+        <button id="btnMobileShare" type="button" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors flex items-center justify-center gap-1.5">
+          <i data-lucide="share-2" class="w-4 h-4"></i>
+          <span>스마트폰 갤러리에 저장 (공유하기)</span>
+        </button>
+        <button id="btnCloseModal" type="button" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="bg-white border-t border-slate-200 py-6 mt-10">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
@@ -657,17 +686,73 @@
       }
     }
 
-    // Download Trigger
-    btnDownload.addEventListener('click', () => {
+    // Mobile Modal Elements
+    const mobileModal = document.getElementById('mobileSaveModal');
+    const mobilePreviewImg = document.getElementById('mobilePreviewImg');
+    const btnMobileShare = document.getElementById('btnMobileShare');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+
+    // Download Trigger (Desktop Native Download + Mobile Safe Modal & Share API)
+    btnDownload.addEventListener('click', async () => {
       if (!state.image) return;
 
       const ext = state.outFormat === 'image/jpeg' ? 'jpg' : (state.outFormat === 'image/webp' ? 'webp' : 'png');
       const outFileName = `${state.fileName}_square_${state.canvasSize}px.${ext}`;
 
-      previewCanvas.toBlob((blob) => {
-        saveAs(blob, outFileName);
-      }, state.outFormat, state.quality);
+      // Always generate high-quality DataURL for maximum mobile compatibility
+      const dataUrl = previewCanvas.toDataURL(state.outFormat, state.quality);
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+
+      // 1. Try standard anchor download first
+      try {
+        const link = document.createElement('a');
+        link.download = outFileName;
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        console.warn('Native anchor download failed:', err);
+      }
+
+      // 2. On Mobile, display friendly save popup so user can long-press or share
+      if (isMobile) {
+        mobilePreviewImg.src = dataUrl;
+        mobileModal.classList.remove('hidden');
+
+        // Web Share API support if available
+        if (navigator.share && previewCanvas.toBlob) {
+          btnMobileShare.classList.remove('hidden');
+          btnMobileShare.onclick = () => {
+            previewCanvas.toBlob(async (blob) => {
+              try {
+                const file = new File([blob], outFileName, { type: state.outFormat });
+                await navigator.share({
+                  files: [file],
+                  title: outFileName,
+                  text: '정방형 썸네일 이미지'
+                });
+              } catch (e) {
+                console.log('Share canceled or failed', e);
+              }
+            }, state.outFormat, state.quality);
+          };
+        } else {
+          btnMobileShare.classList.add('hidden');
+        }
+      }
     });
+
+    if (btnCloseModal) {
+      btnCloseModal.addEventListener('click', () => {
+        mobileModal.classList.add('hidden');
+      });
+    }
+    if (mobileModal) {
+      mobileModal.addEventListener('click', (e) => {
+        if (e.target === mobileModal) mobileModal.classList.add('hidden');
+      });
+    }
 
     // Test Sample Loader
     btnTestSample.addEventListener('click', () => {
