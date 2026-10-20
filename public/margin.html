@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스마트스토어·쿠팡 마진율 & 수수료·역마진 계산기 | 오픈마켓 셀러 순수익 시뮬레이터</title>
+  <meta name="description" content="네이버 스마트스토어, 쿠팡 윙/로켓그로스, 11번가 오픈마켓 카테고리별 실질 수수료, 부가세, 배송비, 광고비를 반영하여 정확한 마진율과 역마진 방지 최소 판매가를 1초 만에 계산하세요.">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+    * { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; }
+    .font-mono-num { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
+
+  <!-- Header -->
+  <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
+          <i data-lucide="calculator" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">
+            오픈마켓 수수료 &amp; 마진율·역마진 계산기
+          </h1>
+          <p class="text-[11px] text-slate-500 font-medium">
+            스마트스토어 · 쿠팡 로켓/윙 · 11번가 실시간 순수익 시뮬레이터
+          </p>
+        </div>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        2026 최신 수수료율 반영
+      </span>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 space-y-8">
+
+    <!-- Hero / Intro -->
+    <div class="text-center max-w-2xl mx-auto space-y-2">
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+        💰 팔수록 손해 보는 역마진 완벽 방지
+      </span>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        정확한 순수익 &amp; 마진율 실시간 계산기
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+        판매가, 원가, 배송비만 넣으면 복잡한 마켓 수수료와 부가세(VAT), 
+        포장비, 목표 광고비(ROAS)를 공제한 <b>통장에 진짜 꽂히는 실수령액</b>을 계산합니다.
+      </p>
+    </div>
+
+    <!-- Core Calculator Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+      <!-- Left Column: Input Form -->
+      <div class="lg:col-span-6 bg-white rounded-3xl p-6 border border-slate-200 shadow-xl shadow-slate-200/50 space-y-6">
+        
+        <!-- Platform Selection -->
+        <div class="space-y-2">
+          <label class="block text-xs font-bold text-slate-700">판매 플랫폼 선택</label>
+          <div class="grid grid-cols-3 gap-2">
+            <label class="platform-btn flex flex-col items-center justify-center p-3 rounded-xl border border-emerald-500 bg-emerald-50/50 cursor-pointer text-center text-xs font-bold text-emerald-950 transition-all">
+              <input type="radio" name="platform" value="smartstore" checked class="hidden">
+              <span class="text-sm mb-0.5">🟢</span>
+              <span>스마트스토어</span>
+              <span class="text-[10px] font-normal text-slate-500 mt-0.5">3.63% ~ 5.63%</span>
+            </label>
+            <label class="platform-btn flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 hover:border-slate-300 bg-white cursor-pointer text-center text-xs font-bold text-slate-700 transition-all">
+              <input type="radio" name="platform" value="coupang_wing" class="hidden">
+              <span class="text-sm mb-0.5">🚀</span>
+              <span>쿠팡 윙(일반)</span>
+              <span class="text-[10px] font-normal text-slate-500 mt-0.5">10.8% (카테고리)</span>
+            </label>
+            <label class="platform-btn flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 hover:border-slate-300 bg-white cursor-pointer text-center text-xs font-bold text-slate-700 transition-all">
+              <input type="radio" name="platform" value="coupang_rocket" class="hidden">
+              <span class="text-sm mb-0.5">📦</span>
+              <span>쿠팡 로켓그로스</span>
+              <span class="text-[10px] font-normal text-slate-500 mt-0.5">입고/보관/배송료</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Price Inputs -->
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">소비자 판매가 (원)</label>
+              <div class="relative">
+                <input type="number" id="inputSalePrice" value="29900" step="100" class="w-full pl-3.5 pr-8 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 text-sm font-mono-num font-bold text-slate-900">
+                <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">원</span>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">상품 매입/원가 (원)</label>
+              <div class="relative">
+                <input type="number" id="inputCostPrice" value="12000" step="100" class="w-full pl-3.5 pr-8 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 text-sm font-mono-num font-bold text-slate-900">
+                <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">원</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shipping & Packaging -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">고객 부담 배송비 (원)</label>
+              <div class="relative">
+                <input type="number" id="inputCustomerShipping" value="3000" step="500" class="w-full pl-3.5 pr-8 py-2.5 rounded-xl border border-slate-300 text-sm font-mono-num font-semibold text-slate-800">
+                <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">원</span>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">실제 택배 계약 배송비 (원)</label>
+              <div class="relative">
+                <input type="number" id="inputActualShipping" value="2800" step="100" class="w-full pl-3.5 pr-8 py-2.5 rounded-xl border border-slate-300 text-sm font-mono-num font-semibold text-slate-800">
+                <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">원</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Costs -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">포장/부자재비 (박스+뽁뽁이)</label>
+              <div class="relative">
+                <input type="number" id="inputPackCost" value="500" step="50" class="w-full pl-3.5 pr-8 py-2.5 rounded-xl border border-slate-300 text-sm font-mono-num font-semibold text-slate-800">
+                <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">원</span>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">예상 1건당 광고비(ROAS)</label>
+              <div class="relative">
+                <input type="number" id="inputAdCost" value="2000" step="100" class="w-full pl-3.5 pr-8 py-2.5 rounded-xl border border-slate-300 text-sm font-mono-num font-semibold text-slate-800">
+                <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">원</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fee Rate Custom & VAT -->
+          <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-slate-700">마켓 결제/카테고리 수수료율:</span>
+              <div class="flex items-center gap-1">
+                <input type="number" id="inputFeeRate" value="5.63" step="0.01" class="w-16 px-2 py-1 text-center rounded border border-slate-300 font-bold text-emerald-700 text-xs">
+                <span class="font-bold text-slate-500">%</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-200">
+              <span class="font-bold text-slate-700">부가세(VAT 10%) 공제 여부:</span>
+              <label class="flex items-center gap-1.5 cursor-pointer font-semibold text-slate-800">
+                <input type="checkbox" id="chkIncludeVat" checked class="w-4 h-4 text-emerald-600 rounded">
+                <span>일반과세자 (VAT 납부)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Live Result Dashboard -->
+      <div class="lg:col-span-6 space-y-5">
+        
+        <!-- Summary Result Card -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 sm:p-7 text-white shadow-2xl space-y-6">
+          <div class="flex items-center justify-between border-b border-slate-700 pb-4">
+            <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="wallet" class="w-4 h-4 text-emerald-400"></i> 실 수령액 &amp; 마진율 결과
+            </span>
+            <span id="badgeProfitStatus" class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              마진 안전권
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <span class="text-xs text-slate-400 block mb-1">건당 순수익 (실수령)</span>
+              <div class="text-2xl sm:text-3xl font-extrabold font-mono-num text-emerald-400 flex items-baseline gap-1">
+                <span id="resNetProfit">0</span><span class="text-sm font-normal text-slate-300">원</span>
+              </div>
+            </div>
+            <div>
+              <span class="text-xs text-slate-400 block mb-1">최종 마진율</span>
+              <div class="text-2xl sm:text-3xl font-extrabold font-mono-num text-white flex items-baseline gap-1">
+                <span id="resMarginRate">0</span><span class="text-sm font-normal text-slate-300">%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Breakeven Target -->
+          <div class="p-3.5 bg-slate-800/80 rounded-2xl border border-slate-700/80 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400"></i>
+              <span class="text-xs text-slate-300 font-medium">손익분기점 (최소 판매가):</span>
+            </div>
+            <span class="text-sm font-bold font-mono-num text-amber-300"><span id="resBreakeven">0</span>원</span>
+          </div>
+        </div>
+
+        <!-- Breakdown Details Table -->
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xl shadow-slate-200/50 space-y-3">
+          <h3 class="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="pie-chart" class="w-4 h-4 text-emerald-600"></i>
+            매출 및 비용 세부 공제 내역
+          </h3>
+
+          <div class="divide-y divide-slate-100 text-xs">
+            <div class="py-2.5 flex justify-between">
+              <span class="text-slate-600">총 결제 매출액 (판매가 + 고객배송비):</span>
+              <span class="font-bold font-mono-num text-slate-900" id="detailGross">0원</span>
+            </div>
+            <div class="py-2.5 flex justify-between text-rose-600">
+              <span>- 상품 매입 원가:</span>
+              <span class="font-bold font-mono-num" id="detailCost">0원</span>
+            </div>
+            <div class="py-2.5 flex justify-between text-rose-600">
+              <span>- 마켓 정산 수수료:</span>
+              <span class="font-bold font-mono-num" id="detailMarketFee">0원</span>
+            </div>
+            <div class="py-2.5 flex justify-between text-rose-600">
+              <span>- 실 발송 배송비:</span>
+              <span class="font-bold font-mono-num" id="detailShipping">0원</span>
+            </div>
+            <div class="py-2.5 flex justify-between text-rose-600">
+              <span>- 포장 부자재비:</span>
+              <span class="font-bold font-mono-num" id="detailPack">0원</span>
+            </div>
+            <div class="py-2.5 flex justify-between text-rose-600">
+              <span>- 1건당 광고 지출비:</span>
+              <span class="font-bold font-mono-num" id="detailAd">0원</span>
+            </div>
+            <div class="py-2.5 flex justify-between text-amber-600">
+              <span>- 납부 예상 부가세 (VAT):</span>
+              <span class="font-bold font-mono-num" id="detailVat">0원</span>
+            </div>
+            <div class="py-3 flex justify-between text-sm font-extrabold bg-emerald-50/50 px-2 rounded-lg mt-1 text-emerald-900">
+              <span>= 최종 순수익:</span>
+              <span class="font-mono-num" id="detailFinalProfit">0원</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Seller Affiliate Section: Office & Logistics Kit -->
+    <section class="mt-12 pt-8 border-t border-slate-200 space-y-5" id="affiliateSection">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+        <div>
+          <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 uppercase tracking-wider">
+            <i data-lucide="briefcase" class="w-3.5 h-3.5"></i> Seller Workspace Kit
+          </span>
+          <h3 class="text-xl font-extrabold text-slate-900 mt-1">
+            마진 관리 &amp; 업무 효율 3배 올려주는 셀러 필수 데스크 장비 3종
+          </h3>
+          <p class="text-xs text-slate-500">
+            정확한 무게 측정으로 배송비 오과금을 막고, 하루 종일 작업하는 손목과 눈의 피로를 덜어주는 장비입니다.
+          </p>
+        </div>
+        <span class="text-[11px] text-slate-400 bg-slate-100 px-2.5 py-1 rounded-md self-start sm:self-auto">
+          셀러 오피스 베스트 3
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- Item 1: 전자 택배 저울 -->
+        <div class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-emerald-400 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="w-full h-36 bg-emerald-50/60 rounded-xl flex items-center justify-center text-emerald-700 border border-emerald-100/80 group-hover:scale-[1.02] transition-transform">
+              <div class="flex flex-col items-center gap-2">
+                <i data-lucide="scale" class="w-12 h-12 text-emerald-600"></i>
+                <span class="text-xs font-semibold text-emerald-800">디지털 택배 상업용 전자저울</span>
+              </div>
+            </div>
+            <div>
+              <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 mb-1.5">배송비 누수 방지</span>
+              <h4 class="font-bold text-slate-900 text-sm group-hover:text-emerald-600 transition-colors">
+                택배 박스 무게 측정용 정밀 디지털 전자 저울 (최대 50kg)
+              </h4>
+              <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                0.1g 단위 정밀 측정. 로켓그로스 입고 및 택배사 무게 구간 오과금을 막아 마진을 사수하는 필수 장비.
+              </p>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+            <div class="text-xs font-extrabold text-slate-900">셀러 1위 <span class="text-[11px] font-normal text-slate-500">/ 로켓배송</span></div>
+            <a href="https://link.coupang.com" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-xs font-semibold text-white bg-slate-900 hover:bg-emerald-600 px-3 py-1.5 rounded-lg transition-colors">
+              상품 보기 <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Item 2: 인체공학 무선 버티컬 마우스 -->
+        <div class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-emerald-400 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="w-full h-36 bg-indigo-50/60 rounded-xl flex items-center justify-center text-indigo-700 border border-indigo-100/80 group-hover:scale-[1.02] transition-transform">
+              <div class="flex flex-col items-center gap-2">
+                <i data-lucide="mouse" class="w-12 h-12 text-indigo-600"></i>
+                <span class="text-xs font-semibold text-indigo-800">손목 보호 인체공학 버티컬 마우스</span>
+              </div>
+            </div>
+            <div>
+              <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800 mb-1.5">터널증후군 예방</span>
+              <h4 class="font-bold text-slate-900 text-sm group-hover:text-emerald-600 transition-colors">
+                무선 인체공학 저소음 버티컬 마우스 (블루투스 겸용)
+              </h4>
+              <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                하루 수백 번 클릭과 상품 등록에도 손목 꺾임 없는 편안한 57도 인체공학 각도 설계.
+              </p>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+            <div class="text-xs font-extrabold text-slate-900">만족도 99% <span class="text-[11px] font-normal text-slate-500">/ 무료배송</span></div>
+            <a href="https://link.coupang.com" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-xs font-semibold text-white bg-slate-900 hover:bg-emerald-600 px-3 py-1.5 rounded-lg transition-colors">
+              상품 보기 <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Item 3: 피벗 듀얼 모니터 거치대 / 모니터 -->
+        <div class="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-emerald-400 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="w-full h-36 bg-amber-50/60 rounded-xl flex items-center justify-center text-amber-700 border border-amber-100/80 group-hover:scale-[1.02] transition-transform">
+              <div class="flex flex-col items-center gap-2">
+                <i data-lucide="monitor" class="w-12 h-12 text-amber-600"></i>
+                <span class="text-xs font-semibold text-amber-800">멀티 태스킹 고하중 모니터암</span>
+              </div>
+            </div>
+            <div>
+              <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 mb-1.5">작업속도 2배</span>
+              <h4 class="font-bold text-slate-900 text-sm group-hover:text-emerald-600 transition-colors">
+                알루미늄 360도 회전 피벗 고하중 모니터 암 싱글/듀얼
+              </h4>
+              <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                세로 모드로 긴 상세페이지 한눈에 검토하고, 가로 모드로 마켓 3개 주문 수집 화면 동시 분할.
+              </p>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+            <div class="text-xs font-extrabold text-slate-900">가성비 추천 <span class="text-[11px] font-normal text-slate-500">/ 로켓배송</span></div>
+            <a href="https://link.coupang.com" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-xs font-semibold text-white bg-slate-900 hover:bg-emerald-600 px-3 py-1.5 rounded-lg transition-colors">
+              상품 보기 <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center pt-2">
+        <p class="text-[11px] text-slate-400 bg-slate-100/80 inline-block px-3 py-1 rounded-full border border-slate-200">
+          이 포스팅은 쿠팡 파트너스 활동의 일환으로 수수료를 제공받습니다.
+        </p>
+      </div>
+    </section>
+
+    <!-- SEO Guide Section -->
+    <article class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 space-y-6 text-slate-700 leading-relaxed">
+      <div>
+        <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mb-2">
+          📌 오픈마켓 마진 계산 시 셀러들이 가장 많이 하는 3가지 실수
+        </h3>
+        <p class="text-xs sm:text-sm">
+          많은 초보 셀러들이 단순 <code>판매가 - 매입원가 = 마진</code>으로 계산하다가 정산 날 통장을 보고 충격을 받습니다. 
+          반드시 <b>마켓 수수료, 배송비 차액, 포장 부자재비, 부가세(VAT)</b>를 사전 시뮬레이션해야 마진 누수를 막을 수 있습니다.
+        </p>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+          <span class="font-bold text-emerald-800 block mb-1">1. 마켓 수수료는 '배송비'에도 부과됩니다!</span>
+          <p>쿠팡, 11번가 등 대부분의 오픈마켓은 고객이 결제한 상품 가격뿐만 아니라 <b>배송비(3,000원 등)에도 동일한 수수료율이 부과</b>됩니다. 이를 계산에서 제외하면 건당 수백 원씩 역마진이 발생합니다.</p>
+        </div>
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+          <span class="font-bold text-emerald-800 block mb-1">2. 부가세 10%는 순수익이 아닌 '마진(매출-매입)'에 대해 발생합니다.</span>
+          <p>일반과세자의 경우 매출 부가세에서 매입 부가세를 공제한 차액을 국세청에 납부해야 하므로, 본 계산기는 실 납부 부가세를 실시간 추산하여 차감합니다.</p>
+        </div>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- Script Logic -->
+  <script>
+    lucide.createIcons();
+
+    const state = {
+      platform: 'smartstore',
+      salePrice: 29900,
+      costPrice: 12000,
+      customerShipping: 3000,
+      actualShipping: 2800,
+      packCost: 500,
+      adCost: 2000,
+      feeRate: 5.63,
+      includeVat: true
+    };
+
+    const platformPresets = {
+      smartstore: 5.63,
+      coupang_wing: 10.8,
+      coupang_rocket: 15.0
+    };
+
+    // DOM Elements
+    const platformButtons = document.querySelectorAll('.platform-btn');
+    const inputSalePrice = document.getElementById('inputSalePrice');
+    const inputCostPrice = document.getElementById('inputCostPrice');
+    const inputCustomerShipping = document.getElementById('inputCustomerShipping');
+    const inputActualShipping = document.getElementById('inputActualShipping');
+    const inputPackCost = document.getElementById('inputPackCost');
+    const inputAdCost = document.getElementById('inputAdCost');
+    const inputFeeRate = document.getElementById('inputFeeRate');
+    const chkIncludeVat = document.getElementById('chkIncludeVat');
+
+    const resNetProfit = document.getElementById('resNetProfit');
+    const resMarginRate = document.getElementById('resMarginRate');
+    const resBreakeven = document.getElementById('resBreakeven');
+    const badgeProfitStatus = document.getElementById('badgeProfitStatus');
+
+    const detailGross = document.getElementById('detailGross');
+    const detailCost = document.getElementById('detailCost');
+    const detailMarketFee = document.getElementById('detailMarketFee');
+    const detailShipping = document.getElementById('detailShipping');
+    const detailPack = document.getElementById('detailPack');
+    const detailAd = document.getElementById('detailAd');
+    const detailVat = document.getElementById('detailVat');
+    const detailFinalProfit = document.getElementById('detailFinalProfit');
+
+    // Platform change
+    platformButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        platformButtons.forEach(b => {
+          b.className = "platform-btn flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 hover:border-slate-300 bg-white cursor-pointer text-center text-xs font-bold text-slate-700 transition-all";
+        });
+        btn.className = "platform-btn flex flex-col items-center justify-center p-3 rounded-xl border border-emerald-500 bg-emerald-50/50 cursor-pointer text-center text-xs font-bold text-emerald-950 transition-all";
+        const val = btn.querySelector('input').value;
+        state.platform = val;
+        state.feeRate = platformPresets[val] || 5.63;
+        inputFeeRate.value = state.feeRate;
+        calculate();
+      });
+    });
+
+    // Inputs
+    [inputSalePrice, inputCostPrice, inputCustomerShipping, inputActualShipping, inputPackCost, inputAdCost, inputFeeRate].forEach(el => {
+      el.addEventListener('input', () => {
+        readInputs();
+        calculate();
+      });
+    });
+    chkIncludeVat.addEventListener('change', () => {
+      state.includeVat = chkIncludeVat.checked;
+      calculate();
+    });
+
+    function readInputs() {
+      state.salePrice = Math.max(0, parseInt(inputSalePrice.value, 10) || 0);
+      state.costPrice = Math.max(0, parseInt(inputCostPrice.value, 10) || 0);
+      state.customerShipping = Math.max(0, parseInt(inputCustomerShipping.value, 10) || 0);
+      state.actualShipping = Math.max(0, parseInt(inputActualShipping.value, 10) || 0);
+      state.packCost = Math.max(0, parseInt(inputPackCost.value, 10) || 0);
+      state.adCost = Math.max(0, parseInt(inputAdCost.value, 10) || 0);
+      state.feeRate = Math.max(0, parseFloat(inputFeeRate.value) || 0);
+    }
+
+    function calculate() {
+      const grossRevenue = state.salePrice + state.customerShipping;
+      const marketFee = Math.round(grossRevenue * (state.feeRate / 100));
+      
+      // Estimated VAT (Sales VAT - Purchase VAT)
+      let vat = 0;
+      if (state.includeVat) {
+        const salesVat = Math.round(grossRevenue / 11);
+        const purchaseVat = Math.round((state.costPrice + state.actualShipping + state.packCost) / 11);
+        vat = Math.max(0, salesVat - purchaseVat);
+      }
+
+      const totalDeductions = state.costPrice + marketFee + state.actualShipping + state.packCost + state.adCost + vat;
+      const netProfit = grossRevenue - totalDeductions;
+      const marginRate = grossRevenue > 0 ? ((netProfit / grossRevenue) * 100).toFixed(1) : 0;
+
+      // Breakeven price calculation
+      // gross - cost - actualShip - pack - ad - (gross * feeRate/100) = 0
+      // gross * (1 - feeRate/100) = cost + actualShip + pack + ad
+      const fixedCosts = state.costPrice + state.actualShipping + state.packCost + state.adCost;
+      const feeMultiplier = 1 - (state.feeRate / 100);
+      const breakevenGross = feeMultiplier > 0 ? Math.round(fixedCosts / feeMultiplier) : 0;
+      const breakevenSalePrice = Math.max(0, breakevenGross - state.customerShipping);
+
+      // Render Dashboard
+      resNetProfit.textContent = netProfit.toLocaleString();
+      resMarginRate.textContent = marginRate;
+      resBreakeven.textContent = breakevenSalePrice.toLocaleString();
+
+      if (netProfit < 0) {
+        badgeProfitStatus.className = "px-2.5 py-1 rounded-full text-xs font-extrabold bg-rose-500/20 text-rose-300 border border-rose-500/30";
+        badgeProfitStatus.textContent = "🚨 역마진 발생 (손해)";
+      } else if (marginRate < 10) {
+        badgeProfitStatus.className = "px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30";
+        badgeProfitStatus.textContent = "⚠️ 저마진 주의";
+      } else {
+        badgeProfitStatus.className = "px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+        badgeProfitStatus.textContent = "✨ 안정적인 마진권";
+      }
+
+      // Render Breakdown
+      detailGross.textContent = `${grossRevenue.toLocaleString()}원`;
+      detailCost.textContent = `-${state.costPrice.toLocaleString()}원`;
+      detailMarketFee.textContent = `-${marketFee.toLocaleString()}원 (${state.feeRate}%)`;
+      detailShipping.textContent = `-${state.actualShipping.toLocaleString()}원`;
+      detailPack.textContent = `-${state.packCost.toLocaleString()}원`;
+      detailAd.textContent = `-${state.adCost.toLocaleString()}원`;
+      detailVat.textContent = state.includeVat ? `-${vat.toLocaleString()}원` : `0원 (면제/미포함)`;
+      detailFinalProfit.textContent = `${netProfit.toLocaleString()}원`;
+    }
+
+    // Init
+    calculate();
+  </script>
+</body>
+</html>
