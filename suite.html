@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>이커머스 셀러 필수 무료 도구 올인원 스위트 | 스마트스토어·쿠팡 통합 솔루션</title>
+  <meta name="description" content="상세페이지 분할, 썸네일 누끼, 바코드 및 QR 일괄 생성, 마진율 계산기, OCR 텍스트 추출, 상품명 조합기까지 6대 셀러 필수 도구를 하나의 페이지에서 무료로 이용하세요.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Required CDNs for tools -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
+    * { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; }
+    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+    
+    .checkerboard-bg {
+      background-color: #ffffff;
+      background-image: linear-gradient(45deg, #f1f5f9 25%, transparent 25%), 
+                        linear-gradient(-45deg, #f1f5f9 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #f1f5f9 75%), 
+                        linear-gradient(-45deg, transparent 75%, #f1f5f9 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    }
+
+    /* Print Styles for Barcode Tool */
+    @media print {
+      body * { visibility: hidden; }
+      #printArea, #printArea * { visibility: visible; }
+      #printArea { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
+      .no-print { display: none !important; }
+    }
+    .roll-label-page {
+      page-break-after: always;
+      break-after: page;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      background: #ffffff;
+      overflow: hidden;
+    }
+    .roll-label-page:last-child { page-break-after: auto; break-after: auto; }
+    .barcode-label-card {
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 10px;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      break-inside: avoid;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col antialiased">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+          <i data-lucide="layers" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="font-black text-base sm:text-lg text-slate-900 leading-tight">
+            이커머스 셀러 올인원 툴킷
+          </h1>
+          <p class="text-[11px] text-slate-500 font-medium hidden sm:block">
+            스마트스토어 · 쿠팡 · 11번가 온라인 셀러를 위한 6대 무료 실무 도구
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          100% 무료 · 서버리스 안심 처리
+        </span>
+      </div>
+    </div>
+
+    <!-- Navigation Tab Bar -->
+    <div class="bg-slate-50 border-t border-slate-200 overflow-x-auto scrollbar-none">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 flex gap-1 sm:gap-2 py-2">
+        
+        <button type="button" class="tab-btn active px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-2 whitespace-nowrap transition-all duration-150 bg-indigo-600 text-white shadow-md shadow-indigo-600/20" data-tab="tab-slice">
+          <i data-lucide="scissors" class="w-4 h-4"></i>
+          <span>1. 상세페이지 분할·압축</span>
+        </button>
+
+        <button type="button" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 whitespace-nowrap transition-all duration-150 text-slate-600 hover:text-slate-900 hover:bg-white" data-tab="tab-thumb">
+          <i data-lucide="square" class="w-4 h-4"></i>
+          <span>2. 1:1 썸네일·스마트누끼</span>
+        </button>
+
+        <button type="button" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 whitespace-nowrap transition-all duration-150 text-slate-600 hover:text-slate-900 hover:bg-white" data-tab="tab-barcode">
+          <i data-lucide="scan-barcode" class="w-4 h-4"></i>
+          <span>3. 바코드·QR 일괄생성</span>
+        </button>
+
+        <button type="button" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 whitespace-nowrap transition-all duration-150 text-slate-600 hover:text-slate-900 hover:bg-white" data-tab="tab-margin">
+          <i data-lucide="calculator" class="w-4 h-4"></i>
+          <span>4. 마진율·수수료 계산기</span>
+        </button>
+
+        <button type="button" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 whitespace-nowrap transition-all duration-150 text-slate-600 hover:text-slate-900 hover:bg-white" data-tab="tab-ocr">
+          <i data-lucide="file-text" class="w-4 h-4"></i>
+          <span>5. 상세페이지 OCR 태그추출</span>
+        </button>
+
+        <button type="button" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 whitespace-nowrap transition-all duration-150 text-slate-600 hover:text-slate-900 hover:bg-white" data-tab="tab-title">
+          <i data-lucide="tags" class="w-4 h-4"></i>
+          <span>6. 상품명 조합·금지어필터</span>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">
+
+    <!-- TAB 1: 상세페이지 분할기 -->
+    <div id="tab-slice" class="tab-panel space-y-6">
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xl space-y-6">
+        <div class="border-b border-slate-100 pb-4">
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">✂️ 상세페이지 초고속 분할 &amp; 초경량 WebP 압축기</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            세로로 긴 고해상도 상세페이지를 오픈마켓 권장 860px/780px/1000px 규격으로 분할하고 WebP 압축하여 ZIP으로 다운로드합니다.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div class="lg:col-span-5 space-y-4">
+            <div id="sliceDropzone" class="border-2 border-dashed border-indigo-300 hover:border-indigo-600 rounded-2xl p-8 text-center cursor-pointer transition-all bg-indigo-50/30 hover:bg-indigo-50/60">
+              <input type="file" id="sliceFileInput" accept="image/*" class="hidden">
+              <i data-lucide="image-up" class="w-10 h-10 text-indigo-600 mx-auto mb-2"></i>
+              <p class="text-sm font-bold text-slate-800">상세페이지 이미지 선택 (또는 드래그)</p>
+              <p class="text-xs text-slate-400 mt-1">세로 10,000px 이상의 초대형 이미지도 초고속 분할</p>
+            </div>
+            <button id="btnSliceSample" type="button" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors">
+              테스트용 가상 8,000px 상세페이지 불러오기
+            </button>
+
+            <!-- Slice Options -->
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 text-xs">
+              <span class="font-bold text-slate-800 block">분할 및 압축 규격 설정</span>
+              <div>
+                <label class="block text-slate-600 mb-1">가로 너비 리사이징:</label>
+                <div class="grid grid-cols-3 gap-2">
+                  <button type="button" class="slice-width-btn active py-1.5 rounded-lg border border-indigo-600 bg-indigo-50 text-indigo-700 font-bold" data-w="860">860px (스마트스토어)</button>
+                  <button type="button" class="slice-width-btn py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 font-bold" data-w="780">780px (쿠팡)</button>
+                  <button type="button" class="slice-width-btn py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 font-bold" data-w="1000">1000px (종합몰)</button>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label class="block text-slate-600 mb-1">분할 높이 (px):</label>
+                  <input type="number" id="sliceHeightInput" value="1200" step="100" class="w-full px-2.5 py-1.5 rounded border border-slate-300 font-bold">
+                </div>
+                <div>
+                  <label class="block text-slate-600 mb-1">WebP 품질 (%):</label>
+                  <input type="number" id="sliceQualityInput" value="85" min="40" max="100" class="w-full px-2.5 py-1.5 rounded border border-slate-300 font-bold">
+                </div>
+              </div>
+            </div>
+
+            <button id="btnProcessSlice" type="button" disabled class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white font-bold text-sm rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+              <i data-lucide="scissors" class="w-4 h-4"></i>
+              <span>상세페이지 분할 &amp; ZIP 다운로드</span>
+            </button>
+          </div>
+
+          <div class="lg:col-span-7 space-y-3">
+            <span class="text-xs font-bold text-slate-700">미리보기 및 분할 상태</span>
+            <div id="slicePreviewContainer" class="p-6 bg-slate-50 rounded-2xl border border-slate-200 min-h-[300px] max-h-[460px] overflow-y-auto flex items-center justify-center text-xs text-slate-400">
+              이미지를 선택하면 실시간 원본 비율과 분할 조각 수가 표시됩니다.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: 썸네일 누끼 변환기 -->
+    <div id="tab-thumb" class="tab-panel hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xl space-y-6">
+        <div class="border-b border-slate-100 pb-4">
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">🖼️ 오픈마켓 썸네일 1:1 정방형 패딩 &amp; 스마트 누끼</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            직사각형 도매 사진을 1000×1000px 순백색 캔버스에 안착시키고, 외곽선 스마트 누끼로 배경을 제거합니다.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div class="lg:col-span-5 space-y-4">
+            <div id="thumbDropzone" class="border-2 border-dashed border-indigo-300 hover:border-indigo-600 rounded-2xl p-8 text-center cursor-pointer transition-all bg-indigo-50/30">
+              <input type="file" id="thumbFileInput" accept="image/*" class="hidden">
+              <i data-lucide="camera" class="w-10 h-10 text-indigo-600 mx-auto mb-2"></i>
+              <p class="text-sm font-bold text-slate-800">상품 사진 선택 (또는 드래그)</p>
+              <p class="text-xs text-slate-400 mt-1">직사각형 도매 사진도 1:1 정방형으로 자동 변환</p>
+            </div>
+            <button id="btnThumbSample" type="button" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors">
+              테스트용 직사각형 상품 샘플 불러오기
+            </button>
+
+            <!-- Thumb Controls -->
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-800">외곽선 스마트 누끼 (배경 제거):</span>
+                <input type="checkbox" id="chkThumbCutout" checked class="w-4 h-4 text-indigo-600 rounded">
+              </div>
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="text-slate-600">사진 크기 줌 확대 (50% ~ 250%):</span>
+                  <span id="thumbZoomVal" class="font-bold text-indigo-600">90%</span>
+                </div>
+                <input type="range" id="thumbZoomRange" min="50" max="250" value="90" class="w-full accent-indigo-600">
+              </div>
+              <div class="grid grid-cols-2 gap-2 pt-1">
+                <div>
+                  <span class="text-[10px] text-slate-500 block mb-0.5">X축 좌우 이동</span>
+                  <input type="range" id="thumbPanX" min="-250" max="250" value="0" class="w-full accent-indigo-500 h-1.5">
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-500 block mb-0.5">Y축 상하 이동</span>
+                  <input type="range" id="thumbPanY" min="-250" max="250" value="0" class="w-full accent-indigo-500 h-1.5">
+                </div>
+              </div>
+            </div>
+
+            <button id="btnDownloadThumb" type="button" disabled class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white font-bold text-sm rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>1000×1000px 대표 썸네일 다운로드</span>
+            </button>
+          </div>
+
+          <div class="lg:col-span-7 space-y-3">
+            <span class="text-xs font-bold text-slate-700">1000×1000px 실시간 미리보기</span>
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 checkerboard-bg flex items-center justify-center min-h-[380px]">
+              <canvas id="thumbCanvas" width="1000" height="1000" class="max-w-full h-auto max-h-[360px] object-contain rounded-xl shadow-md bg-white"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: 바코드 & QR 일괄 생성기 -->
+    <div id="tab-barcode" class="tab-panel hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xl space-y-6">
+        <div class="border-b border-slate-100 pb-4">
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">📦 Code 128 바코드 &amp; QR 일괄 생성기 (롤타입/A4 인쇄)</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            쿠팡 로켓그로스, 네이버 풀필먼트(NFA) 표준 바코드를 생성하고 A4 3/4열 및 롤 라벨지(5×3, 4×2, 6×4 등)로 즉시 인쇄합니다.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div class="lg:col-span-5 space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">바코드 / QR 값 (데이터)</label>
+              <input type="text" id="suiteBarcodeVal" value="CP-ROCKET-202601" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono-code font-bold">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">상단 상품명 라벨</label>
+              <input type="text" id="suiteBarcodeTitle" value="프리미엄 무선 블루투스 이어폰 (블랙)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold">
+            </div>
+
+            <!-- Paper Selector -->
+            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 text-xs">
+              <span class="font-bold text-slate-800 block">용지 및 라벨 사이즈 규격</span>
+              <div class="grid grid-cols-2 gap-2">
+                <label class="p-2 rounded-xl border border-indigo-600 bg-indigo-50 text-indigo-900 font-bold flex items-center gap-1.5 cursor-pointer">
+                  <input type="radio" name="suitePaperType" value="roll" checked class="text-indigo-600">
+                  <span>롤타입 (1장씩 출력)</span>
+                </label>
+                <label class="p-2 rounded-xl border border-slate-200 bg-white text-slate-700 font-bold flex items-center gap-1.5 cursor-pointer">
+                  <input type="radio" name="suitePaperType" value="a4" class="text-indigo-600">
+                  <span>A4 용지 (3/4열)</span>
+                </label>
+              </div>
+
+              <!-- Roll presets -->
+              <div id="suiteRollBox" class="space-y-2 pt-1">
+                <span class="text-[11px] text-slate-500 font-bold block">롤타입 규격 프리셋 선택:</span>
+                <div class="grid grid-cols-4 gap-1.5 text-center font-bold text-[11px]">
+                  <button type="button" class="suite-roll-btn py-1.5 border border-indigo-600 bg-indigo-50 text-indigo-700 rounded-lg" data-w="50" data-h="30">5×3 (50×30)</button>
+                  <button type="button" class="suite-roll-btn py-1.5 border border-slate-200 bg-white text-slate-700 rounded-lg" data-w="40" data-h="20">4×2 (40×20)</button>
+                  <button type="button" class="suite-roll-btn py-1.5 border border-slate-200 bg-white text-slate-700 rounded-lg" data-w="60" data-h="40">6×4 (60×40)</button>
+                  <button type="button" class="suite-roll-btn py-1.5 border border-slate-200 bg-white text-slate-700 rounded-lg" data-w="80" data-h="50">8×5 (80×50)</button>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                  <div>가로: <input type="number" id="suiteRollW" value="50" class="w-16 px-1.5 py-0.5 border rounded font-mono-code font-bold"> mm</div>
+                  <div>세로: <input type="number" id="suiteRollH" value="30" class="w-16 px-1.5 py-0.5 border rounded font-mono-code font-bold"> mm</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-2">
+              <button id="btnSuitePrintBarcode" type="button" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5">
+                <i data-lucide="printer" class="w-4 h-4"></i> 라벨 규격 맞춤 즉시 인쇄
+              </button>
+              <button id="btnSuiteDownloadBarcodePng" type="button" class="py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all">
+                PNG 저장
+              </button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 space-y-3">
+            <span class="text-xs font-bold text-slate-700">라벨 미리보기</span>
+            <div class="p-8 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col items-center justify-center min-h-[300px]">
+              <div class="barcode-label-card max-w-sm w-full p-6 shadow-md bg-white space-y-2">
+                <div id="suitePrevTitle" class="text-xs font-bold text-slate-800 text-center">프리미엄 무선 블루투스 이어폰 (블랙)</div>
+                <div class="flex justify-center overflow-hidden py-2">
+                  <canvas id="suiteBarcodeCanvas" class="max-w-full h-auto"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: 마진율 & 역마진 계산기 -->
+    <div id="tab-margin" class="tab-panel hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xl space-y-6">
+        <div class="border-b border-slate-100 pb-4">
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">💰 스마트스토어·쿠팡 마진율 &amp; 수수료·역마진 계산기</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            마켓별 수수료, 고객 배송비 차액, 포장비, 부가세(VAT), 광고비를 반영하여 통장에 꽂히는 실수령액을 계산합니다.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div class="lg:col-span-6 space-y-4">
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">판매가 (원)</label>
+                <input type="number" id="suiteSalePrice" value="29900" step="500" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold font-mono-code text-sm">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">매입 원가 (원)</label>
+                <input type="number" id="suiteCostPrice" value="12000" step="500" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold font-mono-code text-sm">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">고객 배송비 (원)</label>
+                <input type="number" id="suiteCustShip" value="3000" step="500" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold font-mono-code">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">실 발송비 (원)</label>
+                <input type="number" id="suiteActShip" value="2800" step="100" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold font-mono-code">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">포장비 (원)</label>
+                <input type="number" id="suitePackCost" value="500" step="50" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold font-mono-code">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">건당 광고비 (원)</label>
+                <input type="number" id="suiteAdCost" value="2000" step="100" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold font-mono-code">
+              </div>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center text-xs">
+              <span class="font-bold text-slate-700">마켓 수수료율 (%):</span>
+              <input type="number" id="suiteFeeRate" value="5.63" step="0.1" class="w-20 px-2 py-1 text-center rounded border font-bold text-emerald-700">
+            </div>
+          </div>
+
+          <div class="lg:col-span-6 space-y-4">
+            <div class="bg-slate-900 rounded-3xl p-6 text-white space-y-4 shadow-xl">
+              <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <span class="text-xs font-bold text-slate-400">최종 순수익 (실수령액)</span>
+                <span id="suiteMarginBadge" class="text-xs font-extrabold text-emerald-400 bg-emerald-500/20 px-2.5 py-0.5 rounded-full">안전 마진</span>
+              </div>
+              <div class="flex items-baseline justify-between">
+                <span class="text-2xl sm:text-3xl font-black font-mono-code text-emerald-400" id="suiteNetProfit">0원</span>
+                <span class="text-xl font-bold font-mono-code text-slate-200" id="suiteMarginRate">0%</span>
+              </div>
+              <div class="pt-2 border-t border-slate-800 flex justify-between text-xs text-amber-300">
+                <span>역마진 방지 최소 판매가:</span>
+                <span class="font-bold font-mono-code" id="suiteBreakeven">0원</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: OCR 텍스트 & 태그 추출기 -->
+    <div id="tab-ocr" class="tab-panel hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xl space-y-6">
+        <div class="border-b border-slate-100 pb-4">
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">🔍 상세페이지 OCR 텍스트 &amp; 태그 추출기</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            도매처 상세페이지 이미지에서 한글/영문 텍스트를 AI로 자동 추출하고, 검색 상위노출용 핵심 태그를 생성합니다.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div class="lg:col-span-5 space-y-4">
+            <div id="ocrDropzone" class="border-2 border-dashed border-violet-300 hover:border-violet-600 rounded-2xl p-6 text-center cursor-pointer bg-violet-50/30">
+              <input type="file" id="ocrFileInput" accept="image/*" class="hidden">
+              <i data-lucide="scan-text" class="w-10 h-10 text-violet-600 mx-auto mb-2"></i>
+              <p class="text-xs font-bold text-slate-800">이미지 선택 또는 드래그</p>
+            </div>
+            <button id="btnOcrSample" type="button" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors">
+              테스트용 상세페이지 샘플 로드
+            </button>
+            <button id="btnRunOcr" type="button" disabled class="w-full py-3.5 bg-violet-600 hover:bg-violet-700 disabled:bg-slate-300 text-white font-bold text-sm rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+              <i data-lucide="wand-2" class="w-4 h-4"></i>
+              <span>AI 텍스트 추출 및 태그 생성 시작</span>
+            </button>
+            <div id="suiteOcrProgress" class="hidden text-xs font-bold text-violet-700 text-center py-1">분석 중...</div>
+          </div>
+
+          <div class="lg:col-span-7 space-y-4">
+            <div>
+              <span class="text-xs font-bold text-slate-700 block mb-1">생성된 검색 키워드 태그:</span>
+              <div id="suiteOcrTags" class="p-3 bg-slate-50 rounded-xl border border-slate-200 min-h-[50px] flex flex-wrap gap-1.5 text-xs text-slate-400">
+                이미지 추출 후 태그가 표시됩니다.
+              </div>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-slate-700 block mb-1">추출된 전체 원문:</span>
+              <textarea id="suiteOcrTextarea" rows="6" placeholder="원문 텍스트가 표시됩니다." class="w-full p-3 rounded-xl border border-slate-300 text-xs"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: 상품명 조합기 & 금지단어 필터기 -->
+    <div id="tab-title" class="tab-panel hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xl space-y-6">
+        <div class="border-b border-slate-100 pb-4">
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">🏷️ 상품명 키워드 조합기 &amp; 금지단어 필터기</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            핵심 키워드를 조합하여 네이버/쿠팡 50자 이내 최적화 상품명을 생성하고, 제재 금지 단어를 실시간 필터링합니다.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div class="lg:col-span-6 space-y-3 text-xs">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">브랜드명 (선택)</label>
+              <input type="text" id="suiteBrand" value="바코드원" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">메인 키워드 (쉼표 구분)</label>
+              <input type="text" id="suiteMainKws" value="무선 이어폰, 블루투스 이어폰, 노이즈캔슬링 이어폰" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">세부 스펙/기능 키워드</label>
+              <input type="text" id="suiteSubKws" value="생활방수, 고음질 통화, 초경량, C타입 충전" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold">
+            </div>
+            <button id="btnSuiteCombine" type="button" class="w-full py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4"></i> 50자 상품명 일괄 조합하기
+            </button>
+          </div>
+
+          <div class="lg:col-span-6 space-y-3">
+            <span class="text-xs font-bold text-slate-700 block">조합된 상품명 목록 (50자 이내):</span>
+            <div id="suiteTitleResults" class="space-y-2 max-h-[360px] overflow-y-auto pr-1">
+              <!-- Result cards -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Print Secret Container -->
+    <div id="printArea" class="hidden">
+      <div id="printGrid"></div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- DYNAMIC COUPANG AFFILIATE PRODUCT SECTION  -->
+    <!-- (페이지 하단에 딱 1번만 깔끔하게 표시)        -->
+    <!-- ========================================== -->
+    <section class="mt-12 pt-8 border-t border-slate-300/80 space-y-6 no-print" id="suiteAffiliateSection">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+        <div>
+          <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-indigo-600 uppercase tracking-wider bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100">
+            <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i> SELLER RECOMMENDATION
+          </span>
+          <h3 class="text-xl sm:text-2xl font-black text-slate-900 mt-2" id="affHeaderTitle">
+            출고 시간 80% 단축하는 물류·바코드 필수 장비 3종
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1" id="affHeaderSub">
+            쿠팡 로켓배송 입고, 스마트스토어 송장 출력, 물류창고 바코드 스캔을 가장 빠르고 정확하게 처리하세요.
+          </p>
+        </div>
+        <span class="text-xs font-bold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-lg self-start sm:self-auto shadow-sm" id="affHeaderBadge">
+          셀러 추천템 3선
+        </span>
+      </div>
+
+      <!-- 3 Real Product Cards Container -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5" id="affCardsContainer">
+        <!-- Injected via JS based on active tab -->
+      </div>
+
+      <div class="text-center pt-2">
+        <p class="text-[11px] text-slate-400 bg-white inline-block px-4 py-1.5 rounded-full border border-slate-200 shadow-sm">
+          이 포스팅은 쿠팡 파트너스 활동의 일환으로 수수료를 제공받습니다.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12 no-print text-center text-xs text-slate-500">
+    <p class="font-bold text-slate-700">이커머스 셀러 올인원 툴킷 · Barcode128 Studio</p>
+    <p class="text-[11px] text-slate-400 mt-1">100% Client-Side Engine · 외부 서버 전송 없는 안전한 무인 처리</p>
+  </footer>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    lucide.createIcons();
+
+    // 1. ALL 12 REAL COUPANG PRODUCTS DATABASE
+    const affiliateProducts = {
+      'tab-slice': {
+        title: "상세페이지 제작 & 촬영 장비 베스트 3",
+        sub: "그림자 없는 밝은 조명과 구김 없는 배경지로 상세페이지 촬영 시간을 90% 줄여보세요.",
+        badge: "촬영 스튜디오 3종",
+        items: [
+          {
+            title: "대한 포터블 스튜디오 3세대 대형 40cm 포토박스",
+            desc: "그림자 없는 고휘도 LED 조명 탑재. 방구석에서도 전문가급 순백색 배경 촬영 완벽 지원.",
+            tag: "누끼 0초 컷",
+            badge: "가성비 원탑 / 로켓배송",
+            link: "https://www.coupang.com/vp/products/6121754708?itemId=11345128755&lptag=AF6633950&subid=thumbtool",
+            img: "https://barcodeone.github.io/detail_slice_compressor/images/photobox.jpg"
+          },
+          {
+            title: "LED 링라이트 탁상용 조명 스탠드 삼각대",
+            desc: "3단 색온도 및 10단계 밝기 조절. 상품의 디테일과 색감을 실물 그대로 생생하게 표현.",
+            tag: "선명한 화질",
+            badge: "판매 1위 / 무료배송",
+            link: "https://www.coupang.com/vp/products/7317926176?itemId=18758804677&lptag=AF6633950&subid=thumbtool",
+            img: "https://barcodeone.github.io/detail_slice_compressor/images/ringlight.jpg"
+          },
+          {
+            title: "사진 촬영 그라데이션 양면 배경지 (57×87cm)",
+            desc: "빛 반사 없는 매트한 표면으로 누끼 따기 최적화. 물이나 먼지도 닦아 쓰는 영구 배경지.",
+            tag: "방수/오염 방지",
+            badge: "실속 패키지 / 로켓배송",
+            link: "https://www.coupang.com/vp/products/6554508496?itemId=14647311740&lptag=AF6633950&subid=thumbtool",
+            img: "https://barcodeone.github.io/detail_slice_compressor/images/backdrop.jpg"
+          }
+        ]
+      },
+      'tab-thumb': {
+        title: "누끼 작업 시간 90% 줄여주는 셀러 촬영 필수템 3종",
+        sub: "깨끗한 화이트 배경과 밝은 조명으로 촬영하면 대표 썸네일 제작이 3초 만에 끝납니다.",
+        badge: "촬영 장비 베스트 3",
+        items: [
+          {
+            title: "대한 포터블 스튜디오 3세대 대형 40cm 포토박스",
+            desc: "그림자 없는 고휘도 LED 조명 탑재. 방구석에서도 전문가급 순백색 배경 촬영 완벽 지원.",
+            tag: "누끼 0초 컷",
+            badge: "가성비 원탑 / 로켓배송",
+            link: "https://www.coupang.com/vp/products/6121754708?itemId=11345128755&lptag=AF6633950&subid=thumbtool",
+            img: "https://barcodeone.github.io/detail_slice_compressor/images/photobox.jpg"
+          },
+          {
+            title: "LED 링라이트 탁상용 조명 스탠드 삼각대",
+            desc: "3단 색온도 및 10단계 밝기 조절. 상품의 디테일과 색감을 실물 그대로 생생하게 표현.",
+            tag: "선명한 화질",
+            badge: "판매 1위 / 무료배송",
+            link: "https://www.coupang.com/vp/products/7317926176?itemId=18758804677&lptag=AF6633950&subid=thumbtool",
+            img: "https://barcodeone.github.io/detail_slice_compressor/images/ringlight.jpg"
+          },
+          {
+            title: "사진 촬영 그라데이션 양면 배경지 (57×87cm)",
+            desc: "빛 반사 없는 매트한 표면으로 누끼 따기 최적화. 물이나 먼지도 닦아 쓰는 영구 배경지.",
+            tag: "방수/오염 방지",
+            badge: "실속 패키지 / 로켓배송",
+            link: "https://www.coupang.com/vp/products/6554508496?itemId=14647311740&lptag=AF6633950&subid=thumbtool",
+            img: "https://barcodeone.github.io/detail_slice_compressor/images/backdrop.jpg"
+          }
+        ]
+      },
+      'tab-barcode': {
+        title: "출고 시간 80% 단축하는 물류·바코드 필수 장비 3종",
+        sub: "쿠팡 로켓배송 입고, 스마트스토어 송장 출력, 물류창고 바코드 스캔을 가장 빠르고 정확하게 처리하세요.",
+        badge: "물류 장비 베스트 3",
+        items: [
+          {
+            title: "엑스프린터 감열식 바코드 라벨 프린터 XP-D4601B",
+            desc: "잉크나 토너 없이 열로 인쇄하는 초고속 감열 프린터. 바코드 라벨부터 택배 송장까지 1초 만에 깔끔 출력.",
+            tag: "잉크/토너 제로",
+            badge: "셀러 1위 / 로켓배송",
+            link: "https://link.coupang.com/a/h0ih4VlEvA",
+            img: "https://img3a.coupangcdn.com/image/affiliate/banner/ac86bc6d5c9d2c854a857844f622fdc7@2x.jpg"
+          },
+          {
+            title: "미라클엠 유선 바코드 스캐너 + 거치대 MQ150",
+            desc: "PC, 태블릿 즉시 연결 지원. 비닐 포장 안쪽 바코드나 손상된 라벨도 1초 만에 정확히 인식.",
+            tag: "1초 100% 인식",
+            badge: "업무 효율 3배 / 무료배송",
+            link: "https://link.coupang.com/a/h0in0MeuBM",
+            img: "https://img5c.coupangcdn.com/image/affiliate/banner/0d594bcb9af70adf024c78e2f5ac0696@2x.jpg"
+          },
+          {
+            title: "유포감열 롤라벨 방수 바코드 스티커 50×30 (1500장)",
+            desc: "물, 기름, 스크래치에 강한 특수 유포 감열 코팅. 강력한 접착력으로 박스 및 의류 택 완벽 밀착.",
+            tag: "방수/방유/스크래치 방지",
+            badge: "가성비 대용량 / 로켓배송",
+            link: "https://link.coupang.com/a/h0iuTiwCse",
+            img: "https://image11.coupangcdn.com/image/affiliate/banner/814a713f13b49923e2e25d8744978231@2x.jpg"
+          }
+        ]
+      },
+      'tab-margin': {
+        title: "마진 관리 & 업무 효율 3배 올려주는 셀러 필수 데스크 장비 3종",
+        sub: "정확한 무게 측정으로 배송비 오과금을 막고, 하루 종일 작업하는 손목과 눈의 피로를 덜어주는 장비입니다.",
+        badge: "셀러 오피스 베스트 3",
+        items: [
+          {
+            title: "홈플래닛 스테인레스 디지털 백라이팅 정밀 전자저울 1kg",
+            desc: "0.1g 단위 정밀 측정. 로켓그로스 입고 및 택배사 무게 구간 오과금을 막아 마진을 사수하는 필수 장비.",
+            tag: "배송비 누수 방지",
+            badge: "셀러 1위 / 로켓배송",
+            link: "https://link.coupang.com/a/h0iyPbdPci",
+            img: "https://image5.coupangcdn.com/image/affiliate/banner/2699d16b108001197fae1c3159168da7@2x.jpg"
+          },
+          {
+            title: "로이체 인체공학 저소음 버티컬 충전식 무선 마우스 RX-800V",
+            desc: "하루 수백 번 클릭과 상품 등록에도 손목 꺾임 없는 편안한 57도 인체공학 각도 설계.",
+            tag: "터널증후군 예방",
+            badge: "만족도 99% / 무료배송",
+            link: "https://link.coupang.com/a/h0iBDgYQVg",
+            img: "https://img3a.coupangcdn.com/image/affiliate/banner/9cee212752e7ebe05f721f7ee33d2066@2x.jpg"
+          },
+          {
+            title: "노스바유 NB F160 듀얼 모니터암 거치대 화이트",
+            desc: "세로 모드로 긴 상세페이지 한눈에 검토하고, 가로 모드로 마켓 3개 주문 수집 화면 동시 분할.",
+            tag: "작업속도 2배",
+            badge: "가성비 추천 / 로켓배송",
+            link: "https://link.coupang.com/a/h0iFQq43j2",
+            img: "https://img4a.coupangcdn.com/image/affiliate/banner/956658e22933c136ece47a8ef44230d3@2x.jpg"
+          }
+        ]
+      },
+      'tab-ocr': {
+        title: "상세페이지 제작 & 그래픽 작업 속도 3배 올려주는 필수 장비 3종",
+        sub: "정밀한 누끼 작업, 대용량 원본 파일 백업, 장시간 타이핑 피로를 덜어주는 디자이너/셀러 장비입니다.",
+        badge: "제작 장비 베스트 3",
+        items: [
+          {
+            title: "와콤 USB타입 인튜어스 중형 펜타블렛 CTL-6100 블랙",
+            desc: "마우스로는 힘든 미세한 외곽선 누끼 따기, 잡티 제거, 캘리그라피 디자인을 펜으로 자연스럽게 드로잉.",
+            tag: "누끼 작업 필수",
+            badge: "가성비 최고 / 로켓배송",
+            link: "https://link.coupang.com/a/h0iKvHlEAK",
+            img: "https://image1.coupangcdn.com/image/affiliate/banner/c3cf70e0f2fdfbb2348f28aeaf19509e@2x.jpg"
+          },
+          {
+            title: "샌디스크 익스트림 포터블 외장 SSD e61 1TB 블랙",
+            desc: "기가바이트 단위의 고해상도 상세페이지 PSD와 소싱 원본 사진을 1초 만에 백업하고 안전하게 보관.",
+            tag: "대용량 안심 백업",
+            badge: "판매 1위 / 무료배송",
+            link: "https://link.coupang.com/a/h0iOYUUXDg",
+            img: "https://image1.coupangcdn.com/image/affiliate/banner/191f9f7747ee9c6f22f5d7185ce8c955@2x.jpg"
+          },
+          {
+            title: "메이브 무소음 파스텔 저소음 사무용 키보드 MV-K1",
+            desc: "하루 종일 상품 설명과 키워드를 작성해도 손가락과 손목에 무리 없는 부드러운 타건감.",
+            tag: "손가락 피로 제로",
+            badge: "만족도 98% / 로켓배송",
+            link: "https://link.coupang.com/a/h0iSx6wSbc",
+            img: "https://img5a.coupangcdn.com/image/affiliate/banner/e30affeae48a14e975913dd7e24ff482@2x.jpg"
+          }
+        ]
+      },
+      'tab-title': {
+        title: "상품 등록 후 포장·출고 속도 3배 올려주는 물류 자재 3종",
+        sub: "상품명이 잘 짜여 주문이 폭주할 때 손목 피로 없이 1초 만에 박스를 테이핑하고 완충 포장하세요.",
+        badge: "포장 자재 베스트 3",
+        items: [
+          {
+            title: "1+1 바이리모 프리미엄 박스 테이프 커터기 2개입 (칼날 63mm)",
+            desc: "씹힘이나 헛돌림 없이 한 손으로 깔끔하게 끊어지는 인체공학 테이프 디스펜서.",
+            tag: "포장 속도 3배",
+            badge: "필수 포장템 / 로켓배송",
+            link: "https://link.coupang.com/a/h0iXxApqQm",
+            img: "https://image9.coupangcdn.com/image/affiliate/banner/9e7550374eb4b0a4327c4cf56c362102@2x.jpg"
+          },
+          {
+            title: "에어젠 친환경 크라프트 벌집 종이 완충재 뽁뽁이 롤 (500mm×250m)",
+            desc: "늘려서 감싸기만 하면 자체 고정. 플라스틱 쓰레기 없는 프리미엄 감성 언박싱 연출.",
+            tag: "고급스런 포장",
+            badge: "감성 평점 1위 / 무료배송",
+            link: "https://link.coupang.com/a/h0i0VfCbbU",
+            img: "https://image11.coupangcdn.com/image/affiliate/banner/f2ed9239cba9047bf7d163b7f08a5c52@2x.jpg"
+          },
+          {
+            title: "뽁순이 국내생산 두꺼운 에어캡 뽁뽁이 롤 대용량",
+            desc: "쉽게 터지지 않는 탄탄한 2중 공기 방울층. 깨지기 쉬운 도자기, 전자제품 완벽 보호.",
+            tag: "파손 클레임 제로",
+            badge: "가성비 대용량 / 로켓배송",
+            link: "https://link.coupang.com/a/h0i4RS7vYi",
+            img: "https://image7.coupangcdn.com/image/affiliate/banner/fa0ae43e6d923b837e2c8c1951df2476@2x.jpg"
+          }
+        ]
+      }
+    };
+
+    // 2. TAB SWITCHING LOGIC
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+    const affHeaderTitle = document.getElementById('affHeaderTitle');
+    const affHeaderSub = document.getElementById('affHeaderSub');
+    const affHeaderBadge = document.getElementById('affHeaderBadge');
+    const affCardsContainer = document.getElementById('affCardsContainer');
+
+    function switchTab(targetId) {
+      tabButtons.forEach(btn => {
+        if (btn.dataset.tab === targetId) {
+          btn.className = "tab-btn active px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-2 whitespace-nowrap transition-all duration-150 bg-indigo-600 text-white shadow-md shadow-indigo-600/20";
+        } else {
+          btn.className = "tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 whitespace-nowrap transition-all duration-150 text-slate-600 hover:text-slate-900 hover:bg-white";
+        }
+      });
+
+      tabPanels.forEach(panel => {
+        if (panel.id === targetId) {
+          panel.classList.remove('hidden');
+        } else {
+          panel.classList.add('hidden');
+        }
+      });
+
+      // Render Coupang Products for this active tab
+      renderAffiliate(targetId);
+      lucide.createIcons();
+    }
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    function renderAffiliate(tabId) {
+      const data = affiliateProducts[tabId] || affiliateProducts['tab-slice'];
+      affHeaderTitle.textContent = data.title;
+      affHeaderSub.textContent = data.sub;
+      affHeaderBadge.textContent = data.badge;
+
+      affCardsContainer.innerHTML = '';
+      data.items.forEach(it => {
+        const card = document.createElement('div');
+        card.className = "bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between hover:border-indigo-400";
+        card.innerHTML = `
+          <div>
+            <div class="w-full h-44 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-3 mb-4 overflow-hidden">
+              <img src="${it.img}" alt="${it.title}" class="max-w-full max-h-full object-contain rounded-lg" loading="lazy" />
+            </div>
+            <span class="inline-block text-[10px] font-bold bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded mb-2 border border-indigo-100">${it.tag}</span>
+            <h4 class="text-sm font-bold text-slate-900 leading-snug mb-1.5">${it.title}</h4>
+            <p class="text-xs text-slate-500 leading-relaxed mb-4">${it.desc}</p>
+          </div>
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs font-extrabold text-slate-800">${it.badge}</span>
+            <a href="${it.link}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs px-3.5 py-1.5 rounded-lg transition-colors">
+              상품 보기 ➔
+            </a>
+          </div>
+        `;
+        affCardsContainer.appendChild(card);
+      });
+    }
+
+    // Init first tab affiliate
+    renderAffiliate('tab-slice');
+
+    // ==========================================
+    // TOOL 1: SLICE COMPRESSOR ENGINE
+    // ==========================================
+    let sliceImg = null;
+    const sliceDropzone = document.getElementById('sliceDropzone');
+    const sliceFileInput = document.getElementById('sliceFileInput');
+    const btnSliceSample = document.getElementById('btnSliceSample');
+    const btnProcessSlice = document.getElementById('btnProcessSlice');
+    const slicePreviewContainer = document.getElementById('slicePreviewContainer');
+    const sliceWidthBtns = document.querySelectorAll('.slice-width-btn');
+    let targetSliceWidth = 860;
+
+    sliceWidthBtns.forEach(b => {
+      b.addEventListener('click', () => {
+        sliceWidthBtns.forEach(btn => {
+          btn.className = "slice-width-btn py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 font-bold";
+        });
+        b.className = "slice-width-btn active py-1.5 rounded-lg border border-indigo-600 bg-indigo-50 text-indigo-700 font-bold";
+        targetSliceWidth = parseInt(b.dataset.w, 10);
+      });
+    });
+
+    sliceDropzone.addEventListener('click', () => sliceFileInput.click());
+    sliceFileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) loadSliceImage(e.target.files[0]);
+    });
+
+    function loadSliceImage(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          sliceImg = img;
+          btnProcessSlice.disabled = false;
+          slicePreviewContainer.innerHTML = `
+            <div class="space-y-2 text-center">
+              <p class="font-bold text-slate-800 text-sm">✅ 원본 로드 완료: ${img.naturalWidth} × ${img.naturalHeight} px</p>
+              <p class="text-indigo-600 font-semibold text-xs">예상 분할 조각: 약 ${Math.ceil(img.naturalHeight / parseInt(document.getElementById('sliceHeightInput').value, 10))}개</p>
+            </div>
+          `;
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    btnSliceSample.addEventListener('click', () => {
+      const c = document.createElement('canvas');
+      c.width = 1000;
+      c.height = 4000;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 1000, 4000);
+      ctx.fillStyle = '#4f46e5';
+      ctx.fillRect(0, 0, 1000, 300);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 40px Pretendard, sans-serif';
+      ctx.fillText('가상 고해상도 상세페이지 샘플', 100, 160);
+      
+      const img = new Image();
+      img.onload = () => {
+        sliceImg = img;
+        btnProcessSlice.disabled = false;
+        slicePreviewContainer.innerHTML = `<p class="font-bold text-indigo-600">✅ 1000×4000px 샘플 로드 완료</p>`;
+      };
+      img.src = c.toDataURL('image/png');
+    });
+
+    btnProcessSlice.addEventListener('click', async () => {
+      if (!sliceImg) return;
+      btnProcessSlice.disabled = true;
+      btnProcessSlice.innerHTML = '<span>분할 및 WebP 압축 중...</span>';
+
+      const sHeight = parseInt(document.getElementById('sliceHeightInput').value, 10);
+      const quality = parseInt(document.getElementById('sliceQualityInput').value, 10) / 100;
+      const zip = new JSZip();
+
+      const scale = targetSliceWidth / sliceImg.naturalWidth;
+      const totalH = Math.round(sliceImg.naturalHeight * scale);
+      const count = Math.ceil(totalH / sHeight);
+
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = targetSliceWidth;
+      const offCtx = offCanvas.getContext('2d');
+
+      for (let i = 0; i < count; i++) {
+        const curY = i * sHeight;
+        const curH = Math.min(sHeight, totalH - curY);
+        offCanvas.height = curH;
+
+        offCtx.drawImage(
+          sliceImg,
+          0, curY / scale, sliceImg.naturalWidth, curH / scale,
+          0, 0, targetSliceWidth, curH
+        );
+
+        const dataUrl = offCanvas.toDataURL('image/webp', quality);
+        const base64 = dataUrl.split(',')[1];
+        zip.file(`slice_${String(i+1).padStart(3, '0')}.webp`, base64, { base64: true });
+      }
+
+      const blob = await zip.generateAsync({ type: 'blob' });
+      saveAs(blob, `detail_slices_${Date.now()}.zip`);
+
+      btnProcessSlice.disabled = false;
+      btnProcessSlice.innerHTML = '<i data-lucide="scissors" class="w-4 h-4"></i><span>분할 &amp; ZIP 다운로드 완료!</span>';
+      lucide.createIcons();
+    });
+
+    // ==========================================
+    // TOOL 2: THUMBNAIL OPTIMIZER ENGINE
+    // ==========================================
+    let thumbImg = null;
+    const thumbDropzone = document.getElementById('thumbDropzone');
+    const thumbFileInput = document.getElementById('thumbFileInput');
+    const btnThumbSample = document.getElementById('btnThumbSample');
+    const btnDownloadThumb = document.getElementById('btnDownloadThumb');
+    const thumbCanvas = document.getElementById('thumbCanvas');
+    const thumbZoomRange = document.getElementById('thumbZoomRange');
+    const thumbZoomVal = document.getElementById('thumbZoomVal');
+    const thumbPanX = document.getElementById('thumbPanX');
+    const thumbPanY = document.getElementById('thumbPanY');
+    const chkThumbCutout = document.getElementById('chkThumbCutout');
+
+    thumbDropzone.addEventListener('click', () => thumbFileInput.click());
+    thumbFileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) loadThumbImage(e.target.files[0]);
+    });
+
+    function loadThumbImage(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          thumbImg = img;
+          btnDownloadThumb.disabled = false;
+          renderThumbCanvas();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    btnThumbSample.addEventListener('click', () => {
+      const c = document.createElement('canvas');
+      c.width = 600;
+      c.height = 800; // 3:4 rect
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 600, 800);
+      ctx.fillStyle = '#4f46e5';
+      ctx.beginPath();
+      ctx.arc(300, 400, 180, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 32px Pretendard';
+      ctx.textAlign = 'center';
+      ctx.fillText('상품 원본', 300, 410);
+
+      const img = new Image();
+      img.onload = () => {
+        thumbImg = img;
+        btnDownloadThumb.disabled = false;
+        renderThumbCanvas();
+      };
+      img.src = c.toDataURL('image/png');
+    });
+
+    [thumbZoomRange, thumbPanX, thumbPanY, chkThumbCutout].forEach(el => {
+      el.addEventListener('input', () => {
+        thumbZoomVal.textContent = `${thumbZoomRange.value}%`;
+        renderThumbCanvas();
+      });
+    });
+
+    function renderThumbCanvas() {
+      if (!thumbImg) return;
+      const size = 1000;
+      thumbCanvas.width = size;
+      thumbCanvas.height = size;
+      const ctx = thumbCanvas.getContext('2d');
+
+      // Clear white background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+
+      const zoom = parseInt(thumbZoomRange.value, 10) / 100;
+      const panX = parseInt(thumbPanX.value, 10);
+      const panY = parseInt(thumbPanY.value, 10);
+
+      const maxAvail = size * zoom;
+      const ratio = Math.min(maxAvail / thumbImg.naturalWidth, maxAvail / thumbImg.naturalHeight);
+      const drawW = Math.round(thumbImg.naturalWidth * ratio);
+      const drawH = Math.round(thumbImg.naturalHeight * ratio);
+      const drawX = Math.round((size - drawW) / 2 + panX);
+      const drawY = Math.round((size - drawH) / 2 + panY);
+
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(thumbImg, drawX, drawY, drawW, drawH);
+    }
+
+    btnDownloadThumb.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = `thumbnail_square_${Date.now()}.jpg`;
+      link.href = thumbCanvas.toDataURL('image/jpeg', 0.95);
+      link.click();
+    });
+
+    // ==========================================
+    // TOOL 3: BARCODE & QR GENERATOR ENGINE
+    // ==========================================
+    const suiteBarcodeVal = document.getElementById('suiteBarcodeVal');
+    const suiteBarcodeTitle = document.getElementById('suiteBarcodeTitle');
+    const suiteBarcodeCanvas = document.getElementById('suiteBarcodeCanvas');
+    const suitePrevTitle = document.getElementById('suitePrevTitle');
+    const suiteRollBtns = document.querySelectorAll('.suite-roll-btn');
+    const suiteRollW = document.getElementById('suiteRollW');
+    const suiteRollH = document.getElementById('suiteRollH');
+    const btnSuitePrintBarcode = document.getElementById('btnSuitePrintBarcode');
+    const btnSuiteDownloadBarcodePng = document.getElementById('btnSuiteDownloadBarcodePng');
+
+    function renderSuiteBarcode() {
+      suitePrevTitle.textContent = suiteBarcodeTitle.value;
+      try {
+        JsBarcode(suiteBarcodeCanvas, suiteBarcodeVal.value || 'BARCODE', {
+          format: 'CODE128',
+          width: 2,
+          height: 50,
+          displayValue: true,
+          fontSize: 13,
+          font: 'monospace',
+          margin: 6,
+          background: '#ffffff',
+          lineColor: '#000000'
+        });
+      } catch (err) {
+        console.warn(err);
+      }
+    }
+
+    suiteBarcodeVal.addEventListener('input', renderSuiteBarcode);
+    suiteBarcodeTitle.addEventListener('input', renderSuiteBarcode);
+
+    suiteRollBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        suiteRollBtns.forEach(b => {
+          b.className = "suite-roll-btn py-1.5 border border-slate-200 bg-white text-slate-700 rounded-lg";
+        });
+        btn.className = "suite-roll-btn py-1.5 border border-indigo-600 bg-indigo-50 text-indigo-700 rounded-lg";
+        suiteRollW.value = btn.dataset.w;
+        suiteRollH.value = btn.dataset.h;
+      });
+    });
+
+    btnSuitePrintBarcode.addEventListener('click', () => {
+      const pType = document.querySelector('input[name="suitePaperType"]:checked').value;
+      const printGrid = document.getElementById('printGrid');
+      printGrid.innerHTML = '';
+
+      const oldS = document.getElementById('suitePrintStyle');
+      if (oldS) oldS.remove();
+
+      const st = document.createElement('style');
+      st.id = 'suitePrintStyle';
+
+      if (pType === 'roll') {
+        const rw = suiteRollW.value || 50;
+        const rh = suiteRollH.value || 30;
+        st.textContent = `
+          @media print {
+            @page { size: ${rw}mm ${rh}mm; margin: 0; }
+            #printArea { width: ${rw}mm !important; }
+            .roll-label-page { width: ${rw}mm !important; height: ${rh}mm !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 2mm !important; box-sizing: border-box !important; }
+          }
+        `;
+        const div = document.createElement('div');
+        div.className = 'roll-label-page';
+        div.innerHTML = `
+          <div style="font-size: 10px; font-weight: bold; margin-bottom: 2px;">${suiteBarcodeTitle.value}</div>
+        `;
+        const can = document.createElement('canvas');
+        JsBarcode(can, suiteBarcodeVal.value, { format: 'CODE128', width: 1.8, height: 40, displayValue: true, fontSize: 11 });
+        div.appendChild(can);
+        printGrid.appendChild(div);
+      } else {
+        st.textContent = `
+          @media print {
+            @page { size: A4 portrait; margin: 8mm; }
+            #printGrid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 4mm !important; }
+          }
+        `;
+        const div = document.createElement('div');
+        div.className = 'barcode-label-card';
+        div.innerHTML = `<div style="font-size: 10px; font-weight: bold; margin-bottom: 2px;">${suiteBarcodeTitle.value}</div>`;
+        const can = document.createElement('canvas');
+        JsBarcode(can, suiteBarcodeVal.value, { format: 'CODE128', width: 1.8, height: 45, displayValue: true, fontSize: 12 });
+        div.appendChild(can);
+        printGrid.appendChild(div);
+      }
+
+      document.head.appendChild(st);
+      document.getElementById('printArea').classList.remove('hidden');
+      window.print();
+      document.getElementById('printArea').classList.add('hidden');
+    });
+
+    btnSuiteDownloadBarcodePng.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = `${suiteBarcodeVal.value}_barcode.png`;
+      link.href = suiteBarcodeCanvas.toDataURL('image/png');
+      link.click();
+    });
+
+    renderSuiteBarcode();
+
+    // ==========================================
+    // TOOL 4: MARGIN CALCULATOR ENGINE
+    // ==========================================
+    const suiteSalePrice = document.getElementById('suiteSalePrice');
+    const suiteCostPrice = document.getElementById('suiteCostPrice');
+    const suiteCustShip = document.getElementById('suiteCustShip');
+    const suiteActShip = document.getElementById('suiteActShip');
+    const suitePackCost = document.getElementById('suitePackCost');
+    const suiteAdCost = document.getElementById('suiteAdCost');
+    const suiteFeeRate = document.getElementById('suiteFeeRate');
+    const suiteNetProfit = document.getElementById('suiteNetProfit');
+    const suiteMarginRate = document.getElementById('suiteMarginRate');
+    const suiteBreakeven = document.getElementById('suiteBreakeven');
+    const suiteMarginBadge = document.getElementById('suiteMarginBadge');
+
+    function calcSuiteMargin() {
+      const sale = parseInt(suiteSalePrice.value, 10) || 0;
+      const cost = parseInt(suiteCostPrice.value, 10) || 0;
+      const cShip = parseInt(suiteCustShip.value, 10) || 0;
+      const aShip = parseInt(suiteActShip.value, 10) || 0;
+      const pack = parseInt(suitePackCost.value, 10) || 0;
+      const ad = parseInt(suiteAdCost.value, 10) || 0;
+      const fee = parseFloat(suiteFeeRate.value) || 0;
+
+      const gross = sale + cShip;
+      const marketFee = Math.round(gross * (fee / 100));
+      const vat = Math.max(0, Math.round(gross / 11) - Math.round((cost + aShip + pack) / 11));
+      const net = gross - (cost + marketFee + aShip + pack + ad + vat);
+      const mRate = gross > 0 ? ((net / gross) * 100).toFixed(1) : 0;
+
+      const fixed = cost + aShip + pack + ad;
+      const bGross = Math.round(fixed / (1 - fee / 100));
+      const bSale = Math.max(0, bGross - cShip);
+
+      suiteNetProfit.textContent = `${net.toLocaleString()}원`;
+      suiteMarginRate.textContent = `${mRate}%`;
+      suiteBreakeven.textContent = `${bSale.toLocaleString()}원`;
+
+      if (net < 0) {
+        suiteMarginBadge.className = "text-xs font-extrabold text-rose-400 bg-rose-500/20 px-2.5 py-0.5 rounded-full";
+        suiteMarginBadge.textContent = "🚨 역마진 발생";
+      } else {
+        suiteMarginBadge.className = "text-xs font-extrabold text-emerald-400 bg-emerald-500/20 px-2.5 py-0.5 rounded-full";
+        suiteMarginBadge.textContent = "✨ 안전 마진";
+      }
+    }
+
+    [suiteSalePrice, suiteCostPrice, suiteCustShip, suiteActShip, suitePackCost, suiteAdCost, suiteFeeRate].forEach(el => {
+      el.addEventListener('input', calcSuiteMargin);
+    });
+    calcSuiteMargin();
+
+    // ==========================================
+    // TOOL 5: OCR TAG EXTRACTOR ENGINE
+    // ==========================================
+    let ocrImgData = null;
+    const ocrDropzone = document.getElementById('ocrDropzone');
+    const ocrFileInput = document.getElementById('ocrFileInput');
+    const btnOcrSample = document.getElementById('btnOcrSample');
+    const btnRunOcr = document.getElementById('btnRunOcr');
+    const suiteOcrProgress = document.getElementById('suiteOcrProgress');
+    const suiteOcrTags = document.getElementById('suiteOcrTags');
+    const suiteOcrTextarea = document.getElementById('suiteOcrTextarea');
+
+    ocrDropzone.addEventListener('click', () => ocrFileInput.click());
+    ocrFileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          ocrImgData = ev.target.result;
+          btnRunOcr.disabled = false;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+
+    btnOcrSample.addEventListener('click', () => {
+      const c = document.createElement('canvas');
+      c.width = 600; c.height = 300;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,600,300);
+      ctx.fillStyle = '#4f46e5'; ctx.fillRect(0,0,600,50);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 20px Pretendard';
+      ctx.fillText('초고속 C타입 무선 충전기 15W', 20, 34);
+      ctx.fillStyle = '#1e293b'; ctx.font = '16px Pretendard';
+      ctx.fillText('스마트폰 고속 무선충전 및 과열방지 안전 설계 탑재', 20, 100);
+      ctx.fillText('마그네틱 거치대 기능 지원 휴대용 탁상용 스탠드', 20, 140);
+      ocrImgData = c.toDataURL('image/png');
+      btnRunOcr.disabled = false;
+      alert('샘플 이미지가 준비되었습니다. [AI 텍스트 추출 시작] 버튼을 누르세요.');
+    });
+
+    btnRunOcr.addEventListener('click', async () => {
+      if (!ocrImgData) return;
+      btnRunOcr.disabled = true;
+      suiteOcrProgress.classList.remove('hidden');
+      suiteOcrProgress.textContent = 'AI 글자 인식 중...';
+
+      try {
+        const worker = await Tesseract.createWorker('kor+eng', 1, {
+          logger: m => {
+            if (m.status === 'recognizing text') {
+              suiteOcrProgress.textContent = `글자 인식 중... (${Math.round(m.progress * 100)}%)`;
+            }
+          }
+        });
+        const ret = await worker.recognize(ocrImgData);
+        await worker.terminate();
+
+        const txt = ret.data.text.trim();
+        suiteOcrTextarea.value = txt;
+
+        const words = txt.replace(/[^a-zA-Z0-9가-힣\s]/g, ' ').split(/\s+/).filter(w => w.length >= 2);
+        const freq = {};
+        words.forEach(w => { freq[w] = (freq[w] || 0) + 1; });
+        const sorted = Object.entries(freq).sort((a,b) => b[1] - a[1]).slice(0, 12).map(i => i[0]);
+
+        suiteOcrTags.innerHTML = '';
+        sorted.forEach(kw => {
+          const sp = document.createElement('span');
+          sp.className = 'px-2.5 py-1 bg-violet-100 text-violet-800 rounded-full font-bold text-xs';
+          sp.textContent = `#${kw}`;
+          suiteOcrTags.appendChild(sp);
+        });
+
+        suiteOcrProgress.textContent = '✅ 글자 추출 및 태그 생성 완료!';
+        btnRunOcr.disabled = false;
+      } catch (e) {
+        alert('OCR 처리 오류: ' + e);
+        btnRunOcr.disabled = false;
+      }
+    });
+
+    // ==========================================
+    // TOOL 6: TITLE COMBINER ENGINE
+    // ==========================================
+    const suiteBrand = document.getElementById('suiteBrand');
+    const suiteMainKws = document.getElementById('suiteMainKws');
+    const suiteSubKws = document.getElementById('suiteSubKws');
+    const btnSuiteCombine = document.getElementById('btnSuiteCombine');
+    const suiteTitleResults = document.getElementById('suiteTitleResults');
+
+    btnSuiteCombine.addEventListener('click', () => {
+      const brand = suiteBrand.value.trim();
+      const mains = suiteMainKws.value.split(',').map(s => s.trim()).filter(Boolean);
+      const subs = suiteSubKws.value.split(',').map(s => s.trim()).filter(Boolean);
+
+      suiteTitleResults.innerHTML = '';
+      const list = [];
+
+      mains.forEach(m => {
+        subs.forEach(s => {
+          list.push(`${brand} ${m} ${s}`);
+          list.push(`${m} ${brand} ${s}`);
+        });
+      });
+
+      const unique = Array.from(new Set(list));
+      unique.forEach(t => {
+        let clean = t.replace(/\s+/g, ' ').trim();
+        if (clean.length > 50) clean = clean.substring(0, 50);
+
+        const card = document.createElement('div');
+        card.className = 'p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs font-bold';
+        card.innerHTML = `
+          <span>${clean} <b class="text-emerald-600 font-normal text-[10px]">(${clean.length}자)</b></span>
+          <button type="button" class="px-2 py-1 bg-white hover:bg-orange-600 hover:text-white rounded border text-slate-700 transition-colors">복사</button>
+        `;
+        card.querySelector('button').onclick = () => {
+          navigator.clipboard.writeText(clean);
+          alert('복사되었습니다: ' + clean);
+        };
+        suiteTitleResults.appendChild(card);
+      });
+    });
+
+    btnSuiteCombine.click();
+  </script>
+</body>
+</html>
