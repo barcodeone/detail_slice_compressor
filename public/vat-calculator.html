@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>오픈마켓 부가세(VAT) 계산기 & 실납부세액·매입공제 시뮬레이터</title>
+  <meta name="description" content="스마트스토어, 쿠팡, 오픈마켓 셀러를 위한 부가세 계산기. 공급가액·공급대가 1초 분리, 간이과세자 vs 일반과세자 납부세액 비교, 매입세액 공제 및 신용카드 세액공제(1.3%) 시뮬레이션.">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+    
+    * {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
+
+  <!-- Header -->
+  <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 text-lg">
+          🧾
+        </div>
+        <div>
+          <h1 class="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">
+            오픈마켓 부가세(VAT) &amp; 실납부세액 계산기
+          </h1>
+          <p class="text-[11px] text-slate-500 font-medium">
+            스마트스토어 · 쿠팡 셀러 부가세 1초 분리 &amp; 매입공제 시뮬레이터
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          2026 국세청 기준 완벽 적용
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 space-y-8">
+    
+    <!-- Hero / Intro -->
+    <div class="text-center max-w-2xl mx-auto space-y-2">
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100">
+        💰 이커머스 세무·정산 필수 계산기
+      </span>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        공급가액 분리 &amp; 실납부 부가세 시뮬레이션
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+        고객 결제금액(공급대가)에서 부가세 10%를 1초 만에 분리하고, 사입 원가와 플랫폼 수수료 세금계산서 공제를 반영하여 실제 국세청에 납부할 예상 세액을 계산하세요.
+      </p>
+    </div>
+
+    <!-- Mode Selector Tabs -->
+    <div class="flex justify-center">
+      <div class="bg-slate-200/80 p-1 rounded-2xl flex max-w-md w-full shadow-inner">
+        <button id="tabModeSplit" type="button" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-1.5 bg-white text-blue-700 shadow-sm">
+          <i data-lucide="split" class="w-4 h-4"></i>
+          1초 부가세 분리 (단건)
+        </button>
+        <button id="tabModeSimulate" type="button" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900">
+          <i data-lucide="calculator" class="w-4 h-4"></i>
+          실납부세액 종합 시뮬레이션
+        </button>
+      </div>
+    </div>
+
+    <!-- VIEW 1: 단건 1초 부가세 분리 (양방향) -->
+    <div id="viewSplit" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- Input Panel -->
+      <div class="lg:col-span-6 bg-white rounded-3xl p-6 border border-slate-200 shadow-xl shadow-slate-200/50 space-y-6">
+        <div>
+          <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2">
+            <i data-lucide="sliders" class="w-5 h-5 text-blue-600"></i>
+            금액 입력 및 계산 방향
+          </h3>
+          <p class="text-xs text-slate-500 mt-1">
+            공급대가(합계금액) 또는 공급가액(세전) 중 하나를 입력하면 반대 금액이 자동 계산됩니다.
+          </p>
+        </div>
+
+        <!-- Direction Toggle Buttons -->
+        <div class="grid grid-cols-2 gap-3">
+          <button type="button" id="btnDirTotalToNet" class="p-3 rounded-xl border border-blue-500 bg-blue-50/50 text-blue-900 text-xs font-bold text-center transition-all flex flex-col items-center gap-1">
+            <span>합계금액(공급대가) ➔ 분리</span>
+            <span class="text-[10px] text-blue-600 font-normal">판매가에서 부가세 10% 제외</span>
+          </button>
+          <button type="button" id="btnDirNetToTotal" class="p-3 rounded-xl border border-slate-200 hover:border-slate-300 bg-white text-slate-700 text-xs font-bold text-center transition-all flex flex-col items-center gap-1">
+            <span>공급가액(세전) ➔ 합계 산출</span>
+            <span class="text-[10px] text-slate-400 font-normal">원가에 부가세 10% 가산</span>
+          </button>
+        </div>
+
+        <!-- Input Field -->
+        <div class="space-y-4">
+          <div>
+            <label id="lblInputAmount" class="block text-xs font-bold text-slate-700 mb-1">
+              소비자 결제 합계금액 (공급대가, 원)
+            </label>
+            <div class="relative">
+              <input type="number" id="inputSplitAmount" value="33000" step="1000" class="w-full pl-3.5 pr-8 py-3 rounded-xl border border-slate-300 text-base font-mono-num font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <span class="absolute right-3.5 top-3.5 text-xs text-slate-400 font-bold">원</span>
+            </div>
+            <div class="flex gap-2 mt-2">
+              <button type="button" class="btn-quick-amt px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded text-xs font-semibold text-slate-600" data-amt="10000">+1만</button>
+              <button type="button" class="btn-quick-amt px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded text-xs font-semibold text-slate-600" data-amt="50000">+5만</button>
+              <button type="button" class="btn-quick-amt px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded text-xs font-semibold text-slate-600" data-amt="100000">+10만</button>
+              <button type="button" id="btnResetSplit" class="ml-auto px-2 py-1 text-xs text-slate-400 hover:text-slate-600 underline">초기화</button>
+            </div>
+          </div>
+
+          <!-- Business Type -->
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2.5">
+            <span class="text-xs font-bold text-slate-800 block">사업자 과세 유형 선택:</span>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="flex items-center gap-2 p-2.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-blue-400 text-xs font-semibold">
+                <input type="radio" name="bizType" value="general" checked class="text-blue-600">
+                <span>일반과세자 (10%)</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-blue-400 text-xs font-semibold">
+                <input type="radio" name="bizType" value="simple" class="text-blue-600">
+                <span>간이과세자 (1.5%~4%)</span>
+              </label>
+            </div>
+            <div id="simpleRateBox" class="hidden pt-2 border-t border-slate-200 text-xs flex items-center justify-between">
+              <span class="text-slate-600">간이과세 업종별 부가가치율:</span>
+              <select id="selSimpleRate" class="px-2 py-1 rounded border border-slate-300 font-bold text-slate-800">
+                <option value="15">소매업 · 전자상거래 (15% ➔ 실세율 1.5%)</option>
+                <option value="20">제조업 · 숙박·음식 (20% ➔ 실세율 2.0%)</option>
+                <option value="30">건설업 · 운수창고 (30% ➔ 실세율 3.0%)</option>
+                <option value="40">서비스업 · 부동산임대 (40% ➔ 실세율 4.0%)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Output Dashboard -->
+      <div class="lg:col-span-6 space-y-4">
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 sm:p-7 text-white shadow-2xl space-y-6">
+          <div class="flex items-center justify-between border-b border-slate-700 pb-4">
+            <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="receipt" class="w-4 h-4 text-blue-400"></i> 부가세 분리 계산 결과
+            </span>
+            <span id="badgeBizStatus" class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+              일반과세자 적용
+            </span>
+          </div>
+
+          <!-- Total Gross -->
+          <div>
+            <span class="text-xs text-slate-400 font-medium block mb-1">합계금액 (공급대가)</span>
+            <div class="text-2xl sm:text-3xl font-extrabold font-mono-num text-white flex items-baseline gap-1">
+              <span id="resTotalAmount">33,000</span>
+              <span class="text-sm font-bold text-slate-400">원</span>
+            </div>
+          </div>
+
+          <!-- Two Main Boxes -->
+          <div class="grid grid-cols-2 gap-4 pt-2">
+            <div class="p-4 bg-slate-800/80 rounded-2xl border border-slate-700/80">
+              <span class="text-[11px] text-slate-400 font-semibold block mb-1">공급가액 (순 매출)</span>
+              <div class="text-xl sm:text-2xl font-extrabold font-mono-num text-emerald-400">
+                <span id="resNetSupply">30,000</span><span class="text-xs font-bold text-slate-400 ml-0.5">원</span>
+              </div>
+            </div>
+            <div class="p-4 bg-slate-800/80 rounded-2xl border border-slate-700/80">
+              <span class="text-[11px] text-slate-400 font-semibold block mb-1">부가가치세 (VAT 10%)</span>
+              <div class="text-xl sm:text-2xl font-extrabold font-mono-num text-blue-400">
+                <span id="resVatAmount">3,000</span><span class="text-xs font-bold text-slate-400 ml-0.5">원</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Explanation box -->
+          <div class="p-4 bg-blue-950/40 rounded-2xl border border-blue-800/40 text-xs text-blue-200 leading-relaxed space-y-1">
+            <div class="font-bold flex items-center gap-1 text-blue-300">
+              <i data-lucide="info" class="w-3.5 h-3.5"></i> 계산 공식 안내
+            </div>
+            <p id="txtFormulaDesc">
+              공급대가 33,000원 ÷ 1.1 = 공급가액 30,000원 / 부가세 3,000원
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VIEW 2: 실납부세액 종합 시뮬레이션 (매출 - 매입공제 - 카드공제) -->
+    <div id="viewSimulate" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- Input Column -->
+      <div class="lg:col-span-6 bg-white rounded-3xl p-6 border border-slate-200 shadow-xl shadow-slate-200/50 space-y-5">
+        <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2">
+          <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-600"></i>
+          신고 기간 매출 &amp; 매입 세부 입력
+        </h3>
+
+        <!-- 매출액 -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">
+            기간 총 매출액 (공급대가, VAT포함 결제액)
+          </label>
+          <div class="relative">
+            <input type="number" id="simGrossSales" value="11000000" step="100000" class="w-full pl-3.5 pr-8 py-2.5 rounded-xl border border-slate-300 text-sm font-mono-num font-bold text-slate-800">
+            <span class="absolute right-3.5 top-2.5 text-xs text-slate-400 font-bold">원</span>
+          </div>
+          <span class="text-[11px] text-slate-400 mt-1 block">스마트스토어/쿠팡 정산 관리의 총 결제금액</span>
+        </div>
+
+        <!-- 매입 세금계산서 (사입 원가) -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">
+            도매 사입 매입금액 (세금계산서 수취액, VAT포함)
+          </label>
+          <div class="relative">
+            <input type="number" id="simCostPurchase" value="5500000" step="100000" class="w-full pl-3.5 pr-8 py-2.5 rounded-xl border border-slate-300 text-sm font-mono-num font-bold text-slate-800">
+            <span class="absolute right-3.5 top-2.5 text-xs text-slate-400 font-bold">원</span>
+          </div>
+          <span class="text-[11px] text-slate-400 mt-1 block">도매꾹, 1688 대행, 제조공장 등에서 발급받은 매입 세금계산서</span>
+        </div>
+
+        <!-- 플랫폼 수수료 & 택배비 세금계산서 -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">
+            플랫폼 수수료 + 택배비 등 지출 (세금계산서 수취액, VAT포함)
+          </label>
+          <div class="relative">
+            <input type="number" id="simFeePurchase" value="1100000" step="50000" class="w-full pl-3.5 pr-8 py-2.5 rounded-xl border border-slate-300 text-sm font-mono-num font-bold text-slate-800">
+            <span class="absolute right-3.5 top-2.5 text-xs text-slate-400 font-bold">원</span>
+          </div>
+          <span class="text-[11px] text-slate-400 mt-1 block">네이버·쿠팡에서 발행해 준 월별 수수료 세금계산서 합계</span>
+        </div>
+
+        <!-- 신용카드 매출전표 세액공제 (1.3%) -->
+        <div class="p-3.5 bg-indigo-50/60 rounded-2xl border border-indigo-100 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-indigo-900">신용카드 등 발행세액공제 (1.3%):</span>
+            <label class="flex items-center gap-1.5 cursor-pointer font-semibold text-indigo-800">
+              <input type="checkbox" id="chkCardDeduct" checked class="w-4 h-4 text-indigo-600 rounded">
+              <span>적용 (연 1,000만원 한도)</span>
+            </label>
+          </div>
+          <p class="text-[11px] text-indigo-700">소상공인 셀러가 고객 신용카드/현금영수증 결제 시 국세청에서 납부세액의 1.3%를 추가 공제해 줍니다.</p>
+        </div>
+
+      </div>
+
+      <!-- Result Column -->
+      <div class="lg:col-span-6 space-y-4">
+        <div class="bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-900 rounded-3xl p-6 sm:p-7 text-white shadow-2xl space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+            <span class="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="landmark" class="w-4 h-4 text-emerald-400"></i> 국세청 최종 예상 납부세액
+            </span>
+            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              일반과세자 기준
+            </span>
+          </div>
+
+          <div>
+            <span class="text-xs text-slate-400 block mb-1">최종 실 납부 예상 부가세</span>
+            <div class="text-3xl sm:text-4xl font-extrabold font-mono-num text-emerald-400 flex items-baseline gap-1">
+              <span id="simResFinalVat">267,000</span>
+              <span class="text-base font-bold text-slate-400">원</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">※ 매입공제와 카드발행공제로 원래 세액(100만원) 대비 73% 절세</p>
+          </div>
+
+          <!-- Step breakdown table -->
+          <div class="divide-y divide-slate-800 text-xs pt-2">
+            <div class="py-2.5 flex justify-between text-slate-300">
+              <span>(+) 매출 부가세 (총매출의 10%):</span>
+              <span class="font-mono-num font-bold text-white" id="simDetailSalesVat">1,000,000원</span>
+            </div>
+            <div class="py-2.5 flex justify-between text-rose-300">
+              <span>(-) 도매 사입 매입세액 공제:</span>
+              <span class="font-mono-num font-bold" id="simDetailCostVat">-500,000원</span>
+            </div>
+            <div class="py-2.5 flex justify-between text-rose-300">
+              <span>(-) 수수료·택배비 매입세액 공제:</span>
+              <span class="font-mono-num font-bold" id="simDetailFeeVat">-100,000원</span>
+            </div>
+            <div class="py-2.5 flex justify-between text-amber-300">
+              <span>(-) 신용카드 발행세액공제 (1.3%):</span>
+              <span class="font-mono-num font-bold" id="simDetailCardVat">-133,000원</span>
+            </div>
+            <div class="py-3 flex justify-between text-sm font-extrabold bg-emerald-500/10 px-3 rounded-xl text-emerald-300 mt-2">
+              <span>= 국세청 실 납부세액:</span>
+              <span class="font-mono-num" id="simDetailFinalSum">267,000원</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SEO Guide Article -->
+    <article class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 space-y-5 text-slate-700 leading-relaxed text-xs sm:text-sm">
+      <h3 class="text-lg font-extrabold text-slate-900">
+        💡 오픈마켓 셀러 부가세 신고 필수 체크리스트
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5">
+          <strong class="text-blue-900 font-bold block">1. 공급가액 vs 공급대가 차이</strong>
+          <p class="text-slate-600">공급가액은 순수한 물건값(세전), 공급대가는 부가세 10%가 포함된 고객 결제금액입니다. 오픈마켓 정산 시 공급가액 기준으로 마진을 산출해야 착오가 없습니다.</p>
+        </div>
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5">
+          <strong class="text-blue-900 font-bold block">2. 플랫폼 수수료 세금계산서 수취</strong>
+          <p class="text-slate-600">네이버 스마트스토어와 쿠팡 정산관리에서 매월 발행되는 수수료 세금계산서는 국세청 홈택스에 자동 연동되어 매입세액으로 100% 공제받을 수 있습니다.</p>
+        </div>
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5">
+          <strong class="text-blue-900 font-bold block">3. 간이과세자 납부의무 면제</strong>
+          <p class="text-slate-600">연간 매출(공급대가)이 4,800만원 미만인 간이과세자는 부가세 신고는 하되 납부 의무가 면제됩니다. (단, 세금계산서 발급 대상 간이과세자는 예외)</p>
+        </div>
+      </div>
+    </article>
+
+  </main>
+
+  <script>
+    lucide.createIcons();
+
+    // Mode Toggle
+    const tabModeSplit = document.getElementById('tabModeSplit');
+    const tabModeSimulate = document.getElementById('tabModeSimulate');
+    const viewSplit = document.getElementById('viewSplit');
+    const viewSimulate = document.getElementById('viewSimulate');
+
+    tabModeSplit.addEventListener('click', () => {
+      tabModeSplit.className = "flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-1.5 bg-white text-blue-700 shadow-sm";
+      tabModeSimulate.className = "flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900";
+      viewSplit.classList.remove('hidden');
+      viewSimulate.classList.add('hidden');
+      notifyParentHeight();
+    });
+
+    tabModeSimulate.addEventListener('click', () => {
+      tabModeSimulate.className = "flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-1.5 bg-white text-blue-700 shadow-sm";
+      tabModeSplit.className = "flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900";
+      viewSimulate.classList.remove('hidden');
+      viewSplit.classList.add('hidden');
+      notifyParentHeight();
+    });
+
+    // VIEW 1 Logic: 1초 부가세 분리
+    let isTotalToNet = true;
+    const btnDirTotalToNet = document.getElementById('btnDirTotalToNet');
+    const btnDirNetToTotal = document.getElementById('btnDirNetToTotal');
+    const lblInputAmount = document.getElementById('lblInputAmount');
+    const inputSplitAmount = document.getElementById('inputSplitAmount');
+    const resTotalAmount = document.getElementById('resTotalAmount');
+    const resNetSupply = document.getElementById('resNetSupply');
+    const resVatAmount = document.getElementById('resVatAmount');
+    const txtFormulaDesc = document.getElementById('txtFormulaDesc');
+    const badgeBizStatus = document.getElementById('badgeBizStatus');
+    const simpleRateBox = document.getElementById('simpleRateBox');
+    const selSimpleRate = document.getElementById('selSimpleRate');
+
+    btnDirTotalToNet.addEventListener('click', () => {
+      isTotalToNet = true;
+      btnDirTotalToNet.className = "p-3 rounded-xl border border-blue-500 bg-blue-50/50 text-blue-900 text-xs font-bold text-center transition-all flex flex-col items-center gap-1";
+      btnDirNetToTotal.className = "p-3 rounded-xl border border-slate-200 hover:border-slate-300 bg-white text-slate-700 text-xs font-bold text-center transition-all flex flex-col items-center gap-1";
+      lblInputAmount.textContent = "소비자 결제 합계금액 (공급대가, 원)";
+      calcSplit();
+    });
+
+    btnDirNetToTotal.addEventListener('click', () => {
+      isTotalToNet = false;
+      btnDirNetToTotal.className = "p-3 rounded-xl border border-blue-500 bg-blue-50/50 text-blue-900 text-xs font-bold text-center transition-all flex flex-col items-center gap-1";
+      btnDirTotalToNet.className = "p-3 rounded-xl border border-slate-200 hover:border-slate-300 bg-white text-slate-700 text-xs font-bold text-center transition-all flex flex-col items-center gap-1";
+      lblInputAmount.textContent = "물품 순수 원가 (공급가액 세전, 원)";
+      calcSplit();
+    });
+
+    document.querySelectorAll('input[name="bizType"]').forEach(r => {
+      r.addEventListener('change', (e) => {
+        if (e.target.value === 'simple') {
+          simpleRateBox.classList.remove('hidden');
+          badgeBizStatus.textContent = "간이과세자 적용";
+          badgeBizStatus.className = "px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30";
+        } else {
+          simpleRateBox.classList.add('hidden');
+          badgeBizStatus.textContent = "일반과세자 적용";
+          badgeBizStatus.className = "px-2.5 py-1 rounded-full text-xs font-extrabold bg-blue-500/20 text-blue-300 border border-blue-500/30";
+        }
+        calcSplit();
+        notifyParentHeight();
+      });
+    });
+
+    selSimpleRate.addEventListener('change', calcSplit);
+    inputSplitAmount.addEventListener('input', calcSplit);
+
+    document.querySelectorAll('.btn-quick-amt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const add = parseInt(btn.dataset.amt, 10);
+        const cur = parseInt(inputSplitAmount.value, 10) || 0;
+        inputSplitAmount.value = cur + add;
+        calcSplit();
+      });
+    });
+
+    document.getElementById('btnResetSplit').addEventListener('click', () => {
+      inputSplitAmount.value = 33000;
+      calcSplit();
+    });
+
+    function calcSplit() {
+      const amt = Math.max(0, parseInt(inputSplitAmount.value, 10) || 0);
+      const bizType = document.querySelector('input[name="bizType"]:checked').value;
+      const simpleRate = parseFloat(selSimpleRate.value) / 100;
+
+      let total = 0;
+      let net = 0;
+      let vat = 0;
+
+      if (bizType === 'general') {
+        if (isTotalToNet) {
+          total = amt;
+          net = Math.round(total / 1.1);
+          vat = total - net;
+          txtFormulaDesc.textContent = `공급대가 ${total.toLocaleString()}원 ÷ 1.1 = 공급가액 ${net.toLocaleString()}원 (VAT 10%: ${vat.toLocaleString()}원)`;
+        } else {
+          net = amt;
+          vat = Math.round(net * 0.1);
+          total = net + vat;
+          txtFormulaDesc.textContent = `공급가액 ${net.toLocaleString()}원 × 1.1 = 합계금액 ${total.toLocaleString()}원 (VAT 10%: ${vat.toLocaleString()}원)`;
+        }
+      } else {
+        // 간이과세자: 세액 = 공급대가 × 부가가치율 × 10%
+        if (isTotalToNet) {
+          total = amt;
+          vat = Math.round(total * simpleRate * 0.1);
+          net = total - vat;
+          txtFormulaDesc.textContent = `간이과세 세액 = 공급대가 ${total.toLocaleString()}원 × 부가가치율(${(simpleRate*100).toFixed(0)}%) × 10% = ${vat.toLocaleString()}원`;
+        } else {
+          net = amt;
+          total = net;
+          vat = Math.round(total * simpleRate * 0.1);
+          txtFormulaDesc.textContent = `간이과세 세액 = ${total.toLocaleString()}원 × 부가가치율(${(simpleRate*100).toFixed(0)}%) × 10% = ${vat.toLocaleString()}원`;
+        }
+      }
+
+      resTotalAmount.textContent = total.toLocaleString();
+      resNetSupply.textContent = net.toLocaleString();
+      resVatAmount.textContent = vat.toLocaleString();
+    }
+
+    // VIEW 2 Logic: 실납부세액 종합 시뮬레이션
+    const simGrossSales = document.getElementById('simGrossSales');
+    const simCostPurchase = document.getElementById('simCostPurchase');
+    const simFeePurchase = document.getElementById('simFeePurchase');
+    const chkCardDeduct = document.getElementById('chkCardDeduct');
+
+    const simResFinalVat = document.getElementById('simResFinalVat');
+    const simDetailSalesVat = document.getElementById('simDetailSalesVat');
+    const simDetailCostVat = document.getElementById('simDetailCostVat');
+    const simDetailFeeVat = document.getElementById('simDetailFeeVat');
+    const simDetailCardVat = document.getElementById('simDetailCardVat');
+    const simDetailFinalSum = document.getElementById('simDetailFinalSum');
+
+    [simGrossSales, simCostPurchase, simFeePurchase].forEach(el => {
+      el.addEventListener('input', calcSimulation);
+    });
+    chkCardDeduct.addEventListener('change', calcSimulation);
+
+    function calcSimulation() {
+      const gross = Math.max(0, parseInt(simGrossSales.value, 10) || 0);
+      const cost = Math.max(0, parseInt(simCostPurchase.value, 10) || 0);
+      const fee = Math.max(0, parseInt(simFeePurchase.value, 10) || 0);
+      const applyCard = chkCardDeduct.checked;
+
+      const salesVat = Math.round(gross / 11);
+      const costVat = Math.round(cost / 11);
+      const feeVat = Math.round(fee / 11);
+      
+      let cardDeduct = 0;
+      if (applyCard) {
+        cardDeduct = Math.min(10000000, Math.round(gross * 0.013));
+      }
+
+      const taxableVat = Math.max(0, salesVat - costVat - feeVat);
+      const finalVat = Math.max(0, taxableVat - cardDeduct);
+
+      simDetailSalesVat.textContent = salesVat.toLocaleString() + '원';
+      simDetailCostVat.textContent = '-' + costVat.toLocaleString() + '원';
+      simDetailFeeVat.textContent = '-' + feeVat.toLocaleString() + '원';
+      simDetailCardVat.textContent = '-' + cardDeduct.toLocaleString() + '원';
+      simDetailFinalSum.textContent = finalVat.toLocaleString() + '원';
+      simResFinalVat.textContent = finalVat.toLocaleString();
+    }
+
+    // Auto-resize for iframe embed
+    function notifyParentHeight() {
+      if (window.parent && window.parent !== window) {
+        const height = document.documentElement.scrollHeight || document.body.scrollHeight;
+        window.parent.postMessage({ type: 'TOOL_RESIZE', height: height + 10 }, '*');
+      }
+    }
+
+    window.addEventListener('load', () => {
+      calcSplit();
+      calcSimulation();
+      notifyParentHeight();
+    });
+    window.addEventListener('resize', notifyParentHeight);
+    if (window.ResizeObserver) {
+      new ResizeObserver(notifyParentHeight).observe(document.body);
+    }
+  </script>
+</body>
+</html>

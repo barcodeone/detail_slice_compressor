@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스마트스토어 vs 쿠팡 채널별 수수료 & 마진 비교기 | 양방향 판매가 역산 툴</title>
+  <meta name="description" content="스마트스토어와 쿠팡 윙, 로켓그로스의 수수료와 마진을 실시간 비교하세요. 판매가 기준 마진율 계산 및 목표 마진 기준 적정 판매가 역산출 양방향 지원. 원가·수수료·마진 금액 및 % 한눈에 확인.">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+    
+    * {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
+
+  <!-- Header -->
+  <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md shadow-amber-500/20 text-lg">
+          ⚖️
+        </div>
+        <div>
+          <h1 class="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">
+            스마트스토어 vs 쿠팡 채널별 수수료 &amp; 마진 비교기
+          </h1>
+          <p class="text-[11px] text-slate-500 font-medium">
+            양방향 계산 · 원가/수수료/마진 금액 &amp; % 정밀 비교
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          수수료율 자유 수정 지원
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 space-y-8">
+    
+    <!-- Hero / Intro -->
+    <div class="text-center max-w-2xl mx-auto space-y-2">
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+        📊 오픈마켓 입점 채널 최적화 도구
+      </span>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        동일 상품, 어느 마켓에 올릴 때 더 남을까?
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+        네이버 스마트스토어, 쿠팡 마켓플레이스(윙), 쿠팡 로켓그로스의 수수료와 물류비를 반영하여 
+        <b>원가 · 수수료 · 마진을 금액(원)과 %(비율)</b>로 실시간 대조하고 목표 마진에 맞춘 적정 판매가를 역산하세요.
+      </p>
+    </div>
+
+    <!-- Mode Selector Tabs (양방향 모드) -->
+    <div class="flex justify-center">
+      <div class="bg-slate-200/80 p-1 rounded-2xl flex max-w-md w-full shadow-inner">
+        <button id="tabModeForward" type="button" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-1.5 bg-white text-amber-900 shadow-sm">
+          <i data-lucide="arrow-right-left" class="w-4 h-4 text-amber-600"></i>
+          모드 A: 판매가 기준 마진 비교
+        </button>
+        <button id="tabModeReverse" type="button" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900">
+          <i data-lucide="target" class="w-4 h-4 text-amber-600"></i>
+          모드 B: 목표 마진 기준 판매가 역산
+        </button>
+      </div>
+    </div>
+
+    <!-- Top Inputs Card -->
+    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xl shadow-slate-200/50 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <div>
+          <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2">
+            <i data-lucide="edit-3" class="w-4 h-4 text-amber-600"></i>
+            기본 원가 및 판매 조건 입력
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">
+            도매 사입원가와 배송비를 입력하고, 각 마켓별 수수료율을 필요에 맞게 직접 수정할 수 있습니다.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 self-start sm:self-auto">
+          <label class="flex items-center gap-1.5 text-xs font-bold text-slate-700 cursor-pointer bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+            <input type="checkbox" id="chkIncludeVat" checked class="w-4 h-4 text-amber-600 rounded">
+            <span>부가세(10%) 실납부액 감안</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Core Inputs Row -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <!-- 매입 원가 -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">
+            📦 제품 매입 원가 (VAT포함, 원)
+          </label>
+          <div class="relative">
+            <input type="number" id="inputCostPrice" value="10000" step="500" class="w-full pl-3.5 pr-8 py-2.5 rounded-xl border border-slate-300 text-sm font-mono-num font-bold text-slate-800">
+            <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">원</span>
+          </div>
+          <span class="text-[11px] text-slate-400 mt-1 block">도매꾹/1688 수입 개당 사입원가</span>
+        </div>
+
+        <!-- 기본 배송비 -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">
+            🚚 택배 발송 실 배송비 (원)
+          </label>
+          <div class="relative">
+            <input type="number" id="inputActualShipping" value="2800" step="100" class="w-full pl-3.5 pr-8 py-2.5 rounded-xl border border-slate-300 text-sm font-mono-num font-bold text-slate-800">
+            <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">원</span>
+          </div>
+          <span class="text-[11px] text-slate-400 mt-1 block">자체 발송 시 계약 택배비 (로켓그로스는 제외)</span>
+        </div>
+
+        <!-- 모드에 따른 가변 입력 (판매가 or 목표마진) -->
+        <div id="boxDynamicInput">
+          <label id="lblDynamicInput" class="block text-xs font-bold text-amber-900 mb-1">
+            🏷️ 기준 판매 가격 (원)
+          </label>
+          <div class="relative">
+            <input type="number" id="inputDynamicVal" value="25000" step="1000" class="w-full pl-3.5 pr-8 py-2.5 rounded-xl border-2 border-amber-400 text-sm font-mono-num font-bold text-slate-900 bg-amber-50/30">
+            <span id="unitDynamicVal" class="absolute right-3 top-2.5 text-xs text-amber-700 font-bold">원</span>
+          </div>
+          <span id="subDynamicDesc" class="text-[11px] text-amber-700 mt-1 block">채널 공통으로 책정할 소비자 판매가</span>
+        </div>
+
+      </div>
+
+      <!-- 수수료율 자유 수정 패널 -->
+      <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
+            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-slate-600"></i>
+            채널별 수수료율 직접 수정 설정 (% 입력 가능)
+          </span>
+          <button type="button" id="btnResetFees" class="text-[11px] text-slate-500 hover:text-slate-800 underline">기본값 복원</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- 스마트스토어 -->
+          <div class="p-3 bg-white rounded-xl border border-emerald-200">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-xs font-bold text-emerald-800 flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> 스마트스토어
+              </span>
+              <span class="text-[10px] text-slate-400">네이버쇼핑 연동</span>
+            </div>
+            <div class="flex items-center gap-1 mt-1">
+              <input type="number" id="feeSmartstore" value="5.63" step="0.01" class="w-full px-2.5 py-1.5 rounded border border-slate-300 font-mono-num font-bold text-xs text-slate-800">
+              <span class="text-xs font-bold text-slate-500">%</span>
+            </div>
+            <span class="text-[10px] text-slate-400 mt-1 block">주문연동 2% + 결제수수료 최대 3.63%</span>
+          </div>
+
+          <!-- 쿠팡 윙 -->
+          <div class="p-3 bg-white rounded-xl border border-rose-200">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-xs font-bold text-rose-800 flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-rose-500"></span> 쿠팡 마켓플레이스 (윙)
+              </span>
+              <span class="text-[10px] text-slate-400">판매자 직접배송</span>
+            </div>
+            <div class="flex items-center gap-1 mt-1">
+              <input type="number" id="feeCoupangWing" value="10.8" step="0.1" class="w-full px-2.5 py-1.5 rounded border border-slate-300 font-mono-num font-bold text-xs text-slate-800">
+              <span class="text-xs font-bold text-slate-500">%</span>
+            </div>
+            <span class="text-[10px] text-slate-400 mt-1 block">카테고리 평균 수수료 (배송비에도 부과)</span>
+          </div>
+
+          <!-- 쿠팡 로켓그로스 -->
+          <div class="p-3 bg-white rounded-xl border border-blue-200">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-xs font-bold text-blue-800 flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span> 쿠팡 로켓그로스
+              </span>
+              <span class="text-[10px] text-slate-400">쿠팡 풀필먼트</span>
+            </div>
+            <div class="flex items-center gap-1 mt-1">
+              <input type="number" id="feeCoupangRocket" value="30.0" step="0.5" class="w-full px-2.5 py-1.5 rounded border border-slate-300 font-mono-num font-bold text-xs text-slate-800">
+              <span class="text-xs font-bold text-slate-500">%</span>
+            </div>
+            <span class="text-[10px] text-slate-400 mt-1 block">판매수수료 + 입출고/배송 물류대행비 통합</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3대 채널 비교 카드 그리드 (원가, 수수료, 마진 금액 & % 동시 표기) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- 채널 1: 스마트스토어 -->
+      <div class="bg-white rounded-3xl p-6 border-2 border-emerald-500 shadow-xl shadow-emerald-500/10 space-y-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-3 border-b border-emerald-100">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">N</div>
+              <h4 class="font-extrabold text-slate-900 text-base">스마트스토어</h4>
+            </div>
+            <span id="tagBestProfit1" class="hidden px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500 text-white">마진 1위 🏆</span>
+          </div>
+
+          <!-- Target Price / Revenue -->
+          <div class="mt-4">
+            <span class="text-[11px] text-slate-400 font-semibold block" id="lblCardPrice1">판매 기준 가격</span>
+            <div class="text-2xl font-extrabold font-mono-num text-slate-900">
+              <span id="valCardPrice1">25,000</span><span class="text-xs font-bold text-slate-400 ml-1">원</span>
+            </div>
+          </div>
+
+          <!-- Net Profit & Margin % Highlight -->
+          <div class="mt-3 p-4 bg-emerald-50/70 rounded-2xl border border-emerald-100">
+            <div class="flex justify-between items-baseline">
+              <span class="text-xs font-bold text-emerald-900">최종 순수익 (마진)</span>
+              <span class="text-xs font-extrabold font-mono-num text-emerald-700" id="valMarginRate1">38.5%</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold font-mono-num text-emerald-700 mt-1">
+              <span id="valNetProfit1">9,632</span><span class="text-xs font-bold text-emerald-600 ml-1">원</span>
+            </div>
+          </div>
+
+          <!-- Proportion Breakdown: 원가 / 수수료 / 마진 (금액 & %) -->
+          <div class="mt-4 space-y-2.5 text-xs">
+            <!-- 원가 -->
+            <div class="flex justify-between items-center text-slate-600">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded bg-slate-400"></span> 원가 (사입+배송비)
+              </span>
+              <span class="font-mono-num font-semibold text-slate-800" id="txtCost1">12,800원 (51.2%)</span>
+            </div>
+            <!-- 수수료 -->
+            <div class="flex justify-between items-center text-slate-600">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded bg-rose-400"></span> 플랫폼 수수료
+              </span>
+              <span class="font-mono-num font-semibold text-slate-800" id="txtFee1">1,408원 (5.6%)</span>
+            </div>
+            <!-- 부가세 -->
+            <div class="flex justify-between items-center text-slate-600">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded bg-blue-400"></span> 부가세(VAT) 추정
+              </span>
+              <span class="font-mono-num font-semibold text-slate-800" id="txtVat1">1,160원 (4.6%)</span>
+            </div>
+          </div>
+
+          <!-- Visual Bar Chart -->
+          <div class="mt-4 pt-3 border-t border-slate-100">
+            <span class="text-[10px] text-slate-400 font-bold block mb-1.5">매출액 구성 비중:</span>
+            <div class="h-3 w-full rounded-full overflow-hidden flex bg-slate-100">
+              <div id="barCost1" class="bg-slate-400 h-full" style="width: 51%"></div>
+              <div id="barFee1" class="bg-rose-400 h-full" style="width: 6%"></div>
+              <div id="barVat1" class="bg-blue-400 h-full" style="width: 5%"></div>
+              <div id="barMargin1" class="bg-emerald-500 h-full" style="width: 38%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-2 text-[11px] text-emerald-800 bg-emerald-50/40 p-2.5 rounded-xl border border-emerald-100 text-center font-semibold">
+          💡 수수료가 가장 저렴하여 순수익 극대화에 유리
+        </div>
+      </div>
+
+      <!-- 채널 2: 쿠팡 윙 -->
+      <div class="bg-white rounded-3xl p-6 border-2 border-rose-300 shadow-xl shadow-slate-200/50 space-y-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-3 border-b border-rose-100">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-xs">C</div>
+              <h4 class="font-extrabold text-slate-900 text-base">쿠팡 마켓플레이스 (윙)</h4>
+            </div>
+            <span id="tagBestProfit2" class="hidden px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500 text-white">마진 1위 🏆</span>
+          </div>
+
+          <!-- Target Price / Revenue -->
+          <div class="mt-4">
+            <span class="text-[11px] text-slate-400 font-semibold block" id="lblCardPrice2">판매 기준 가격</span>
+            <div class="text-2xl font-extrabold font-mono-num text-slate-900">
+              <span id="valCardPrice2">25,000</span><span class="text-xs font-bold text-slate-400 ml-1">원</span>
+            </div>
+          </div>
+
+          <!-- Net Profit & Margin % Highlight -->
+          <div class="mt-3 p-4 bg-rose-50/70 rounded-2xl border border-rose-100">
+            <div class="flex justify-between items-baseline">
+              <span class="text-xs font-bold text-rose-900">최종 순수익 (마진)</span>
+              <span class="text-xs font-extrabold font-mono-num text-rose-700" id="valMarginRate2">33.5%</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold font-mono-num text-rose-700 mt-1">
+              <span id="valNetProfit2">8,373</span><span class="text-xs font-bold text-rose-600 ml-1">원</span>
+            </div>
+          </div>
+
+          <!-- Proportion Breakdown -->
+          <div class="mt-4 space-y-2.5 text-xs">
+            <div class="flex justify-between items-center text-slate-600">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded bg-slate-400"></span> 원가 (사입+배송비)
+              </span>
+              <span class="font-mono-num font-semibold text-slate-800" id="txtCost2">12,800원 (51.2%)</span>
+            </div>
+            <div class="flex justify-between items-center text-slate-600">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded bg-rose-400"></span> 플랫폼 수수료
+              </span>
+              <span class="font-mono-num font-semibold text-slate-800" id="txtFee2">2,700원 (10.8%)</span>
+            </div>
+            <div class="flex justify-between items-center text-slate-600">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded bg-blue-400"></span> 부가세(VAT) 추정
+              </span>
+              <span class="font-mono-num font-semibold text-slate-800" id="txtVat2">1,127원 (4.5%)</span>
+            </div>
+          </div>
+
+          <!-- Visual Bar Chart -->
+          <div class="mt-4 pt-3 border-t border-slate-100">
+            <span class="text-[10px] text-slate-400 font-bold block mb-1.5">매출액 구성 비중:</span>
+            <div class="h-3 w-full rounded-full overflow-hidden flex bg-slate-100">
+              <div id="barCost2" class="bg-slate-400 h-full" style="width: 51%"></div>
+              <div id="barFee2" class="bg-rose-400 h-full" style="width: 11%"></div>
+              <div id="barVat2" class="bg-blue-400 h-full" style="width: 5%"></div>
+              <div id="barMargin2" class="bg-rose-500 h-full" style="width: 33%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-2 text-[11px] text-rose-800 bg-rose-50/40 p-2.5 rounded-xl border border-rose-100 text-center font-semibold">
+          💡 압도적인 검색 트래픽으로 판매량(회전율) 확보
+        </div>
+      </div>
+
+      <!-- 채널 3: 쿠팡 로켓그로스 -->
+      <div class="bg-white rounded-3xl p-6 border-2 border-blue-300 shadow-xl shadow-slate-200/50 space-y-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-3 border-b border-blue-100">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">🚀</div>
+              <h4 class="font-extrabold text-slate-900 text-base">쿠팡 로켓그로스</h4>
+            </div>
+            <span id="tagBestProfit3" class="hidden px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500 text-white">마진 1위 🏆</span>
+          </div>
+
+          <!-- Target Price / Revenue -->
+          <div class="mt-4">
+            <span class="text-[11px] text-slate-400 font-semibold block" id="lblCardPrice3">판매 기준 가격</span>
+            <div class="text-2xl font-extrabold font-mono-num text-slate-900">
+              <span id="valCardPrice3">25,000</span><span class="text-xs font-bold text-slate-400 ml-1">원</span>
+            </div>
+          </div>
+
+          <!-- Net Profit & Margin % Highlight -->
+          <div class="mt-3 p-4 bg-blue-50/70 rounded-2xl border border-blue-100">
+            <div class="flex justify-between items-baseline">
+              <span class="text-xs font-bold text-blue-900">최종 순수익 (마진)</span>
+              <span class="text-xs font-extrabold font-mono-num text-blue-700" id="valMarginRate3">25.0%</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold font-mono-num text-blue-700 mt-1">
+              <span id="valNetProfit3">6,250</span><span class="text-xs font-bold text-blue-600 ml-1">원</span>
+            </div>
+          </div>
+
+          <!-- Proportion Breakdown -->
+          <div class="mt-4 space-y-2.5 text-xs">
+            <div class="flex justify-between items-center text-slate-600">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded bg-slate-400"></span> 순수 사입원가 (배송비 제외)
+              </span>
+              <span class="font-mono-num font-semibold text-slate-800" id="txtCost3">10,000원 (40.0%)</span>
+            </div>
+            <div class="flex justify-between items-center text-slate-600">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded bg-rose-400"></span> 풀필먼트+수수료 통합
+              </span>
+              <span class="font-mono-num font-semibold text-slate-800" id="txtFee3">7,500원 (30.0%)</span>
+            </div>
+            <div class="flex justify-between items-center text-slate-600">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded bg-blue-400"></span> 부가세(VAT) 추정
+              </span>
+              <span class="font-mono-num font-semibold text-slate-800" id="txtVat3">1,250원 (5.0%)</span>
+            </div>
+          </div>
+
+          <!-- Visual Bar Chart -->
+          <div class="mt-4 pt-3 border-t border-slate-100">
+            <span class="text-[10px] text-slate-400 font-bold block mb-1.5">매출액 구성 비중:</span>
+            <div class="h-3 w-full rounded-full overflow-hidden flex bg-slate-100">
+              <div id="barCost3" class="bg-slate-400 h-full" style="width: 40%"></div>
+              <div id="barFee3" class="bg-rose-400 h-full" style="width: 30%"></div>
+              <div id="barVat3" class="bg-blue-400 h-full" style="width: 5%"></div>
+              <div id="barMargin3" class="bg-blue-500 h-full" style="width: 25%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-2 text-[11px] text-blue-800 bg-blue-50/40 p-2.5 rounded-xl border border-blue-100 text-center font-semibold">
+          💡 내일도착 로켓배송 뱃지로 전환율 3배 상승 (포장·택배 무인화)
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 대조 요약 표 (종합 비교 테이블) -->
+    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xl shadow-slate-200/50 space-y-4">
+      <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2">
+        <i data-lucide="table" class="w-4 h-4 text-amber-600"></i>
+        채널별 금액 &amp; 비율 종합 대조표
+      </h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-600">
+          <thead class="bg-slate-50 text-slate-800 uppercase font-extrabold border-b border-slate-200">
+            <tr>
+              <th class="py-3 px-4">채널 구분</th>
+              <th class="py-3 px-4">판매가</th>
+              <th class="py-3 px-4">원가 (금액 / %)</th>
+              <th class="py-3 px-4">수수료 (금액 / %)</th>
+              <th class="py-3 px-4">부가세 추정</th>
+              <th class="py-3 px-4">최종 순수익 (마진율)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 font-mono-num">
+            <tr class="hover:bg-slate-50/60">
+              <td class="py-3.5 px-4 font-bold font-sans text-emerald-800">네이버 스마트스토어</td>
+              <td class="py-3.5 px-4 font-bold text-slate-900" id="tbPrice1">25,000원</td>
+              <td class="py-3.5 px-4" id="tbCost1">12,800원 (51.2%)</td>
+              <td class="py-3.5 px-4 text-rose-600 font-semibold" id="tbFee1">1,408원 (5.6%)</td>
+              <td class="py-3.5 px-4" id="tbVat1">1,160원</td>
+              <td class="py-3.5 px-4 font-extrabold text-emerald-600 text-sm" id="tbProfit1">9,632원 (38.5%)</td>
+            </tr>
+            <tr class="hover:bg-slate-50/60">
+              <td class="py-3.5 px-4 font-bold font-sans text-rose-800">쿠팡 마켓플레이스 (윙)</td>
+              <td class="py-3.5 px-4 font-bold text-slate-900" id="tbPrice2">25,000원</td>
+              <td class="py-3.5 px-4" id="tbCost2">12,800원 (51.2%)</td>
+              <td class="py-3.5 px-4 text-rose-600 font-semibold" id="tbFee2">2,700원 (10.8%)</td>
+              <td class="py-3.5 px-4" id="tbVat2">1,127원</td>
+              <td class="py-3.5 px-4 font-extrabold text-rose-600 text-sm" id="tbProfit2">8,373원 (33.5%)</td>
+            </tr>
+            <tr class="hover:bg-slate-50/60">
+              <td class="py-3.5 px-4 font-bold font-sans text-blue-800">쿠팡 로켓그로스</td>
+              <td class="py-3.5 px-4 font-bold text-slate-900" id="tbPrice3">25,000원</td>
+              <td class="py-3.5 px-4" id="tbCost3">10,000원 (40.0%)</td>
+              <td class="py-3.5 px-4 text-rose-600 font-semibold" id="tbFee3">7,500원 (30.0%)</td>
+              <td class="py-3.5 px-4" id="tbVat3">1,250원</td>
+              <td class="py-3.5 px-4 font-extrabold text-blue-600 text-sm" id="tbProfit3">6,250원 (25.0%)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    lucide.createIcons();
+
+    // Mode: 'forward' (판매가 기준) | 'reverse' (목표 마진 기준 역산)
+    let currentMode = 'forward';
+
+    // Inputs
+    const tabModeForward = document.getElementById('tabModeForward');
+    const tabModeReverse = document.getElementById('tabModeReverse');
+    const lblDynamicInput = document.getElementById('lblDynamicInput');
+    const inputDynamicVal = document.getElementById('inputDynamicVal');
+    const unitDynamicVal = document.getElementById('unitDynamicVal');
+    const subDynamicDesc = document.getElementById('subDynamicDesc');
+
+    const inputCostPrice = document.getElementById('inputCostPrice');
+    const inputActualShipping = document.getElementById('inputActualShipping');
+    const chkIncludeVat = document.getElementById('chkIncludeVat');
+
+    const feeSmartstore = document.getElementById('feeSmartstore');
+    const feeCoupangWing = document.getElementById('feeCoupangWing');
+    const feeCoupangRocket = document.getElementById('feeCoupangRocket');
+    const btnResetFees = document.getElementById('btnResetFees');
+
+    // Cards elements
+    const channels = [
+      {
+        id: 1,
+        lblPrice: document.getElementById('lblCardPrice1'),
+        valPrice: document.getElementById('valCardPrice1'),
+        valProfit: document.getElementById('valNetProfit1'),
+        valMargin: document.getElementById('valMarginRate1'),
+        txtCost: document.getElementById('txtCost1'),
+        txtFee: document.getElementById('txtFee1'),
+        txtVat: document.getElementById('txtVat1'),
+        barCost: document.getElementById('barCost1'),
+        barFee: document.getElementById('barFee1'),
+        barVat: document.getElementById('barVat1'),
+        barMargin: document.getElementById('barMargin1'),
+        tbPrice: document.getElementById('tbPrice1'),
+        tbCost: document.getElementById('tbCost1'),
+        tbFee: document.getElementById('tbFee1'),
+        tbVat: document.getElementById('tbVat1'),
+        tbProfit: document.getElementById('tbProfit1'),
+        tagBest: document.getElementById('tagBestProfit1')
+      },
+      {
+        id: 2,
+        lblPrice: document.getElementById('lblCardPrice2'),
+        valPrice: document.getElementById('valCardPrice2'),
+        valProfit: document.getElementById('valNetProfit2'),
+        valMargin: document.getElementById('valMarginRate2'),
+        txtCost: document.getElementById('txtCost2'),
+        txtFee: document.getElementById('txtFee2'),
+        txtVat: document.getElementById('txtVat2'),
+        barCost: document.getElementById('barCost2'),
+        barFee: document.getElementById('barFee2'),
+        barVat: document.getElementById('barVat2'),
+        barMargin: document.getElementById('barMargin2'),
+        tbPrice: document.getElementById('tbPrice2'),
+        tbCost: document.getElementById('tbCost2'),
+        tbFee: document.getElementById('tbFee2'),
+        tbVat: document.getElementById('tbVat2'),
+        tbProfit: document.getElementById('tbProfit2'),
+        tagBest: document.getElementById('tagBestProfit2')
+      },
+      {
+        id: 3,
+        lblPrice: document.getElementById('lblCardPrice3'),
+        valPrice: document.getElementById('valCardPrice3'),
+        valProfit: document.getElementById('valNetProfit3'),
+        valMargin: document.getElementById('valMarginRate3'),
+        txtCost: document.getElementById('txtCost3'),
+        txtFee: document.getElementById('txtFee3'),
+        txtVat: document.getElementById('txtVat3'),
+        barCost: document.getElementById('barCost3'),
+        barFee: document.getElementById('barFee3'),
+        barVat: document.getElementById('barVat3'),
+        barMargin: document.getElementById('barMargin3'),
+        tbPrice: document.getElementById('tbPrice3'),
+        tbCost: document.getElementById('tbCost3'),
+        tbFee: document.getElementById('tbFee3'),
+        tbVat: document.getElementById('tbVat3'),
+        tbProfit: document.getElementById('tbProfit3'),
+        tagBest: document.getElementById('tagBestProfit3')
+      }
+    ];
+
+    // Mode Toggle
+    tabModeForward.addEventListener('click', () => {
+      currentMode = 'forward';
+      tabModeForward.className = "flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-1.5 bg-white text-amber-900 shadow-sm";
+      tabModeReverse.className = "flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900";
+      lblDynamicInput.textContent = "🏷️ 기준 판매 가격 (원)";
+      unitDynamicVal.textContent = "원";
+      subDynamicDesc.textContent = "채널 공통으로 책정할 소비자 판매가";
+      inputDynamicVal.value = 25000;
+      inputDynamicVal.step = 1000;
+      recalculate();
+    });
+
+    tabModeReverse.addEventListener('click', () => {
+      currentMode = 'reverse';
+      tabModeReverse.className = "flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-1.5 bg-white text-amber-900 shadow-sm";
+      tabModeForward.className = "flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900";
+      lblDynamicInput.textContent = "🎯 원하는 목표 마진율 (%)";
+      unitDynamicVal.textContent = "%";
+      subDynamicDesc.textContent = "모든 비용 제외 후 남기고 싶은 순마진율 입력 (예: 25%)";
+      inputDynamicVal.value = 30;
+      inputDynamicVal.step = 1;
+      recalculate();
+    });
+
+    // Reset Fees
+    btnResetFees.addEventListener('click', () => {
+      feeSmartstore.value = 5.63;
+      feeCoupangWing.value = 10.8;
+      feeCoupangRocket.value = 30.0;
+      recalculate();
+    });
+
+    // Event Listeners
+    [inputCostPrice, inputActualShipping, inputDynamicVal, feeSmartstore, feeCoupangWing, feeCoupangRocket].forEach(el => {
+      el.addEventListener('input', recalculate);
+    });
+    chkIncludeVat.addEventListener('change', recalculate);
+
+    function recalculate() {
+      const cost = Math.max(0, parseInt(inputCostPrice.value, 10) || 0);
+      const ship = Math.max(0, parseInt(inputActualShipping.value, 10) || 0);
+      const incVat = chkIncludeVat.checked;
+
+      const f1 = (parseFloat(feeSmartstore.value) || 0) / 100;
+      const f2 = (parseFloat(feeCoupangWing.value) || 0) / 100;
+      const f3 = (parseFloat(feeCoupangRocket.value) || 0) / 100;
+
+      const feeRates = [f1, f2, f3];
+      const isRocket = [false, false, true];
+
+      let results = [];
+
+      if (currentMode === 'forward') {
+        const salePrice = Math.max(0, parseInt(inputDynamicVal.value, 10) || 0);
+
+        feeRates.forEach((feeRate, idx) => {
+          const rocket = isRocket[idx];
+          const totalCost = rocket ? cost : (cost + ship);
+          const feeAmt = Math.round(salePrice * feeRate);
+
+          let vatAmt = 0;
+          if (incVat) {
+            const salesVat = Math.round(salePrice / 11);
+            const costVat = Math.round(totalCost / 11);
+            vatAmt = Math.max(0, salesVat - costVat);
+          }
+
+          const netProfit = salePrice - totalCost - feeAmt - vatAmt;
+          const marginRate = salePrice > 0 ? ((netProfit / salePrice) * 100).toFixed(1) : 0;
+
+          results.push({
+            salePrice,
+            totalCost,
+            feeAmt,
+            feeRatePct: (feeRate * 100).toFixed(1),
+            vatAmt,
+            netProfit,
+            marginRate: parseFloat(marginRate)
+          });
+        });
+      } else {
+        // Reverse Mode: Target Margin % to Required Sale Price
+        const targetMarginPct = Math.max(1, Math.min(90, parseFloat(inputDynamicVal.value) || 30)) / 100;
+
+        feeRates.forEach((feeRate, idx) => {
+          const rocket = isRocket[idx];
+          const totalCost = rocket ? cost : (cost + ship);
+
+          // P = totalCost + (P * feeRate) + vat + (P * targetMarginPct)
+          // approx vat: (P/11 - cost/11) = (P - cost)/11
+          // P * (1 - feeRate - targetMargin - (incVat ? 1/11 : 0)) = totalCost - (incVat ? cost/11 : 0)
+          const vatRatio = incVat ? (1 / 11) : 0;
+          const costVatDeduct = incVat ? (totalCost / 11) : 0;
+
+          const denom = 1 - feeRate - targetMarginPct - vatRatio;
+          let reqPrice = 0;
+          if (denom > 0) {
+            reqPrice = Math.round((totalCost - costVatDeduct) / denom);
+          } else {
+            reqPrice = Math.round(totalCost * 2);
+          }
+
+          const feeAmt = Math.round(reqPrice * feeRate);
+          let vatAmt = 0;
+          if (incVat) {
+            vatAmt = Math.max(0, Math.round(reqPrice / 11) - Math.round(totalCost / 11));
+          }
+          const netProfit = reqPrice - totalCost - feeAmt - vatAmt;
+          const actualMarginRate = reqPrice > 0 ? ((netProfit / reqPrice) * 100).toFixed(1) : 0;
+
+          results.push({
+            salePrice: reqPrice,
+            totalCost,
+            feeAmt,
+            feeRatePct: (feeRate * 100).toFixed(1),
+            vatAmt,
+            netProfit,
+            marginRate: parseFloat(actualMarginRate)
+          });
+        });
+      }
+
+      // Best margin index
+      let bestIdx = 0;
+      let maxProf = -Infinity;
+      results.forEach((r, i) => {
+        if (r.netProfit > maxProf) {
+          maxProf = r.netProfit;
+          bestIdx = i;
+        }
+      });
+
+      // Render to DOM
+      results.forEach((res, i) => {
+        const c = channels[i];
+
+        if (currentMode === 'forward') {
+          c.lblPrice.textContent = "판매 기준 가격";
+        } else {
+          c.lblPrice.textContent = "목표 마진 달성을 위한 권장 판매가";
+        }
+
+        c.valPrice.textContent = res.salePrice.toLocaleString();
+        c.valProfit.textContent = res.netProfit.toLocaleString();
+        c.valMargin.textContent = res.marginRate.toFixed(1) + '%';
+
+        const costPct = res.salePrice > 0 ? ((res.totalCost / res.salePrice) * 100).toFixed(1) : 0;
+        const feePct = res.salePrice > 0 ? ((res.feeAmt / res.salePrice) * 100).toFixed(1) : 0;
+        const vatPct = res.salePrice > 0 ? ((res.vatAmt / res.salePrice) * 100).toFixed(1) : 0;
+        const profitPct = res.salePrice > 0 ? ((res.netProfit / res.salePrice) * 100).toFixed(1) : 0;
+
+        c.txtCost.textContent = `${res.totalCost.toLocaleString()}원 (${costPct}%)`;
+        c.txtFee.textContent = `${res.feeAmt.toLocaleString()}원 (${feePct}%)`;
+        c.txtVat.textContent = `${res.vatAmt.toLocaleString()}원 (${vatPct}%)`;
+
+        // Bar widths
+        c.barCost.style.width = Math.max(0, costPct) + '%';
+        c.barFee.style.width = Math.max(0, feePct) + '%';
+        c.barVat.style.width = Math.max(0, vatPct) + '%';
+        c.barMargin.style.width = Math.max(0, profitPct) + '%';
+
+        // Table
+        c.tbPrice.textContent = res.salePrice.toLocaleString() + '원';
+        c.tbCost.textContent = `${res.totalCost.toLocaleString()}원 (${costPct}%)`;
+        c.tbFee.textContent = `${res.feeAmt.toLocaleString()}원 (${feePct}%)`;
+        c.tbVat.textContent = res.vatAmt.toLocaleString() + '원';
+        c.tbProfit.textContent = `${res.netProfit.toLocaleString()}원 (${res.marginRate.toFixed(1)}%)`;
+
+        if (i === bestIdx) {
+          c.tagBest.classList.remove('hidden');
+        } else {
+          c.tagBest.classList.add('hidden');
+        }
+      });
+
+      notifyParentHeight();
+    }
+
+    function notifyParentHeight() {
+      if (window.parent && window.parent !== window) {
+        const height = document.documentElement.scrollHeight || document.body.scrollHeight;
+        window.parent.postMessage({ type: 'TOOL_RESIZE', height: height + 10 }, '*');
+      }
+    }
+
+    window.addEventListener('load', () => {
+      recalculate();
+      notifyParentHeight();
+    });
+    window.addEventListener('resize', notifyParentHeight);
+    if (window.ResizeObserver) {
+      new ResizeObserver(notifyParentHeight).observe(document.body);
+    }
+  </script>
+</body>
+</html>

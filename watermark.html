@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>상세페이지·썸네일 이미지 워터마크 자동 일괄 삽입기 | 불펌·도용 방지 툴</title>
+  <meta name="description" content="스마트스토어, 쿠팡 상품 썸네일과 상세페이지에 브랜드 로고나 텍스트 워터마크를 원클릭으로 일괄 각인하고 ZIP으로 다운로드하세요. 100% 브라우저 연산으로 유출 걱정 없는 무료 도구.">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- JSZip CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+    
+    * {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
+
+  <!-- Header -->
+  <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center text-white shadow-md shadow-cyan-500/20 text-lg">
+          🛡️
+        </div>
+        <div>
+          <h1 class="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">
+            이미지 워터마크 자동 일괄 삽입기
+          </h1>
+          <p class="text-[11px] text-slate-500 font-medium">
+            상세페이지 · 썸네일 무단 도용 방지 텍스트/로고 각인 툴
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          서버 전송 없는 100% 클라이언트 보안 처리
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 space-y-8">
+    
+    <!-- Hero / Intro -->
+    <div class="text-center max-w-2xl mx-auto space-y-2">
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-cyan-50 text-cyan-700 border border-cyan-100">
+        🔒 소중한 상세페이지 저작권 보호
+      </span>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        상품 이미지에 워터마크를 단 1초 만에 일괄 각인
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+        힘들게 기획하고 촬영한 상세페이지와 썸네일을 경쟁사가 무단 캡처하거나 불펌하지 못하도록, 스토어 브랜드명 또는 로고를 자연스럽게 각인하고 ZIP으로 일괄 다운로드하세요.
+      </p>
+    </div>
+
+    <!-- Core Tool Container -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Left Column: Controls & Settings -->
+      <div class="lg:col-span-5 bg-white rounded-3xl p-6 border border-slate-200 shadow-xl shadow-slate-200/50 space-y-6">
+        
+        <!-- Step 1: Upload Images -->
+        <div class="space-y-3">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-cyan-600 flex items-center gap-1.5">
+            <i data-lucide="upload" class="w-4 h-4"></i> Step 1. 대상 이미지 선택 (다중 가능)
+          </span>
+          <div id="dropzone" class="border-2 border-dashed border-cyan-300 hover:border-cyan-600 rounded-2xl p-6 text-center cursor-pointer transition-all bg-cyan-50/20 hover:bg-cyan-50/50">
+            <input type="file" id="fileInput" accept="image/*" multiple class="hidden">
+            <i data-lucide="images" class="w-8 h-8 text-cyan-600 mx-auto mb-2"></i>
+            <p class="text-xs font-bold text-slate-800">이미지 파일들을 여기로 드래그하세요</p>
+            <p class="text-[11px] text-slate-400 mt-1">JPG, PNG, WebP 다중 선택 지원 (무제한)</p>
+          </div>
+          <div id="fileCountBadge" class="hidden text-xs font-bold text-cyan-700 bg-cyan-50 px-3 py-1.5 rounded-lg flex items-center justify-between border border-cyan-100">
+            <span id="fileCountText">선택된 이미지: 0개</span>
+            <button type="button" id="btnClearFiles" class="text-rose-500 hover:text-rose-700 text-[11px] underline">전체 비우기</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Watermark Type Selection -->
+        <div class="space-y-3 pt-2 border-t border-slate-100">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-cyan-600 flex items-center gap-1.5">
+            <i data-lucide="type" class="w-4 h-4"></i> Step 2. 워터마크 유형 선택
+          </span>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" id="btnTypeTxt" class="py-2 px-3 rounded-xl border border-cyan-500 bg-cyan-50/60 text-cyan-900 text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+              <i data-lucide="type" class="w-3.5 h-3.5"></i> 텍스트 문구
+            </button>
+            <button type="button" id="btnTypeImg" class="py-2 px-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-slate-700 text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+              <i data-lucide="image" class="w-3.5 h-3.5"></i> 로고 이미지 (PNG)
+            </button>
+          </div>
+
+          <!-- Text Watermark Controls -->
+          <div id="panelTextControls" class="space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">워터마크 텍스트</label>
+              <input type="text" id="inputWmText" value="© SMARTSTORE ALL RIGHTS RESERVED" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-cyan-500">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">글자 크기 (px)</label>
+                <input type="number" id="inputWmSize" value="32" min="10" max="150" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono-num font-bold">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">글자 색상</label>
+                <div class="flex items-center gap-2">
+                  <input type="color" id="inputWmColor" value="#ffffff" class="w-8 h-8 rounded border border-slate-300 cursor-pointer">
+                  <span id="txtColorVal" class="text-xs font-mono text-slate-500">#ffffff</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image Watermark Controls -->
+          <div id="panelImgControls" class="hidden space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">투명 배경 로고 (PNG 추천)</label>
+              <input type="file" id="logoInput" accept="image/png,image/jpeg,image/webp" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-cyan-50 file:text-cyan-700 hover:file:bg-cyan-100">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">로고 크기 배율 (%)</label>
+              <input type="range" id="inputLogoScale" min="5" max="80" value="25" class="w-full accent-cyan-600">
+              <div class="flex justify-between text-[11px] text-slate-400">
+                <span>작게 (5%)</span>
+                <span id="txtLogoScale">25%</span>
+                <span>크게 (80%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Positioning & Opacity -->
+        <div class="space-y-3 pt-2 border-t border-slate-100">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-cyan-600 flex items-center gap-1.5">
+            <i data-lucide="layout" class="w-4 h-4"></i> Step 3. 위치 및 투명도
+          </span>
+          
+          <!-- Position Grid -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">배치 위치 선택</label>
+            <div class="grid grid-cols-4 gap-1.5 max-w-xs">
+              <button type="button" class="pos-btn py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold" data-pos="top-left">좌상</button>
+              <button type="button" class="pos-btn py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold" data-pos="top-center">상단</button>
+              <button type="button" class="pos-btn py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold" data-pos="top-right">우상</button>
+              <button type="button" class="pos-btn py-1.5 rounded-lg border border-cyan-500 bg-cyan-50 text-cyan-900 text-xs font-bold" data-pos="center">중앙</button>
+              <button type="button" class="pos-btn py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold" data-pos="bottom-left">좌하</button>
+              <button type="button" class="pos-btn py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold" data-pos="bottom-center">하단</button>
+              <button type="button" class="pos-btn py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold" data-pos="bottom-right">우하</button>
+              <button type="button" class="pos-btn py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold" data-pos="tile">격자 타일</button>
+            </div>
+          </div>
+
+          <!-- Opacity slider -->
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-xs font-bold text-slate-700">투명도 (불투명할수록 선명)</label>
+              <span id="txtOpacityVal" class="text-xs font-mono font-bold text-cyan-700">40%</span>
+            </div>
+            <input type="range" id="inputOpacity" min="5" max="100" value="40" class="w-full accent-cyan-600">
+          </div>
+
+          <!-- Rotation slider -->
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-xs font-bold text-slate-700">회전 각도</label>
+              <span id="txtRotateVal" class="text-xs font-mono font-bold text-cyan-700">-25°</span>
+            </div>
+            <input type="range" id="inputRotate" min="-90" max="90" value="-25" class="w-full accent-cyan-600">
+          </div>
+        </div>
+
+        <!-- Download Buttons -->
+        <div class="pt-4 border-t border-slate-100 space-y-2">
+          <button type="button" id="btnDownloadZip" class="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-extrabold text-sm rounded-xl shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2">
+            <i data-lucide="archive" class="w-4 h-4"></i>
+            워터마크 적용 후 ZIP 일괄 다운로드
+          </button>
+          <button type="button" id="btnDownloadCurrent" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            현재 미리보기 이미지 1장만 다운로드
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Live Preview Area -->
+      <div class="lg:col-span-7 space-y-4">
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xl shadow-slate-200/50">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-cyan-500"></span>
+              <h3 class="text-sm font-extrabold text-slate-900">실시간 각인 미리보기</h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" id="btnPrevImg" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded text-xs font-bold text-slate-600">◀ 이전</button>
+              <span id="txtPreviewIndex" class="text-xs font-bold text-slate-500">1 / 1</span>
+              <button type="button" id="btnNextImg" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded text-xs font-bold text-slate-600">다음 ▶</button>
+            </div>
+          </div>
+
+          <!-- Canvas Preview Container -->
+          <div class="mt-4 flex items-center justify-center bg-slate-100/70 rounded-2xl p-4 min-h-[420px] max-h-[640px] overflow-auto border border-slate-200/60">
+            <canvas id="previewCanvas" class="max-w-full rounded-xl shadow-md bg-white"></canvas>
+          </div>
+          <p class="text-[11px] text-slate-400 text-center mt-3">
+            ※ 원본 해상도 그대로 고화질로 렌더링되어 다운로드됩니다.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SEO Guide Section -->
+    <article class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 space-y-5 text-slate-700 leading-relaxed text-xs sm:text-sm">
+      <h3 class="text-lg font-extrabold text-slate-900">
+        🛡️ 온라인 쇼핑몰 워터마크 적용 3가지 꿀팁
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5">
+          <strong class="text-cyan-900 font-bold block">1. '격자 타일링'으로 누끼 도용 차단</strong>
+          <p class="text-slate-600">외곽 모서리에만 워터마크를 넣으면 크롭(자르기)해서 쉽게 도용합니다. 은은한 투명도(20~30%)로 전체 격자 타일링을 주면 이미지 감상을 해치지 않으면서 도용을 원천 차단합니다.</p>
+        </div>
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5">
+          <strong class="text-cyan-900 font-bold block">2. 대표 썸네일 네이버 가이드 준수</strong>
+          <p class="text-slate-600">네이버 스마트스토어 첫 번째 대표 썸네일에는 과도한 텍스트가 들어가면 노출 제재를 받을 수 있으므로, 대표 썸네일은 은은하게, 상세페이지 내 컷에는 선명하게 넣는 것이 좋습니다.</p>
+        </div>
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5">
+          <strong class="text-cyan-900 font-bold block">3. 100% 브라우저 메모리 연산</strong>
+          <p class="text-slate-600">본 도구는 업로드한 사진을 외부 웹 서버로 전송하지 않고 사용자의 PC 브라우저 메모리(HTML5 Canvas)에서만 즉시 합성하므로 신제품 상세페이지 유출 위험이 없습니다.</p>
+        </div>
+      </div>
+    </article>
+
+  </main>
+
+  <script>
+    lucide.createIcons();
+
+    // State
+    const state = {
+      images: [], // { name, img }
+      currentIndex: 0,
+      wmType: 'text', // 'text' | 'image'
+      text: '© SMARTSTORE ALL RIGHTS RESERVED',
+      fontSize: 32,
+      fontColor: '#ffffff',
+      logoImg: null,
+      logoScale: 25,
+      position: 'center',
+      opacity: 40,
+      rotation: -25
+    };
+
+    // DOM Elements
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const fileCountBadge = document.getElementById('fileCountBadge');
+    const fileCountText = document.getElementById('fileCountText');
+    const btnClearFiles = document.getElementById('btnClearFiles');
+
+    const btnTypeTxt = document.getElementById('btnTypeTxt');
+    const btnTypeImg = document.getElementById('btnTypeImg');
+    const panelTextControls = document.getElementById('panelTextControls');
+    const panelImgControls = document.getElementById('panelImgControls');
+
+    const inputWmText = document.getElementById('inputWmText');
+    const inputWmSize = document.getElementById('inputWmSize');
+    const inputWmColor = document.getElementById('inputWmColor');
+    const txtColorVal = document.getElementById('txtColorVal');
+
+    const logoInput = document.getElementById('logoInput');
+    const inputLogoScale = document.getElementById('inputLogoScale');
+    const txtLogoScale = document.getElementById('txtLogoScale');
+
+    const inputOpacity = document.getElementById('inputOpacity');
+    const txtOpacityVal = document.getElementById('txtOpacityVal');
+    const inputRotate = document.getElementById('inputRotate');
+    const txtRotateVal = document.getElementById('txtRotateVal');
+
+    const posButtons = document.querySelectorAll('.pos-btn');
+    const previewCanvas = document.getElementById('previewCanvas');
+    const ctx = previewCanvas.getContext('2d');
+
+    const btnPrevImg = document.getElementById('btnPrevImg');
+    const btnNextImg = document.getElementById('btnNextImg');
+    const txtPreviewIndex = document.getElementById('txtPreviewIndex');
+    const btnDownloadZip = document.getElementById('btnDownloadZip');
+    const btnDownloadCurrent = document.getElementById('btnDownloadCurrent');
+
+    // Create Sample Image initially
+    function createSampleImage() {
+      const c = document.createElement('canvas');
+      c.width = 1000;
+      c.height = 1000;
+      const cx = c.getContext('2d');
+      cx.fillStyle = '#f8fafc';
+      cx.fillRect(0, 0, 1000, 1000);
+      
+      // Sample design
+      cx.fillStyle = '#e2e8f0';
+      cx.beginPath();
+      cx.arc(500, 450, 200, 0, Math.PI * 2);
+      cx.fill();
+
+      cx.fillStyle = '#64748b';
+      cx.font = 'bold 36px Pretendard, sans-serif';
+      cx.textAlign = 'center';
+      cx.fillText('샘플 상품 이미지 (1000×1000)', 500, 460);
+
+      cx.fillStyle = '#94a3b8';
+      cx.font = '24px Pretendard, sans-serif';
+      cx.fillText('이미지를 드래그하여 등록하세요', 500, 720);
+
+      const img = new Image();
+      img.onload = () => {
+        state.images = [{ name: 'sample.png', img: img }];
+        state.currentIndex = 0;
+        updatePreview();
+      };
+      img.src = c.toDataURL();
+    }
+    createSampleImage();
+
+    // File Upload Handlers
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('border-cyan-600', 'bg-cyan-50/60'); });
+    dropzone.addEventListener('dragleave', () => { dropzone.classList.remove('border-cyan-600', 'bg-cyan-50/60'); });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-cyan-600', 'bg-cyan-50/60');
+      handleFiles(e.dataTransfer.files);
+    });
+    fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+    function handleFiles(files) {
+      if (!files || files.length === 0) return;
+      state.images = [];
+      let loaded = 0;
+      Array.from(files).forEach(file => {
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            state.images.push({ name: file.name, img: img });
+            loaded++;
+            if (loaded === files.length) {
+              state.currentIndex = 0;
+              fileCountBadge.classList.remove('hidden');
+              fileCountText.textContent = `선택된 이미지: ${state.images.length}개`;
+              updatePreview();
+            }
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    btnClearFiles.addEventListener('click', () => {
+      createSampleImage();
+      fileCountBadge.classList.add('hidden');
+    });
+
+    // Watermark Type Toggle
+    btnTypeTxt.addEventListener('click', () => {
+      state.wmType = 'text';
+      btnTypeTxt.className = "py-2 px-3 rounded-xl border border-cyan-500 bg-cyan-50/60 text-cyan-900 text-xs font-bold transition-all flex items-center justify-center gap-1.5";
+      btnTypeImg.className = "py-2 px-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-slate-700 text-xs font-bold transition-all flex items-center justify-center gap-1.5";
+      panelTextControls.classList.remove('hidden');
+      panelImgControls.classList.add('hidden');
+      updatePreview();
+    });
+
+    btnTypeImg.addEventListener('click', () => {
+      state.wmType = 'image';
+      btnTypeImg.className = "py-2 px-3 rounded-xl border border-cyan-500 bg-cyan-50/60 text-cyan-900 text-xs font-bold transition-all flex items-center justify-center gap-1.5";
+      btnTypeTxt.className = "py-2 px-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-slate-700 text-xs font-bold transition-all flex items-center justify-center gap-1.5";
+      panelImgControls.classList.remove('hidden');
+      panelTextControls.classList.add('hidden');
+      updatePreview();
+    });
+
+    // Logo upload
+    logoInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          state.logoImg = img;
+          updatePreview();
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Inputs Change
+    inputWmText.addEventListener('input', (e) => { state.text = e.target.value; updatePreview(); });
+    inputWmSize.addEventListener('input', (e) => { state.fontSize = parseInt(e.target.value, 10) || 32; updatePreview(); });
+    inputWmColor.addEventListener('input', (e) => {
+      state.fontColor = e.target.value;
+      txtColorVal.textContent = e.target.value;
+      updatePreview();
+    });
+    inputLogoScale.addEventListener('input', (e) => {
+      state.logoScale = parseInt(e.target.value, 10);
+      txtLogoScale.textContent = state.logoScale + '%';
+      updatePreview();
+    });
+    inputOpacity.addEventListener('input', (e) => {
+      state.opacity = parseInt(e.target.value, 10);
+      txtOpacityVal.textContent = state.opacity + '%';
+      updatePreview();
+    });
+    inputRotate.addEventListener('input', (e) => {
+      state.rotation = parseInt(e.target.value, 10);
+      txtRotateVal.textContent = state.rotation + '°';
+      updatePreview();
+    });
+
+    // Position Buttons
+    posButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        posButtons.forEach(b => {
+          b.className = "pos-btn py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold";
+        });
+        btn.className = "pos-btn py-1.5 rounded-lg border border-cyan-500 bg-cyan-50 text-cyan-900 text-xs font-bold";
+        state.position = btn.dataset.pos;
+        updatePreview();
+      });
+    });
+
+    // Navigation
+    btnPrevImg.addEventListener('click', () => {
+      if (state.currentIndex > 0) {
+        state.currentIndex--;
+        updatePreview();
+      }
+    });
+    btnNextImg.addEventListener('click', () => {
+      if (state.currentIndex < state.images.length - 1) {
+        state.currentIndex++;
+        updatePreview();
+      }
+    });
+
+    // Render Preview
+    function updatePreview() {
+      if (!state.images.length) return;
+      const cur = state.images[state.currentIndex];
+      txtPreviewIndex.textContent = `${state.currentIndex + 1} / ${state.images.length}`;
+
+      renderWatermark(cur.img, previewCanvas);
+      notifyParentHeight();
+    }
+
+    function renderWatermark(baseImg, targetCanvas) {
+      targetCanvas.width = baseImg.naturalWidth || baseImg.width;
+      targetCanvas.height = baseImg.naturalHeight || baseImg.height;
+      const c = targetCanvas.getContext('2d');
+      c.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+      c.drawImage(baseImg, 0, 0);
+
+      c.save();
+      c.globalAlpha = state.opacity / 100;
+
+      const rad = (state.rotation * Math.PI) / 180;
+      const w = targetCanvas.width;
+      const h = targetCanvas.height;
+
+      if (state.position === 'tile') {
+        // Tile across whole image
+        const stepX = Math.max(200, w / 4);
+        const stepY = Math.max(150, h / 5);
+
+        for (let y = stepY / 2; y < h; y += stepY) {
+          for (let x = stepX / 2; x < w; x += stepX) {
+            c.save();
+            c.translate(x, y);
+            c.rotate(rad);
+            drawWatermarkItem(c, 0, 0, w);
+            c.restore();
+          }
+        }
+      } else {
+        // Single point placement
+        let x = w / 2;
+        let y = h / 2;
+        const padX = w * 0.08;
+        const padY = h * 0.08;
+
+        switch (state.position) {
+          case 'top-left': x = padX; y = padY; break;
+          case 'top-center': x = w / 2; y = padY; break;
+          case 'top-right': x = w - padX; y = padY; break;
+          case 'bottom-left': x = padX; y = h - padY; break;
+          case 'bottom-center': x = w / 2; y = h - padY; break;
+          case 'bottom-right': x = w - padX; y = h - padY; break;
+          case 'center': default: x = w / 2; y = h / 2; break;
+        }
+
+        c.save();
+        c.translate(x, y);
+        c.rotate(rad);
+        drawWatermarkItem(c, 0, 0, w);
+        c.restore();
+      }
+
+      c.restore();
+    }
+
+    function drawWatermarkItem(c, x, y, canvasW) {
+      if (state.wmType === 'text') {
+        const scaledFont = Math.max(14, Math.round(state.fontSize * (canvasW / 1000)));
+        c.font = `bold ${scaledFont}px Pretendard, sans-serif`;
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+
+        // subtle shadow for contrast
+        c.shadowColor = 'rgba(0,0,0,0.5)';
+        c.shadowBlur = 4;
+        c.shadowOffsetX = 1;
+        c.shadowOffsetY = 1;
+
+        c.fillStyle = state.fontColor;
+        c.fillText(state.text, x, y);
+      } else if (state.wmType === 'image' && state.logoImg) {
+        const logoW = (canvasW * (state.logoScale / 100));
+        const aspect = state.logoImg.naturalHeight / state.logoImg.naturalWidth;
+        const logoH = logoW * aspect;
+        c.drawImage(state.logoImg, x - logoW / 2, y - logoH / 2, logoW, logoH);
+      }
+    }
+
+    // Download Single Current
+    btnDownloadCurrent.addEventListener('click', () => {
+      if (!state.images.length) return;
+      const cur = state.images[state.currentIndex];
+      const link = document.createElement('a');
+      link.download = 'wm_' + (cur.name || 'image.png');
+      link.href = previewCanvas.toDataURL('image/png', 0.95);
+      link.click();
+    });
+
+    // Download ZIP
+    btnDownloadZip.addEventListener('click', async () => {
+      if (!state.images.length) return;
+      const zip = new JSZip();
+      btnDownloadZip.disabled = true;
+      btnDownloadZip.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> ZIP 생성 중...`;
+
+      const offCanvas = document.createElement('canvas');
+
+      for (let i = 0; i < state.images.length; i++) {
+        const item = state.images[i];
+        renderWatermark(item.img, offCanvas);
+        const dataUrl = offCanvas.toDataURL('image/png', 0.95);
+        const base64 = dataUrl.split(',')[1];
+        zip.file(`wm_${i + 1}_${item.name || 'image.png'}`, base64, { base64: true });
+      }
+
+      const content = await zip.generateAsync({ type: 'blob' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(content);
+      link.download = `watermark_images_${Date.now()}.zip`;
+      link.click();
+
+      btnDownloadZip.disabled = false;
+      btnDownloadZip.innerHTML = `<i data-lucide="archive" class="w-4 h-4"></i> 워터마크 적용 후 ZIP 일괄 다운로드`;
+      lucide.createIcons();
+    });
+
+    function notifyParentHeight() {
+      if (window.parent && window.parent !== window) {
+        const height = document.documentElement.scrollHeight || document.body.scrollHeight;
+        window.parent.postMessage({ type: 'TOOL_RESIZE', height: height + 10 }, '*');
+      }
+    }
+
+    window.addEventListener('load', notifyParentHeight);
+    window.addEventListener('resize', notifyParentHeight);
+    if (window.ResizeObserver) {
+      new ResizeObserver(notifyParentHeight).observe(document.body);
+    }
+  </script>
+</body>
+</html>
