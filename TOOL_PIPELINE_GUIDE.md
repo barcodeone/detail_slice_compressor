@@ -299,6 +299,7 @@ else:
 | **7** | 오픈마켓 부가세(VAT) & 실납부세액 계산기 | `vat-calculator` | `2119` | `vat-calculator.html` |
 | **8** | 상세페이지·썸네일 이미지 워터마크 자동 삽입기 | `watermark` | `2120` | `watermark.html` |
 | **9** | 스마트스토어 vs 쿠팡 채널별 수수료 & 마진 비교기 | `channel-compare` | `2121` | `channel-compare.html` |
+| **10** | 동영상 ➔ 초경량 고화질 GIF 움짤 생성기 | `gif-maker` | `2128` | `gif-maker.html` |
 | **Hub** | **전체 오픈마켓 셀러 통합 툴 모음 허브** | `tools` | `2112` | - |
 
 ---
