@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스마트 디데이(D-Day) &amp; 기념일·만나이 종합 계산기</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #eef2ff;
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+            --rose-600: #e11d48;
+            --rose-50: #fff1f2;
+            --amber-600: #d97706;
+            --amber-50: #fffbeb;
+            --emerald-600: #059669;
+            --emerald-50: #ecfdf5;
+            --radius-xl: 20px;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--slate-50);
+            color: var(--slate-800);
+            line-height: 1.5;
+            padding: 24px 16px 60px 16px;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 12.5px;
+            font-weight: 700;
+            border-radius: 999px;
+            margin-bottom: 12px;
+        }
+
+        .app-title {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--slate-900);
+            letter-spacing: -0.6px;
+            margin-bottom: 8px;
+        }
+
+        .app-subtitle {
+            font-size: 14px;
+            color: var(--slate-500);
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-lg);
+            padding: 6px;
+            gap: 6px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 14px;
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--slate-600);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+        .tab-panel.active {
+            display: block;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+        }
+
+        .card-header {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--slate-700);
+            margin-bottom: 6px;
+        }
+
+        .input-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--slate-200);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--slate-900);
+            outline: none;
+            background: #ffffff;
+            transition: border-color 0.15s;
+        }
+
+        .input-control:focus {
+            border-color: var(--primary);
+        }
+
+        /* D-Day Result Display */
+        .dday-hero {
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+            color: #ffffff;
+            border-radius: var(--radius-lg);
+            padding: 28px 20px;
+            text-align: center;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.25);
+        }
+
+        .dday-title {
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.9;
+            margin-bottom: 6px;
+        }
+
+        .dday-value {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+
+        .dday-countdown {
+            font-size: 13px;
+            opacity: 0.85;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* List & Table */
+        .milestone-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        .milestone-item {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .milestone-item.passed {
+            opacity: 0.6;
+        }
+
+        .milestone-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .milestone-name {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--slate-900);
+        }
+
+        .milestone-date {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--slate-600);
+        }
+
+        .info-pill-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .info-pill {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            text-align: center;
+        }
+
+        .info-pill-title {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--slate-500);
+            margin-bottom: 4px;
+        }
+
+        .info-pill-val {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--slate-900);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="app-header">
+        <div class="badge-pill">
+            <span>📅</span> 일상 필수 스마트 카운터
+        </div>
+        <h1 class="app-title">스마트 디데이 &amp; 기념일·만나이 계산기</h1>
+        <p class="app-subtitle">시험·목표 D-Day 카운트다운부터 커플 100일/1주년 달력, 개정된 만 나이 및 띠/별자리까지 1초 만에 확인합니다.</p>
+    </header>
+
+    <!-- Tab Nav -->
+    <div class="tab-nav">
+        <button type="button" class="tab-btn active" data-tab="tab-dday">
+            <span>🎯</span> 목표일 디데이 (D-Day)
+        </button>
+        <button type="button" class="tab-btn" data-tab="tab-anniversary">
+            <span>💖</span> 커플·기념일 계산기
+        </button>
+        <button type="button" class="tab-btn" data-tab="tab-age">
+            <span>🎂</span> 개정된 '만 나이' &amp; 띠/별자리
+        </button>
+    </div>
+
+    <!-- 1. D-Day Panel -->
+    <div class="tab-panel active" id="tab-dday">
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span>🎯 디데이 일정 등록</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">일정 제목</label>
+                    <input type="text" class="input-control" id="ddayTitleInput" value="수능 / 중요한 시험일">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">목표 날짜</label>
+                    <input type="date" class="input-control" id="ddayDateInput">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span>⏳ 실시간 디데이 현황</span>
+                </div>
+                <div class="dday-hero">
+                    <div class="dday-title" id="ddayHeroTitle">수능 / 중요한 시험일</div>
+                    <div class="dday-value" id="ddayHeroVal">D-Day</div>
+                    <div class="dday-countdown" id="ddayCountdown">목표일까지 남은 시간 계산 중...</div>
+                </div>
+
+                <div class="info-pill-grid">
+                    <div class="info-pill">
+                        <div class="info-pill-title">목표 날짜 요일</div>
+                        <div class="info-pill-val" id="ddayDayOfWeek">-</div>
+                    </div>
+                    <div class="info-pill">
+                        <div class="info-pill-title">남은 주 수</div>
+                        <div class="info-pill-val" id="ddayWeeksLeft">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Anniversary Panel -->
+    <div class="tab-panel" id="tab-anniversary">
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span>💖 기준 시작일 입력</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">처음 만난 날 (또는 시작일)</label>
+                    <input type="date" class="input-control" id="anniDateInput">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">시작일을 1일째로 계산</label>
+                    <select class="input-control" id="anniCountDayOne">
+                        <option value="1" selected>포함 (당일부터 1일째 - 한국 커플 표준)</option>
+                        <option value="0">미포함 (당일은 0일, 익일부터 1일째)</option>
+                    </select>
+                </div>
+
+                <div class="dday-hero" style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);">
+                    <div class="dday-title">우리가 함께한 지</div>
+                    <div class="dday-value" id="anniTodayDays">오늘 0일째</div>
+                    <div class="dday-countdown" id="anniTodayDate">오늘 기준</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span>📅 주요 기념일 달력 목록</span>
+                </div>
+                <div class="milestone-list" id="anniversaryList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Age Panel -->
+    <div class="tab-panel" id="tab-age">
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span>🎂 생년월일 입력</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">출생일자 (양력 기준)</label>
+                    <input type="date" class="input-control" id="birthDateInput" value="1995-05-15">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span>📊 나이 및 운세 정보</span>
+                </div>
+                <div class="info-pill-grid" style="margin-top:0; margin-bottom:16px;">
+                    <div class="info-pill" style="border-color:var(--primary); background:var(--primary-light);">
+                        <div class="info-pill-title" style="color:var(--primary);">법적 공식 '만 나이'</div>
+                        <div class="info-pill-val" style="color:var(--primary);" id="ageMan">-세</div>
+                    </div>
+                    <div class="info-pill">
+                        <div class="info-pill-title">연 나이 (당해년도 - 출생년도)</div>
+                        <div class="info-pill-val" id="ageYear">-세</div>
+                    </div>
+                    <div class="info-pill">
+                        <div class="info-pill-title">십이지 띠</div>
+                        <div class="info-pill-val" id="zodiacSign">-</div>
+                    </div>
+                    <div class="info-pill">
+                        <div class="info-pill-title">별자리</div>
+                        <div class="info-pill-val" id="starSign">-</div>
+                    </div>
+                </div>
+
+                <div class="dday-hero" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+                    <div class="dday-title">다음 생일까지 남은 날</div>
+                    <div class="dday-value" id="nextBirthdayDday">D-0일</div>
+                    <div class="dday-countdown" id="nextBirthdayDate">생일 날짜</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+        });
+    });
+
+    const daysOfWeek = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+
+    // 1. D-Day Logic
+    const ddayTitleInput = document.getElementById('ddayTitleInput');
+    const ddayDateInput = document.getElementById('ddayDateInput');
+    const ddayHeroTitle = document.getElementById('ddayHeroTitle');
+    const ddayHeroVal = document.getElementById('ddayHeroVal');
+    const ddayCountdown = document.getElementById('ddayCountdown');
+    const ddayDayOfWeek = document.getElementById('ddayDayOfWeek');
+    const ddayWeeksLeft = document.getElementById('ddayWeeksLeft');
+
+    // Default target: 30 days from now
+    const now = new Date();
+    const future30 = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    ddayDateInput.value = future30.toISOString().split('T')[0];
+
+    function updateDday() {
+        const title = ddayTitleInput.value.trim() || '목표일';
+        ddayHeroTitle.textContent = title;
+
+        const targetDate = new Date(ddayDateInput.value + 'T00:00:00');
+        if (isNaN(targetDate.getTime())) return;
+
+        const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const diffMs = targetDate - todayMid;
+        const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) {
+            ddayHeroVal.textContent = 'D-DAY';
+            ddayCountdown.textContent = '오늘이 바로 그 날입니다! 🎉';
+        } else if (diffDays > 0) {
+            ddayHeroVal.textContent = `D-${diffDays}`;
+            ddayCountdown.textContent = `목표일까지 약 ${Math.floor(diffDays / 7)}주 ${diffDays % 7}일 남았습니다.`;
+        } else {
+            ddayHeroVal.textContent = `D+${Math.abs(diffDays)}`;
+            ddayCountdown.textContent = `목표일로부터 ${Math.abs(diffDays)}일 경과되었습니다.`;
+        }
+
+        ddayDayOfWeek.textContent = daysOfWeek[targetDate.getDay()];
+        ddayWeeksLeft.textContent = diffDays > 0 ? `약 ${(diffDays / 7).toFixed(1)}주` : '종료됨';
+    }
+
+    ddayTitleInput.addEventListener('input', updateDday);
+    ddayDateInput.addEventListener('change', updateDday);
+
+    // 2. Anniversary Logic
+    const anniDateInput = document.getElementById('anniDateInput');
+    const anniCountDayOne = document.getElementById('anniCountDayOne');
+    const anniTodayDays = document.getElementById('anniTodayDays');
+    const anniversaryList = document.getElementById('anniversaryList');
+
+    // Default: 100 days ago
+    const past100 = new Date(now.getTime() - 100 * 24 * 60 * 60 * 1000);
+    anniDateInput.value = past100.toISOString().split('T')[0];
+
+    function updateAnniversary() {
+        const start = new Date(anniDateInput.value + 'T00:00:00');
+        if (isNaN(start.getTime())) return;
+
+        const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const offset = parseInt(anniCountDayOne.value);
+        const diffDays = Math.round((todayMid - start) / (1000 * 60 * 60 * 24)) + offset;
+
+        anniTodayDays.textContent = `오늘 ${diffDays}일째 💕`;
+
+        const milestones = [
+            { name: '100일', days: 100 },
+            { name: '200일', days: 200 },
+            { name: '300일', days: 300 },
+            { name: '1주년 (365일)', days: 365 },
+            { name: '500일', days: 500 },
+            { name: '2주년 (730일)', days: 730 },
+            { name: '1,000일', days: 1000 },
+            { name: '3주년 (1095일)', days: 1095 },
+            { name: '2,000일', days: 2000 }
+        ];
+
+        anniversaryList.innerHTML = '';
+        milestones.forEach(m => {
+            const targetMs = start.getTime() + (m.days - offset) * 24 * 60 * 60 * 1000;
+            const targetD = new Date(targetMs);
+            const dateStr = `${targetD.getFullYear()}년 ${targetD.getMonth() + 1}월 ${targetD.getDate()}일 (${daysOfWeek[targetD.getDay()]})`;
+
+            const isPassed = targetD < todayMid;
+            const item = document.createElement('div');
+            item.className = `milestone-item ${isPassed ? 'passed' : ''}`;
+            item.innerHTML = `
+                <div>
+                    <div class="milestone-name">${m.name}</div>
+                    <div class="milestone-date">${dateStr}</div>
+                </div>
+                <span class="milestone-tag" style="${isPassed ? 'background:#f1f5f9; color:#94a3b8;' : ''}">
+                    ${isPassed ? '지남' : '예정'}
+                </span>
+            `;
+            anniversaryList.appendChild(item);
+        });
+    }
+
+    anniDateInput.addEventListener('change', updateAnniversary);
+    anniCountDayOne.addEventListener('change', updateAnniversary);
+
+    // 3. Age Logic
+    const birthDateInput = document.getElementById('birthDateInput');
+    const ageMan = document.getElementById('ageMan');
+    const ageYear = document.getElementById('ageYear');
+    const zodiacSign = document.getElementById('zodiacSign');
+    const starSign = document.getElementById('starSign');
+    const nextBirthdayDday = document.getElementById('nextBirthdayDday');
+    const nextBirthdayDate = document.getElementById('nextBirthdayDate');
+
+    const zodiacAnimals = ['원숭이띠', '닭띠', '개띠', '돼지띠', '쥐띠', '소띠', '호랑이띠', '토끼띠', '용띠', '뱀띠', '말띠', '양띠'];
+
+    function updateAge() {
+        const birth = new Date(birthDateInput.value + 'T00:00:00');
+        if (isNaN(birth.getTime())) return;
+
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth();
+        const currentDate = now.getDate();
+
+        const birthYear = birth.getFullYear();
+        const birthMonth = birth.getMonth();
+        const birthDay = birth.getDate();
+
+        // 1) 만 나이 (생일 지남 여부)
+        let manAge = currentYear - birthYear;
+        const hasBirthdayPassed = (currentMonth > birthMonth) || (currentMonth === birthMonth && currentDate >= birthDay);
+        if (!hasBirthdayPassed) {
+            manAge -= 1;
+        }
+
+        // 2) 연 나이
+        const yearAge = currentYear - birthYear;
+
+        ageMan.textContent = `만 ${manAge}세`;
+        ageYear.textContent = `${yearAge}세`;
+
+        // 3) 띠
+        zodiacSign.textContent = zodiacAnimals[birthYear % 12];
+
+        // 4) 별자리
+        starSign.textContent = getZodiacStar(birthMonth + 1, birthDay);
+
+        // 5) 다음 생일 D-Day
+        let nextBirth = new Date(currentYear, birthMonth, birthDay);
+        if (nextBirth < new Date(currentYear, currentMonth, currentDate)) {
+            nextBirth.setFullYear(currentYear + 1);
+        }
+        const diffMs = nextBirth - new Date(currentYear, currentMonth, currentDate);
+        const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+        nextBirthdayDday.textContent = daysLeft === 0 ? '오늘 생일입니다! 🎂' : `D-${daysLeft}일`;
+        nextBirthdayDate.textContent = `${nextBirth.getFullYear()}년 ${nextBirth.getMonth() + 1}월 ${nextBirth.getDate()}일 (${daysOfWeek[nextBirth.getDay()]})`;
+    }
+
+    function getZodiacStar(month, day) {
+        if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return '물병자리 ♒';
+        if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return '물고기자리 ♓';
+        if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return '양자리 ♈';
+        if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return '황소자리 ♉';
+        if ((month === 5 && day >= 21) || (month === 6 && day <= 21)) return '쌍둥이자리 ♊';
+        if ((month === 6 && day >= 22) || (month === 7 && day <= 22)) return '게자리 ♋';
+        if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return '사자자리 ♌';
+        if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return '처녀자리 ♍';
+        if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return '천칭자리 ♎';
+        if ((month === 10 && day >= 23) || (month === 11 && day <= 22)) return '전갈자리 ♏';
+        if ((month === 11 && day >= 23) || (month === 12 && day <= 21)) return '사수자리 ♐';
+        return '염소자리 ♑';
+    }
+
+    birthDateInput.addEventListener('change', updateAge);
+
+    updateDday();
+    updateAnniversary();
+    updateAge();
+</script>
+
+</body>
+</html>

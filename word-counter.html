@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>글자수 세기 &amp; 바이트(Byte) 계산기 | 자소서·블로그 맞춤 툴</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #eef2ff;
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+            --emerald-600: #059669;
+            --emerald-50: #ecfdf5;
+            --radius-xl: 20px;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--slate-50);
+            color: var(--slate-800);
+            line-height: 1.5;
+            padding: 24px 16px 60px 16px;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 12.5px;
+            font-weight: 700;
+            border-radius: 999px;
+            margin-bottom: 12px;
+        }
+
+        .app-title {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--slate-900);
+            letter-spacing: -0.6px;
+            margin-bottom: 8px;
+        }
+
+        .app-subtitle {
+            font-size: 14px;
+            color: var(--slate-500);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-lg);
+            padding: 16px 18px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--slate-500);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .stat-sub {
+            font-size: 11px;
+            color: var(--slate-400);
+            margin-top: 2px;
+        }
+
+        /* Editor Card */
+        .editor-card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+            margin-bottom: 24px;
+        }
+
+        .editor-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .target-goal-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--slate-700);
+        }
+
+        .target-select {
+            padding: 6px 10px;
+            border: 1px solid var(--slate-200);
+            border-radius: 6px;
+            font-size: 12.5px;
+            font-weight: 700;
+            outline: none;
+            background: var(--slate-50);
+        }
+
+        .tool-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-tool {
+            background: var(--slate-100);
+            border: 1px solid var(--slate-200);
+            color: var(--slate-700);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-tool:hover {
+            background: #e2e8f0;
+        }
+
+        .text-area {
+            width: 100%;
+            height: 280px;
+            padding: 16px;
+            border: 1.5px solid var(--slate-200);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--slate-900);
+            outline: none;
+            resize: vertical;
+            transition: border-color 0.15s;
+        }
+
+        .text-area:focus {
+            border-color: var(--primary);
+        }
+
+        /* Progress Bar for Target Count */
+        .progress-box {
+            margin-top: 14px;
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-bg {
+            flex-grow: 1;
+            height: 8px;
+            background: var(--slate-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            border-radius: 4px;
+            transition: width 0.2s;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--slate-700);
+            white-space: nowrap;
+        }
+
+        /* Detailed Breakdown */
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        @media (max-width: 640px) {
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .detail-card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-lg);
+            padding: 18px 20px;
+        }
+
+        .detail-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--slate-600);
+            margin-bottom: 8px;
+        }
+
+        .detail-val {
+            font-weight: 800;
+            color: var(--slate-900);
+        }
+
+        .keyword-chip-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .kw-chip {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="app-header">
+        <div class="badge-pill">
+            <span>✍️</span> 취준생 자소서 &amp; 블로그 필수 도구
+        </div>
+        <h1 class="app-title">글자수 세기 &amp; 바이트(Byte) 계산기</h1>
+        <p class="app-subtitle">공백 포함/제외 글자수, 공기업·대기업 맞춤 2Byte/3Byte 계산 및 원고지 매수를 실시간으로 확인합니다.</p>
+    </header>
+
+    <!-- Top Key Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">공백 포함</div>
+            <div class="stat-value" id="countWithSpaces">0</div>
+            <div class="stat-sub">글자</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">공백 제외</div>
+            <div class="stat-value" id="countWithoutSpaces">0</div>
+            <div class="stat-sub">순수 글자</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">EUC-KR (2Byte)</div>
+            <div class="stat-value" id="byteEucKr">0</div>
+            <div class="stat-sub">일반 취업 사이트</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">UTF-8 (3Byte)</div>
+            <div class="stat-value" id="byteUtf8">0</div>
+            <div class="stat-sub">웹 표준 규격</div>
+        </div>
+    </div>
+
+    <!-- Main Editor -->
+    <div class="editor-card">
+        <div class="editor-toolbar">
+            <div class="target-goal-wrap">
+                <span>🎯 목표 글자수:</span>
+                <select class="target-select" id="targetSelect">
+                    <option value="0">설정 안 함</option>
+                    <option value="500">500자 (자소서 문항 1)</option>
+                    <option value="1000" selected>1,000자 (표준 자소서)</option>
+                    <option value="1500">1,500자</option>
+                    <option value="2000">2,000자 (블로그 포스팅)</option>
+                </select>
+            </div>
+            <div class="tool-actions">
+                <button type="button" class="btn-tool" id="btnCopy">📋 복사하기</button>
+                <button type="button" class="btn-tool" id="btnClear" style="color:#e11d48;">🗑️ 전체 삭제</button>
+            </div>
+        </div>
+
+        <textarea class="text-area" id="mainText" placeholder="여기에 자기소개서 내용이나 블로그 본문 텍스트를 입력하거나 붙여넣으세요..."></textarea>
+
+        <!-- Target Progress Bar -->
+        <div class="progress-box" id="progressBox">
+            <div class="progress-bg">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-text" id="progressText">0 / 1,000자 (0%)</div>
+        </div>
+    </div>
+
+    <!-- Detailed Stats Grid -->
+    <div class="details-grid">
+        <div class="detail-card">
+            <div class="detail-title">📑 문서 구조 통계</div>
+            <div class="detail-row">
+                <span>총 단어 수 (어절):</span>
+                <span class="detail-val" id="wordCount">0개</span>
+            </div>
+            <div class="detail-row">
+                <span>총 줄 수 (라인):</span>
+                <span class="detail-val" id="lineCount">0줄</span>
+            </div>
+            <div class="detail-row">
+                <span>문장 수 (마침표 기준):</span>
+                <span class="detail-val" id="sentenceCount">0개</span>
+            </div>
+            <div class="detail-row">
+                <span>200자 원고지 환산:</span>
+                <span class="detail-val" id="manuscriptCount">0장</span>
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-title">🔍 자주 사용된 핵심 단어 TOP 5</div>
+            <div class="keyword-chip-list" id="topKeywords">
+                <span style="font-size:12px; color:var(--slate-400);">텍스트를 입력하면 가장 많이 반복된 단어가 분석됩니다.</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const mainText = document.getElementById('mainText');
+    const countWithSpaces = document.getElementById('countWithSpaces');
+    const countWithoutSpaces = document.getElementById('countWithoutSpaces');
+    const byteEucKr = document.getElementById('byteEucKr');
+    const byteUtf8 = document.getElementById('byteUtf8');
+    const wordCount = document.getElementById('wordCount');
+    const lineCount = document.getElementById('lineCount');
+    const sentenceCount = document.getElementById('sentenceCount');
+    const manuscriptCount = document.getElementById('manuscriptCount');
+    const topKeywords = document.getElementById('topKeywords');
+    const targetSelect = document.getElementById('targetSelect');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const progressBox = document.getElementById('progressBox');
+    const btnCopy = document.getElementById('btnCopy');
+    const btnClear = document.getElementById('btnClear');
+
+    function analyzeText() {
+        const text = mainText.value;
+
+        // 1. Character count
+        const withSpaces = text.length;
+        const withoutSpaces = text.replace(/\s/g, '').length;
+
+        countWithSpaces.textContent = withSpaces.toLocaleString();
+        countWithoutSpaces.textContent = withoutSpaces.toLocaleString();
+
+        // 2. Byte calculations
+        let eucKrBytes = 0;
+        let utf8Bytes = 0;
+
+        for (let i = 0; i < text.length; i++) {
+            const code = text.charCodeAt(i);
+            // EUC-KR: ASCII 1Byte, others 2Byte
+            if (code <= 127) {
+                eucKrBytes += 1;
+            } else {
+                eucKrBytes += 2;
+            }
+
+            // UTF-8: ASCII 1Byte, 128~2047 2Byte, 2048~ 3Byte (한글 등)
+            if (code <= 0x7f) {
+                utf8Bytes += 1;
+            } else if (code <= 0x7ff) {
+                utf8Bytes += 2;
+            } else {
+                utf8Bytes += 3;
+            }
+        }
+
+        byteEucKr.textContent = eucKrBytes.toLocaleString() + ' B';
+        byteUtf8.textContent = utf8Bytes.toLocaleString() + ' B';
+
+        // 3. Document structure
+        const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+        const lines = text ? text.split('\n').length : 0;
+        const sentences = text.trim() ? (text.match(/[^.!?]+[.!?]+/g) || []).length || 1 : 0;
+        const manuscript = Math.ceil(withSpaces / 200);
+
+        wordCount.textContent = `${words.toLocaleString()}개`;
+        lineCount.textContent = `${lines.toLocaleString()}줄`;
+        sentenceCount.textContent = `${sentences.toLocaleString()}개`;
+        manuscriptCount.textContent = `약 ${manuscript.toLocaleString()}장`;
+
+        // 4. Target Progress
+        const target = parseInt(targetSelect.value) || 0;
+        if (target > 0) {
+            progressBox.style.display = 'flex';
+            const pct = Math.min(100, Math.round((withSpaces / target) * 100));
+            progressBar.style.width = `${pct}%`;
+            progressText.textContent = `${withSpaces.toLocaleString()} / ${target.toLocaleString()}자 (${pct}%)`;
+            if (withSpaces > target) {
+                progressBar.style.background = '#e11d48';
+                progressText.style.color = '#e11d48';
+            } else {
+                progressBar.style.background = '#4f46e5';
+                progressText.style.color = '#0f172a';
+            }
+        } else {
+            progressBox.style.display = 'none';
+        }
+
+        // 5. Keyword analysis (words >= 2 letters, top 5)
+        if (text.trim().length > 10) {
+            const rawWords = text.match(/[가-힣a-zA-Z0-9]{2,}/g) || [];
+            const freq = {};
+            rawWords.forEach(w => {
+                freq[w] = (freq[w] || 0) + 1;
+            });
+            const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            if (sorted.length > 0) {
+                topKeywords.innerHTML = sorted.map(([word, count]) => `
+                    <span class="kw-chip">${word} (${count}회)</span>
+                `).join('');
+            } else {
+                topKeywords.innerHTML = '<span style="font-size:12px; color:var(--slate-400);">단어 분석 중...</span>';
+            }
+        } else {
+            topKeywords.innerHTML = '<span style="font-size:12px; color:var(--slate-400);">텍스트를 입력하면 가장 많이 반복된 단어가 분석됩니다.</span>';
+        }
+    }
+
+    mainText.addEventListener('input', analyzeText);
+    targetSelect.addEventListener('change', analyzeText);
+
+    btnCopy.addEventListener('click', () => {
+        if (!mainText.value.trim()) {
+            alert('복사할 내용이 없습니다.');
+            return;
+        }
+        navigator.clipboard.writeText(mainText.value).then(() => {
+            alert('텍스트가 클립보드에 복사되었습니다!');
+        });
+    });
+
+    btnClear.addEventListener('click', () => {
+        if (mainText.value.trim() && confirm('작성 중인 내용을 모두 지우시겠습니까?')) {
+            mainText.value = '';
+            analyzeText();
+        }
+    });
+
+    analyzeText();
+</script>
+
+</body>
+</html>
