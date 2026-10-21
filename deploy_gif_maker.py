@@ -41,7 +41,7 @@ raw_content = f"""<!-- wp:html -->
             <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:18px; padding:22px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
                 <div>
                     <div style="display:flex; justify-content:center; align-items:center; height:240px; margin-bottom:14px; background:#fafafa; border-radius:12px; overflow:hidden;">
-                        <a href="https://link.coupang.com/a/h0vLAYeSlM" target="_blank" referrerpolicy="unsafe-url"><img src="https://static.coupangcdn.com/image/affiliate/banner/c3ac6d73a640c90d622935faf29fa8d7@2x.jpg" alt="대한 촬영용 자동 회전판 빅 턴테이블 42cm, 1개, DH-BTT42" width="120" height="240" style="object-fit:contain;"></a>
+                        <a href="https://link.coupang.com/a/h1Ns14NWkS" target="_blank" referrerpolicy="unsafe-url"><img src="https://image7.coupangcdn.com/image/affiliate/banner/c3ac6d73a640c90d622935faf29fa8d7@2x.jpg" alt="대한 촬영용 자동 회전판 빅 턴테이블 42cm, 1개, DH-BTT42" width="120" height="240" style="object-fit:contain;"></a>
                     </div>
                     <span style="font-size:11px; font-weight:700; background:#eef2ff; color:#4338ca; padding:3px 8px; border-radius:6px; display:inline-block; margin-bottom:8px;">360도 무소음 회전</span>
                     <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin:0 0 6px 0; line-height:1.4;">대한 촬영용 자동 전동 턴테이블 42cm (DH-BTT42)</h4>
@@ -49,7 +49,7 @@ raw_content = f"""<!-- wp:html -->
                 </div>
                 <div style="margin-top:16px; padding-top:12px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:11.5px; font-weight:700; color:#0f172a;">로켓배송</span>
-                    <a href="https://link.coupang.com/a/h0vLAYeSlM" target="_blank" referrerpolicy="unsafe-url" style="padding:7px 14px; background:#0f172a; color:#ffffff; font-size:12px; font-weight:700; border-radius:8px; text-decoration:none;">상품 보기 ➔</a>
+                    <a href="https://link.coupang.com/a/h1Ns14NWkS" target="_blank" referrerpolicy="unsafe-url" style="padding:7px 14px; background:#0f172a; color:#ffffff; font-size:12px; font-weight:700; border-radius:8px; text-decoration:none;">상품 보기 ➔</a>
                 </div>
             </div>
 
@@ -57,7 +57,7 @@ raw_content = f"""<!-- wp:html -->
             <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:18px; padding:22px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
                 <div>
                     <div style="display:flex; justify-content:center; align-items:center; height:240px; margin-bottom:14px; background:#fafafa; border-radius:12px; overflow:hidden;">
-                        <a href="https://link.coupang.com/a/h0vzGUbxmK" target="_blank" referrerpolicy="unsafe-url"><img src="https://image10.coupangcdn.com/image/affiliate/banner/5a0060a518c73c9e803aafd6af8d0f5e@2x.jpg" alt="코멧 탁상용 링라이트 + 삼각대 세트, YT-1016, 1세트" width="120" height="240" style="object-fit:contain;"></a>
+                        <a href="https://link.coupang.com/a/h1Nv7spZDM" target="_blank" referrerpolicy="unsafe-url"><img src="https://img2a.coupangcdn.com/image/affiliate/banner/5a0060a518c73c9e803aafd6af8d0f5e@2x.jpg" alt="코멧 탁상용 링라이트 + 삼각대 세트, YT-1016, 1세트" width="120" height="240" style="object-fit:contain;"></a>
                     </div>
                     <span style="font-size:11px; font-weight:700; background:#fef3c7; color:#b45309; padding:3px 8px; border-radius:6px; display:inline-block; margin-bottom:8px;">그림자 제로 조명</span>
                     <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin:0 0 6px 0; line-height:1.4;">코멧 탁상용 LED 링라이트 + 삼각대 세트 YT-1016</h4>
@@ -65,23 +65,23 @@ raw_content = f"""<!-- wp:html -->
                 </div>
                 <div style="margin-top:16px; padding-top:12px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:11.5px; font-weight:700; color:#0f172a;">가성비 1위</span>
-                    <a href="https://link.coupang.com/a/h0vzGUbxmK" target="_blank" referrerpolicy="unsafe-url" style="padding:7px 14px; background:#0f172a; color:#ffffff; font-size:12px; font-weight:700; border-radius:8px; text-decoration:none;">상품 보기 ➔</a>
+                    <a href="https://link.coupang.com/a/h1Nv7spZDM" target="_blank" referrerpolicy="unsafe-url" style="padding:7px 14px; background:#0f172a; color:#ffffff; font-size:12px; font-weight:700; border-radius:8px; text-decoration:none;">상품 보기 ➔</a>
                 </div>
             </div>
 
-            <!-- Item 3: 구스페리 3 in 1 광각 볼록 접사 셀카 렌즈 세트 -->
+            <!-- Item 3: APEXEL 스마트폰 카메라 망원/광각 렌즈 세트 -->
             <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:18px; padding:22px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
                 <div>
                     <div style="display:flex; justify-content:center; align-items:center; height:240px; margin-bottom:14px; background:#fafafa; border-radius:12px; overflow:hidden;">
-                        <a href="https://link.coupang.com/a/h0vNZxPtts" target="_blank" referrerpolicy="unsafe-url"><img src="https://image14.coupangcdn.com/image/affiliate/banner/cfd251a63ac81b6aa012bc45fac72691@2x.jpg" alt="구스페리 3 in 1 광각 볼록 접사 셀카 렌즈 세트, 실버, 1세트" width="120" height="240" style="object-fit:contain;"></a>
+                        <a href="https://link.coupang.com/a/h1NzQIVz7Q" target="_blank" referrerpolicy="unsafe-url"><img src="https://image1.coupangcdn.com/image/affiliate/banner/d4dc36bbade6d8e12ff42bcc3e54e3e7@2x.jpg" alt="휴대폰 카메라 렌즈 광각렌즈 스마트폰 망원렌즈 APEXEL HD 2x" width="120" height="240" style="object-fit:contain;"></a>
                     </div>
-                    <span style="font-size:11px; font-weight:700; background:#ecfdf5; color:#047857; padding:3px 8px; border-radius:6px; display:inline-block; margin-bottom:8px;">초밀착 접사 디테일</span>
-                    <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin:0 0 6px 0; line-height:1.4;">구스페리 3 in 1 스마트폰 초광각·매크로 접사 렌즈</h4>
-                    <p style="font-size:12.5px; color:#64748b; margin:0; line-height:1.5;">작은 부품, 원단 결, 가죽 질감 등을 스마트폰으로 흔들림 없이 초근접 접사 영상으로 촬영.</p>
+                    <span style="font-size:11px; font-weight:700; background:#ecfdf5; color:#047857; padding:3px 8px; border-radius:6px; display:inline-block; margin-bottom:8px;">고선명 인물·상품 렌즈</span>
+                    <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin:0 0 6px 0; line-height:1.4;">APEXEL 스마트폰 HD 2x 전문가용 인물·상품 카메라 렌즈</h4>
+                    <p style="font-size:12.5px; color:#64748b; margin:0; line-height:1.5;">왜곡 없는 선명한 줌 배율과 자연스러운 배경 흐림(아웃포커싱) 효과로 고화질 상품 영상 촬영.</p>
                 </div>
                 <div style="margin-top:16px; padding-top:12px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:11.5px; font-weight:700; color:#0f172a;">로켓배송</span>
-                    <a href="https://link.coupang.com/a/h0vNZxPtts" target="_blank" referrerpolicy="unsafe-url" style="padding:7px 14px; background:#0f172a; color:#ffffff; font-size:12px; font-weight:700; border-radius:8px; text-decoration:none;">상품 보기 ➔</a>
+                    <span style="font-size:11.5px; font-weight:700; color:#0f172a;">전문가 추천</span>
+                    <a href="https://link.coupang.com/a/h1NzQIVz7Q" target="_blank" referrerpolicy="unsafe-url" style="padding:7px 14px; background:#0f172a; color:#ffffff; font-size:12px; font-weight:700; border-radius:8px; text-decoration:none;">상품 보기 ➔</a>
                 </div>
             </div>
 
