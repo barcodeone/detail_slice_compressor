@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상세페이지 동영상 ➔ 초경량 GIF 움짤 생성기 | 구간·화면 자르기 툴</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <!-- gifshot library for fast, client-side video to GIF conversion -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #eef2ff;
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+            --emerald-600: #059669;
+            --emerald-50: #ecfdf5;
+            --amber-600: #d97706;
+            --amber-50: #fffbeb;
+            --radius-xl: 20px;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--slate-50);
+            color: var(--slate-800);
+            line-height: 1.5;
+            padding: 24px 16px 60px 16px;
+        }
+
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .app-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 12.5px;
+            font-weight: 700;
+            border-radius: 999px;
+            margin-bottom: 12px;
+        }
+
+        .app-title {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--slate-900);
+            letter-spacing: -0.6px;
+            margin-bottom: 8px;
+        }
+
+        .app-subtitle {
+            font-size: 14px;
+            color: var(--slate-500);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Notice bar */
+        .security-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-md);
+            padding: 10px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--slate-600);
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        /* Upload Dropzone */
+        .upload-card {
+            background: #ffffff;
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--radius-xl);
+            padding: 40px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 28px;
+        }
+
+        .upload-card:hover, .upload-card.dragover {
+            border-color: var(--primary);
+            background: #faf5ff;
+        }
+
+        .upload-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 14px auto;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+        }
+
+        .upload-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin-bottom: 6px;
+        }
+
+        .upload-desc {
+            font-size: 13px;
+            color: var(--slate-500);
+            margin-bottom: 16px;
+        }
+
+        .btn-upload {
+            display: inline-block;
+            background: var(--primary);
+            color: #ffffff;
+            font-size: 13.5px;
+            font-weight: 700;
+            padding: 9px 20px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .btn-upload:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Main Editor Section */
+        .editor-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .editor-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Video Stage & Crop Overlay */
+        .video-stage-wrap {
+            position: relative;
+            background: #000000;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            max-height: 480px;
+        }
+
+        video#mainVideo {
+            max-width: 100%;
+            max-height: 480px;
+            display: block;
+            pointer-events: none; /* 크롭 드래그 이벤트가 상위 레이어로 가게 함 */
+        }
+
+        /* Interactive Crop Canvas / Overlay */
+        .crop-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        .crop-box {
+            position: absolute;
+            border: 2px solid #38bdf8;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55);
+            cursor: move;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .crop-box::before {
+            content: '';
+            position: absolute;
+            top: 33.33%;
+            left: 0;
+            right: 0;
+            border-top: 1px dashed rgba(255,255,255,0.4);
+            bottom: 33.33%;
+            border-bottom: 1px dashed rgba(255,255,255,0.4);
+            pointer-events: none;
+        }
+        .crop-box::after {
+            content: '';
+            position: absolute;
+            left: 33.33%;
+            top: 0;
+            bottom: 0;
+            border-left: 1px dashed rgba(255,255,255,0.4);
+            right: 33.33%;
+            border-right: 1px dashed rgba(255,255,255,0.4);
+            pointer-events: none;
+        }
+
+        .crop-handle {
+            position: absolute;
+            width: 11px;
+            height: 11px;
+            background: #38bdf8;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+        }
+        .crop-handle.tl { top: -6px; left: -6px; cursor: nwse-resize; }
+        .crop-handle.tr { top: -6px; right: -6px; cursor: nesw-resize; }
+        .crop-handle.bl { bottom: -6px; left: -6px; cursor: nesw-resize; }
+        .crop-handle.br { bottom: -6px; right: -6px; cursor: nwse-resize; }
+
+        .crop-label {
+            position: absolute;
+            bottom: 6px;
+            right: 8px;
+            background: rgba(15, 23, 42, 0.75);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        /* Crop ratio buttons */
+        .crop-ratio-group {
+            display: flex;
+            gap: 6px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-ratio {
+            background: var(--slate-100);
+            border: 1px solid var(--slate-200);
+            color: var(--slate-700);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-ratio:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-ratio.active {
+            background: var(--slate-900);
+            color: #ffffff;
+            border-color: var(--slate-900);
+        }
+
+        /* Timeline & Trimming Controls */
+        .trim-section {
+            margin-top: 20px;
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+        }
+
+        .playback-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .btn-play {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background 0.15s;
+        }
+
+        .btn-play:hover {
+            background: var(--primary-hover);
+        }
+
+        .time-display {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--slate-700);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        .timeline-slider {
+            flex-grow: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #cbd5e1;
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .timeline-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .trim-inputs-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .trim-input-card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+
+        .trim-input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--slate-500);
+            margin-bottom: 6px;
+        }
+
+        .trim-input-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .trim-input-control input {
+            width: 70px;
+            padding: 6px 8px;
+            border: 1px solid var(--slate-200);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--slate-900);
+            text-align: center;
+        }
+
+        .btn-set-cur {
+            background: var(--slate-100);
+            border: 1px solid var(--slate-200);
+            color: var(--slate-700);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 9px;
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+
+        .btn-set-cur:hover {
+            background: var(--slate-200);
+        }
+
+        .trim-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-preview-loop {
+            flex-grow: 1;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: var(--slate-800);
+            font-size: 12.5px;
+            font-weight: 700;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+
+        .btn-preview-loop:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        /* Right Settings Options */
+        .option-group {
+            margin-bottom: 20px;
+        }
+
+        .option-label {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .option-hint {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--slate-500);
+        }
+
+        .pill-select-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 6px;
+        }
+
+        .pill-btn {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: 8px;
+            padding: 9px 8px;
+            text-align: center;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--slate-700);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .pill-btn:hover {
+            background: var(--slate-100);
+        }
+
+        .pill-btn.active {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .custom-width-wrap {
+            margin-top: 8px;
+            display: none;
+        }
+
+        .custom-width-wrap input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--slate-200);
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        /* Subtitle / Watermark Input */
+        .subtitle-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--slate-200);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--slate-800);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .subtitle-input:focus {
+            border-color: var(--primary);
+        }
+
+        /* Stats & Generate Button */
+        .estimate-box {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            margin-bottom: 20px;
+        }
+
+        .estimate-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12.5px;
+            color: var(--slate-600);
+            margin-bottom: 4px;
+        }
+
+        .estimate-val {
+            font-weight: 800;
+            color: var(--slate-900);
+        }
+
+        .badge-naver-safe {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--emerald-600);
+            background: var(--emerald-50);
+            padding: 3px 8px;
+            border-radius: 6px;
+            margin-top: 6px;
+        }
+
+        .btn-generate {
+            width: 100%;
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
+        }
+
+        .btn-generate:disabled {
+            background: #cbd5e1;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Progress Modal / State */
+        .progress-wrap {
+            display: none;
+            margin-top: 20px;
+            background: #ffffff;
+            border: 1px solid var(--primary-light);
+            border-radius: var(--radius-md);
+            padding: 16px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: var(--slate-100);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #6366f1, #38bdf8);
+            border-radius: 5px;
+            transition: width 0.2s;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--slate-600);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Result Section */
+        .result-card {
+            display: none;
+            background: #ffffff;
+            border: 2px solid var(--emerald-600);
+            border-radius: var(--radius-xl);
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(5, 150, 105, 0.08);
+        }
+
+        .result-preview-wrap {
+            max-width: 500px;
+            margin: 0 auto 20px auto;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--slate-200);
+            background: #000000;
+        }
+
+        .result-preview-wrap img {
+            width: 100%;
+            display: block;
+        }
+
+        .result-meta-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .result-meta-item {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            padding: 6px 14px;
+            border-radius: 8px;
+        }
+
+        .btn-download-gif {
+            background: var(--emerald-600);
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 800;
+            padding: 13px 32px;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+            transition: background 0.15s;
+        }
+
+        .btn-download-gif:hover {
+            background: #047857;
+        }
+
+        /* Hidden processing canvas */
+        #renderCanvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="badge-pill">
+            <span>🎬</span> 오픈마켓 상세페이지 전환율 극대화 툴
+        </div>
+        <h1 class="app-title">동영상 ➔ 고화질 초경량 GIF 움짤 생성기</h1>
+        <p class="app-subtitle">스마트폰 촬영 영상을 원하는 시간 구간 &amp; 상품 영역만 잘라내어, 네이버 스마트스토어·쿠팡 규격의 고화질 움짤로 1초 만에 변환합니다.</p>
+    </header>
+
+    <div class="security-banner">
+        <span>🔒</span>
+        <span><strong>100% 브라우저 메모리 로컬 변환:</strong> 고객님의 동영상 파일은 외부 서버로 절대 전송되지 않으며, 기밀 유출 없이 안전하게 보호됩니다.</span>
+    </div>
+
+    <!-- Upload Card -->
+    <div class="upload-card" id="dropArea">
+        <input type="file" id="videoFileInput" accept="video/mp4,video/webm,video/ogg,video/quicktime,video/*" style="display:none;">
+        <div class="upload-icon">📹</div>
+        <h2 class="upload-title">동영상 파일을 드래그하거나 클릭하여 업로드</h2>
+        <p class="upload-desc">MP4, MOV, WebM 등 모든 스마트폰 촬영 영상 지원 (최대 100MB 권장)</p>
+        <span class="btn-upload" onclick="document.getElementById('videoFileInput').click();">내 PC에서 영상 선택</span>
+    </div>
+
+    <!-- Main Editor Section (Hidden until video uploaded) -->
+    <div id="editorSection" style="display:none;">
+        <div class="editor-grid">
+            <!-- Left: Video & Crop Stage -->
+            <div class="card">
+                <div class="card-title">
+                    <span>1. 화면 영역 잘라내기 (크롭)</span>
+                    <span style="font-size:12px; font-weight:600; color:var(--slate-500);">박스를 드래그하여 상품 부분만 선택</span>
+                </div>
+
+                <div class="video-stage-wrap" id="stageWrap">
+                    <video id="mainVideo" playsinline muted preload="auto"></video>
+                    
+                    <!-- Crop Overlay Layer -->
+                    <div class="crop-overlay" id="cropOverlay">
+                        <div class="crop-box" id="cropBox">
+                            <span class="crop-handle tl"></span>
+                            <span class="crop-handle tr"></span>
+                            <span class="crop-handle bl"></span>
+                            <span class="crop-handle br"></span>
+                            <div class="crop-label" id="cropLabel">100% × 100%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Crop Ratio Presets -->
+                <div class="crop-ratio-group">
+                    <button type="button" class="btn-ratio active" data-ratio="free">자유 영역 드래그</button>
+                    <button type="button" class="btn-ratio" data-ratio="1:1">1:1 정방형 (스마트스토어 썸네일)</button>
+                    <button type="button" class="btn-ratio" data-ratio="4:3">4:3 표준</button>
+                    <button type="button" class="btn-ratio" data-ratio="16:9">16:9 와이드</button>
+                    <button type="button" class="btn-ratio" data-ratio="full">전체 화면 (원본 그대로)</button>
+                </div>
+
+                <!-- Timeline / Trimming Section -->
+                <div class="trim-section">
+                    <div class="playback-bar">
+                        <button type="button" class="btn-play" id="btnPlayPause">▶</button>
+                        <input type="range" class="timeline-slider" id="timeSlider" min="0" max="100" step="0.05" value="0">
+                        <span class="time-display" id="timeDisplay">0.0s / 0.0s</span>
+                    </div>
+
+                    <div class="trim-inputs-row">
+                        <div class="trim-input-card">
+                            <div class="trim-input-header">
+                                <span>시작 시점 (초)</span>
+                                <button type="button" class="btn-set-cur" id="btnSetStart">📍 현재 위치로 지정</button>
+                            </div>
+                            <div class="trim-input-control">
+                                <input type="number" id="startTimeInput" step="0.1" min="0" value="0.0">
+                                <span style="font-size:12px; color:var(--slate-500);">초</span>
+                            </div>
+                        </div>
+
+                        <div class="trim-input-card">
+                            <div class="trim-input-header">
+                                <span>종료 시점 (초)</span>
+                                <button type="button" class="btn-set-cur" id="btnSetEnd">📍 현재 위치로 지정</button>
+                            </div>
+                            <div class="trim-input-control">
+                                <input type="number" id="endTimeInput" step="0.1" min="0" value="3.0">
+                                <span style="font-size:12px; color:var(--slate-500);">초</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="trim-actions">
+                        <button type="button" class="btn-preview-loop" id="btnLoopPreview">
+                            <span>🔁</span> 선택한 구간만 반복 미리보기
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Settings & Conversion -->
+            <div class="card">
+                <div class="card-title">
+                    <span>2. 규격 및 화질 최적화</span>
+                </div>
+
+                <!-- Width Preset -->
+                <div class="option-group">
+                    <label class="option-label">
+                        <span>가로 너비 (해상도 규격)</span>
+                        <span class="option-hint">오픈마켓 권장 사이즈</span>
+                    </label>
+                    <div class="pill-select-grid" id="widthPresetGroup">
+                        <div class="pill-btn active" data-width="860">860px (스마트스토어)</div>
+                        <div class="pill-btn" data-width="780">780px (쿠팡 권장)</div>
+                        <div class="pill-btn" data-width="600">600px (1:1 썸네일)</div>
+                        <div class="pill-btn" data-width="480">480px (초경량 모바일)</div>
+                        <div class="pill-btn" data-width="custom">직접 입력</div>
+                    </div>
+                    <div class="custom-width-wrap" id="customWidthWrap">
+                        <input type="number" id="customWidthInput" placeholder="가로 픽셀 입력 (예: 640)" min="100" max="1920">
+                    </div>
+                </div>
+
+                <!-- FPS -->
+                <div class="option-group">
+                    <label class="option-label">
+                        <span>프레임레이트 (FPS)</span>
+                        <span class="option-hint">높을수록 부드럽고 용량 증가</span>
+                    </label>
+                    <div class="pill-select-grid" id="fpsGroup">
+                        <div class="pill-btn" data-fps="8">8 FPS (초절약)</div>
+                        <div class="pill-btn active" data-fps="12">12 FPS (권장 표준)</div>
+                        <div class="pill-btn" data-fps="15">15 FPS (고화질 부드러움)</div>
+                    </div>
+                </div>
+
+                <!-- Playback Speed -->
+                <div class="option-group">
+                    <label class="option-label">
+                        <span>재생 배속</span>
+                        <span class="option-hint">제품 시연을 경쾌하게 표현</span>
+                    </label>
+                    <div class="pill-select-grid" id="speedGroup">
+                        <div class="pill-btn active" data-speed="1.0">1.0x (표준)</div>
+                        <div class="pill-btn" data-speed="1.25">1.25x</div>
+                        <div class="pill-btn" data-speed="1.5">1.5x (추천)</div>
+                        <div class="pill-btn" data-speed="2.0">2.0x (2배속)</div>
+                    </div>
+                </div>
+
+                <!-- Subtitle / Watermark -->
+                <div class="option-group">
+                    <label class="option-label">
+                        <span>자막 / 강조 텍스트 (선택사항)</span>
+                        <span class="option-hint">움짤 하단 중앙에 깔끔하게 삽입</span>
+                    </label>
+                    <input type="text" class="subtitle-input" id="subtitleInput" placeholder="예: ✨ 원터치 조작 테스트 / 💧 생활 방수">
+                </div>
+
+                <!-- Estimation Summary -->
+                <div class="estimate-box">
+                    <div class="estimate-row">
+                        <span>선택 구간 길이:</span>
+                        <span class="estimate-val" id="summaryDuration">3.0초</span>
+                    </div>
+                    <div class="estimate-row">
+                        <span>총 캡처 프레임 수:</span>
+                        <span class="estimate-val" id="summaryFrames">36 프레임</span>
+                    </div>
+                    <div class="badge-naver-safe">
+                        <span>✓</span> 네이버 스마트스토어 용량 규격(20MB 이하)에 최적화됨
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="button" class="btn-generate" id="btnGenerate">
+                    <span>🎬</span> 고화질 초경량 움짤(GIF) 만들기
+                </button>
+
+                <!-- Progress Bar -->
+                <div class="progress-wrap" id="progressWrap">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progressBarFill"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="progressStatus">프레임 추출 중...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Section -->
+    <div class="result-card" id="resultCard">
+        <h2 style="font-size:20px; font-weight:900; color:var(--slate-900); margin-bottom:8px;">🎉 초경량 고화질 움짤(GIF) 생성 완료!</h2>
+        <p style="font-size:13.5px; color:var(--slate-500); margin-bottom:20px;">네이버 스마트스토어 및 쿠팡 상세페이지에 바로 등록할 수 있습니다.</p>
+
+        <div class="result-preview-wrap">
+            <img id="resultGifImg" alt="생성된 움짤">
+        </div>
+
+        <div class="result-meta-row">
+            <div class="result-meta-item">
+                <span>파일 크기: </span><strong id="resultFileSize" style="color:var(--emerald-600);">0.0 MB</strong>
+            </div>
+            <div class="result-meta-item">
+                <span>해상도 규격: </span><strong id="resultDimension">0 × 0 px</strong>
+            </div>
+            <div class="result-meta-item">
+                <span>총 프레임: </span><strong id="resultFrameCount">0 frames</strong>
+            </div>
+        </div>
+
+        <a id="btnDownload" class="btn-download-gif" download="detail_product.gif">
+            <span>💾</span> 완성된 GIF 움짤 다운로드
+        </a>
+        <div style="margin-top:14px;">
+            <button type="button" onclick="window.scrollTo({top:0, behavior:'smooth'});" style="background:none; border:none; color:var(--slate-500); font-size:12.5px; text-decoration:underline; cursor:pointer;">
+                다른 구간이나 옵션으로 다시 만들기
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Offscreen Processing Canvas -->
+<canvas id="renderCanvas"></canvas>
+
+<script>
+    // Elements
+    const dropArea = document.getElementById('dropArea');
+    const videoFileInput = document.getElementById('videoFileInput');
+    const editorSection = document.getElementById('editorSection');
+    const mainVideo = document.getElementById('mainVideo');
+    const stageWrap = document.getElementById('stageWrap');
+    const cropOverlay = document.getElementById('cropOverlay');
+    const cropBox = document.getElementById('cropBox');
+    const cropLabel = document.getElementById('cropLabel');
+    const timeSlider = document.getElementById('timeSlider');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const btnPlayPause = document.getElementById('btnPlayPause');
+    const startTimeInput = document.getElementById('startTimeInput');
+    const endTimeInput = document.getElementById('endTimeInput');
+    const btnSetStart = document.getElementById('btnSetStart');
+    const btnSetEnd = document.getElementById('btnSetEnd');
+    const btnLoopPreview = document.getElementById('btnLoopPreview');
+    const btnGenerate = document.getElementById('btnGenerate');
+    const progressWrap = document.getElementById('progressWrap');
+    const progressBarFill = document.getElementById('progressBarFill');
+    const progressStatus = document.getElementById('progressStatus');
+    const progressPercent = document.getElementById('progressPercent');
+    const resultCard = document.getElementById('resultCard');
+    const resultGifImg = document.getElementById('resultGifImg');
+    const resultFileSize = document.getElementById('resultFileSize');
+    const resultDimension = document.getElementById('resultDimension');
+    const resultFrameCount = document.getElementById('resultFrameCount');
+    const btnDownload = document.getElementById('btnDownload');
+    const summaryDuration = document.getElementById('summaryDuration');
+    const summaryFrames = document.getElementById('summaryFrames');
+    const subtitleInput = document.getElementById('subtitleInput');
+    const renderCanvas = document.getElementById('renderCanvas');
+
+    // State Variables
+    let videoFile = null;
+    let videoDuration = 0;
+    let videoNaturalWidth = 0;
+    let videoNaturalHeight = 0;
+    let isLoopingPreview = false;
+    let loopTimer = null;
+
+    // Crop box coordinates in percentage of stage (0 ~ 100)
+    let cropRect = { x: 0, y: 0, w: 100, h: 100 };
+    let currentAspectRatio = 'free'; // 'free', '1:1', '4:3', '16:9', 'full'
+
+    // Setting Options
+    let targetWidth = 860;
+    let targetFps = 12;
+    let playbackSpeed = 1.0;
+
+    // 1. File Upload & Loading
+    videoFileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleVideoFile(e.target.files[0]);
+        }
+    });
+
+    dropArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropArea.classList.add('dragover');
+    });
+
+    dropArea.addEventListener('dragleave', () => {
+        dropArea.classList.remove('dragover');
+    });
+
+    dropArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropArea.classList.remove('dragover');
+        if (e.dataTransfer.files.length > 0) {
+            handleVideoFile(e.dataTransfer.files[0]);
+        }
+    });
+
+    function handleVideoFile(file) {
+        if (!file.type.startsWith('video/')) {
+            alert('동영상 파일(MP4, WebM, MOV 등)만 업로드 가능합니다.');
+            return;
+        }
+        videoFile = file;
+        const videoUrl = URL.createObjectURL(file);
+        mainVideo.src = videoUrl;
+        mainVideo.load();
+
+        mainVideo.onloadedmetadata = () => {
+            videoDuration = mainVideo.duration;
+            videoNaturalWidth = mainVideo.videoWidth;
+            videoNaturalHeight = mainVideo.videoHeight;
+
+            timeSlider.max = videoDuration;
+            timeSlider.value = 0;
+
+            startTimeInput.value = '0.0';
+            startTimeInput.max = videoDuration.toFixed(1);
+            // Default: 3 seconds or video duration
+            endTimeInput.value = Math.min(3.0, videoDuration).toFixed(1);
+            endTimeInput.max = videoDuration.toFixed(1);
+
+            updateTimeDisplay();
+            updateEstimates();
+
+            editorSection.style.display = 'block';
+            dropArea.style.display = 'none';
+
+            // Reset crop box to full
+            resetCropBox('free');
+            updateCropBoxUI();
+
+            // Scroll to editor
+            editorSection.scrollIntoView({ behavior: 'smooth' });
+        };
+    }
+
+    // 2. Playback & Timeline Controls
+    btnPlayPause.addEventListener('click', () => {
+        if (mainVideo.paused) {
+            mainVideo.play();
+            btnPlayPause.textContent = '⏸';
+        } else {
+            mainVideo.pause();
+            btnPlayPause.textContent = '▶';
+        }
+    });
+
+    mainVideo.addEventListener('timeupdate', () => {
+        if (!isLoopingPreview) {
+            timeSlider.value = mainVideo.currentTime;
+            updateTimeDisplay();
+        }
+    });
+
+    mainVideo.addEventListener('ended', () => {
+        btnPlayPause.textContent = '▶';
+    });
+
+    timeSlider.addEventListener('input', () => {
+        stopLoopPreview();
+        mainVideo.currentTime = parseFloat(timeSlider.value);
+        updateTimeDisplay();
+    });
+
+    function updateTimeDisplay() {
+        const cur = mainVideo.currentTime.toFixed(1);
+        const total = videoDuration.toFixed(1);
+        timeDisplay.textContent = `${cur}s / ${total}s`;
+    }
+
+    btnSetStart.addEventListener('click', () => {
+        const cur = parseFloat(mainVideo.currentTime.toFixed(1));
+        const end = parseFloat(endTimeInput.value);
+        if (cur >= end) {
+            alert('시작 시점은 종료 시점보다 작아야 합니다.');
+            return;
+        }
+        startTimeInput.value = cur.toFixed(1);
+        updateEstimates();
+    });
+
+    btnSetEnd.addEventListener('click', () => {
+        const cur = parseFloat(mainVideo.currentTime.toFixed(1));
+        const start = parseFloat(startTimeInput.value);
+        if (cur <= start) {
+            alert('종료 시점은 시작 시점보다 커야 합니다.');
+            return;
+        }
+        endTimeInput.value = cur.toFixed(1);
+        updateEstimates();
+    });
+
+    startTimeInput.addEventListener('change', updateEstimates);
+    endTimeInput.addEventListener('change', updateEstimates);
+
+    btnLoopPreview.addEventListener('click', () => {
+        if (isLoopingPreview) {
+            stopLoopPreview();
+        } else {
+            startLoopPreview();
+        }
+    });
+
+    function startLoopPreview() {
+        const start = parseFloat(startTimeInput.value);
+        const end = parseFloat(endTimeInput.value);
+        if (start >= end) {
+            alert('구간을 올바르게 설정해주세요.');
+            return;
+        }
+        isLoopingPreview = true;
+        btnLoopPreview.innerHTML = '<span>⏹</span> 반복 미리보기 중지';
+        btnLoopPreview.style.background = '#fee2e2';
+        btnLoopPreview.style.borderColor = '#f87171';
+
+        mainVideo.playbackRate = playbackSpeed;
+        mainVideo.currentTime = start;
+        mainVideo.play();
+        btnPlayPause.textContent = '⏸';
+
+        clearInterval(loopTimer);
+        loopTimer = setInterval(() => {
+            if (mainVideo.currentTime >= end || mainVideo.currentTime < start) {
+                mainVideo.currentTime = start;
+            }
+            timeSlider.value = mainVideo.currentTime;
+            updateTimeDisplay();
+        }, 100);
+    }
+
+    function stopLoopPreview() {
+        if (!isLoopingPreview) return;
+        isLoopingPreview = false;
+        clearInterval(loopTimer);
+        mainVideo.pause();
+        mainVideo.playbackRate = 1.0;
+        btnPlayPause.textContent = '▶';
+        btnLoopPreview.innerHTML = '<span>🔁</span> 선택한 구간만 반복 미리보기';
+        btnLoopPreview.style.background = '#ffffff';
+        btnLoopPreview.style.borderColor = '#cbd5e1';
+    }
+
+    function updateEstimates() {
+        const start = parseFloat(startTimeInput.value) || 0;
+        const end = parseFloat(endTimeInput.value) || 0;
+        const dur = Math.max(0, end - start);
+        summaryDuration.textContent = `${dur.toFixed(1)}초`;
+
+        // frame count = (duration / speed) * fps
+        const effectiveDuration = dur / playbackSpeed;
+        const frames = Math.round(effectiveDuration * targetFps);
+        summaryFrames.textContent = `${frames} 프레임`;
+    }
+
+    // 3. Interactive Crop Box Logic
+    let isDraggingCrop = false;
+    let isResizingCrop = false;
+    let resizeHandle = '';
+    let dragStartX = 0, dragStartY = 0;
+    let initialCropRect = { ...cropRect };
+
+    function resetCropBox(ratio) {
+        currentAspectRatio = ratio;
+        if (ratio === 'full') {
+            cropRect = { x: 0, y: 0, w: 100, h: 100 };
+        } else if (ratio === '1:1') {
+            const size = 70;
+            cropRect = { x: 15, y: 15, w: size, h: size };
+        } else if (ratio === '4:3') {
+            cropRect = { x: 10, y: 15, w: 80, h: 60 };
+        } else if (ratio === '16:9') {
+            cropRect = { x: 5, y: 20, w: 90, h: 50.6 };
+        } else {
+            // Free: 80% default
+            cropRect = { x: 10, y: 10, w: 80, h: 80 };
+        }
+        updateCropBoxUI();
+    }
+
+    function updateCropBoxUI() {
+        cropBox.style.left = `${cropRect.x}%`;
+        cropBox.style.top = `${cropRect.y}%`;
+        cropBox.style.width = `${cropRect.w}%`;
+        cropBox.style.height = `${cropRect.h}%`;
+
+        const calcW = Math.round((cropRect.w / 100) * videoNaturalWidth);
+        const calcH = Math.round((cropRect.h / 100) * videoNaturalHeight);
+        cropLabel.textContent = `${calcW} × ${calcH} px`;
+    }
+
+    // Crop ratio preset buttons
+    document.querySelectorAll('.btn-ratio').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.btn-ratio').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            resetCropBox(btn.getAttribute('data-ratio'));
+        });
+    });
+
+    // Mouse events on crop box
+    cropBox.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('crop-handle')) {
+            isResizingCrop = true;
+            resizeHandle = e.target.classList[1]; // tl, tr, bl, br
+        } else {
+            isDraggingCrop = true;
+        }
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        initialCropRect = { ...cropRect };
+        e.stopPropagation();
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!isDraggingCrop && !isResizingCrop) return;
+        const rect = cropOverlay.getBoundingClientRect();
+        const deltaXPercent = ((e.clientX - dragStartX) / rect.width) * 100;
+        const deltaYPercent = ((e.clientY - dragStartY) / rect.height) * 100;
+
+        if (isDraggingCrop) {
+            let newX = initialCropRect.x + deltaXPercent;
+            let newY = initialCropRect.y + deltaYPercent;
+
+            newX = Math.max(0, Math.min(100 - initialCropRect.w, newX));
+            newY = Math.max(0, Math.min(100 - initialCropRect.h, newY));
+
+            cropRect.x = newX;
+            cropRect.y = newY;
+            updateCropBoxUI();
+        } else if (isResizingCrop) {
+            let newX = initialCropRect.x;
+            let newY = initialCropRect.y;
+            let newW = initialCropRect.w;
+            let newH = initialCropRect.h;
+
+            if (resizeHandle === 'br') {
+                newW = Math.max(15, Math.min(100 - initialCropRect.x, initialCropRect.w + deltaXPercent));
+                newH = Math.max(15, Math.min(100 - initialCropRect.y, initialCropRect.h + deltaYPercent));
+            } else if (resizeHandle === 'bl') {
+                const maxDelta = initialCropRect.w - 15;
+                const dX = Math.max(-initialCropRect.x, Math.min(maxDelta, deltaXPercent));
+                newX = initialCropRect.x + dX;
+                newW = initialCropRect.w - dX;
+                newH = Math.max(15, Math.min(100 - initialCropRect.y, initialCropRect.h + deltaYPercent));
+            } else if (resizeHandle === 'tr') {
+                newW = Math.max(15, Math.min(100 - initialCropRect.x, initialCropRect.w + deltaXPercent));
+                const maxDelta = initialCropRect.h - 15;
+                const dY = Math.max(-initialCropRect.y, Math.min(maxDelta, deltaYPercent));
+                newY = initialCropRect.y + dY;
+                newH = initialCropRect.h - dY;
+            } else if (resizeHandle === 'tl') {
+                const maxDeltaX = initialCropRect.w - 15;
+                const dX = Math.max(-initialCropRect.x, Math.min(maxDeltaX, deltaXPercent));
+                newX = initialCropRect.x + dX;
+                newW = initialCropRect.w - dX;
+                const maxDeltaY = initialCropRect.h - 15;
+                const dY = Math.max(-initialCropRect.y, Math.min(maxDeltaY, deltaYPercent));
+                newY = initialCropRect.y + dY;
+                newH = initialCropRect.h - dY;
+            }
+
+            // Fixed aspect ratio constraint if 1:1 selected
+            if (currentAspectRatio === '1:1') {
+                const avg = (newW + newH) / 2;
+                newW = avg;
+                newH = avg;
+            }
+
+            cropRect.x = newX;
+            cropRect.y = newY;
+            cropRect.w = newW;
+            cropRect.h = newH;
+            updateCropBoxUI();
+        }
+    });
+
+    window.addEventListener('mouseup', () => {
+        isDraggingCrop = false;
+        isResizingCrop = false;
+    });
+
+    // 4. Options Pill Selections
+    // Width
+    document.querySelectorAll('#widthPresetGroup .pill-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#widthPresetGroup .pill-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const val = btn.getAttribute('data-width');
+            if (val === 'custom') {
+                document.getElementById('customWidthWrap').style.display = 'block';
+                targetWidth = parseInt(document.getElementById('customWidthInput').value) || 700;
+            } else {
+                document.getElementById('customWidthWrap').style.display = 'none';
+                targetWidth = parseInt(val);
+            }
+        });
+    });
+
+    document.getElementById('customWidthInput').addEventListener('input', (e) => {
+        targetWidth = parseInt(e.target.value) || 700;
+    });
+
+    // FPS
+    document.querySelectorAll('#fpsGroup .pill-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#fpsGroup .pill-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            targetFps = parseInt(btn.getAttribute('data-fps'));
+            updateEstimates();
+        });
+    });
+
+    // Speed
+    document.querySelectorAll('#speedGroup .pill-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#speedGroup .pill-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            playbackSpeed = parseFloat(btn.getAttribute('data-speed'));
+            updateEstimates();
+            if (isLoopingPreview) {
+                mainVideo.playbackRate = playbackSpeed;
+            }
+        });
+    });
+
+    // 5. Video to GIF Engine (Frame Extraction + gifshot Encoding)
+    btnGenerate.addEventListener('click', async () => {
+        stopLoopPreview();
+        const start = parseFloat(startTimeInput.value) || 0;
+        const end = parseFloat(endTimeInput.value) || 0;
+
+        if (start >= end) {
+            alert('시작 시점과 종료 시점을 올바르게 설정해주세요.');
+            return;
+        }
+
+        const duration = end - start;
+        if (duration > 15) {
+            if (!confirm('구간이 15초를 초과하면 브라우저 메모리 부하와 파일 용량이 20MB를 넘길 수 있습니다. 계속 진행하시겠습니까?')) {
+                return;
+            }
+        }
+
+        btnGenerate.disabled = true;
+        progressWrap.style.display = 'block';
+        resultCard.style.display = 'none';
+        setProgress(5, '비디오 프레임 추출 준비 중...');
+
+        try {
+            // Calculate pixel crop coordinates
+            const cropX = Math.round((cropRect.x / 100) * videoNaturalWidth);
+            const cropY = Math.round((cropRect.y / 100) * videoNaturalHeight);
+            const cropW = Math.round((cropRect.w / 100) * videoNaturalWidth);
+            const cropH = Math.round((cropRect.h / 100) * videoNaturalHeight);
+
+            // Compute target output dimensions
+            const outW = targetWidth;
+            const outH = Math.round((cropH / cropW) * outW);
+
+            renderCanvas.width = outW;
+            renderCanvas.height = outH;
+            const ctx = renderCanvas.getContext('2d', { willReadFrequently: true });
+
+            const subtitleText = subtitleInput.value.trim();
+
+            // Total frames to capture
+            const effectiveDur = duration / playbackSpeed;
+            const totalFrames = Math.max(3, Math.round(effectiveDur * targetFps));
+            const timeStep = duration / totalFrames;
+
+            const capturedFrames = [];
+
+            // Step 1: Capture Frames via HTML5 Video Seeking
+            for (let i = 0; i < totalFrames; i++) {
+                const targetTime = start + (i * timeStep);
+                await seekVideo(targetTime);
+
+                // Draw cropped region
+                ctx.clearRect(0, 0, outW, outH);
+                ctx.drawImage(mainVideo, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
+
+                // Draw subtitle if present
+                if (subtitleText) {
+                    ctx.save();
+                    const fontSize = Math.max(14, Math.round(outW * 0.038));
+                    ctx.font = `bold ${fontSize}px 'Pretendard', sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    const textMetrics = ctx.measureText(subtitleText);
+                    const pillW = textMetrics.width + 24;
+                    const pillH = fontSize + 16;
+                    const pillX = (outW - pillW) / 2;
+                    const pillY = outH - pillH - 16;
+
+                    // Black semi-transparent capsule
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.78)';
+                    roundRect(ctx, pillX, pillY, pillW, pillH, 8);
+                    ctx.fill();
+
+                    // White text
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText(subtitleText, outW / 2, pillY + (pillH / 2));
+                    ctx.restore();
+                }
+
+                // Push JPEG dataURL for lightweight encoding
+                capturedFrames.push(renderCanvas.toDataURL('image/jpeg', 0.85));
+
+                const percent = Math.round(10 + ((i + 1) / totalFrames) * 45);
+                setProgress(percent, `프레임 추출 중 (${i + 1} / ${totalFrames})...`);
+            }
+
+            // Step 2: gifshot.createGIF
+            setProgress(60, '고속 Web Worker 멀티스레드 GIF 압축 인코딩 중...');
+
+            const frameInterval = 1 / targetFps; // seconds per frame
+
+            gifshot.createGIF({
+                images: capturedFrames,
+                gifWidth: outW,
+                gifHeight: outH,
+                interval: frameInterval,
+                numFrames: capturedFrames.length,
+                progressCallback: (captureProgress) => {
+                    const pct = Math.round(60 + captureProgress * 38);
+                    setProgress(pct, `GIF 파일 렌더링 및 압축 중 (${Math.round(captureProgress * 100)}%)...`);
+                }
+            }, (obj) => {
+                btnGenerate.disabled = false;
+                progressWrap.style.display = 'none';
+
+                if (obj.error) {
+                    alert('GIF 생성 중 오류가 발생했습니다: ' + obj.errorMsg);
+                    return;
+                }
+
+                // Success!
+                const base64Gif = obj.image;
+                resultGifImg.src = base64Gif;
+                btnDownload.href = base64Gif;
+                btnDownload.download = `product_움짤_${outW}px.gif`;
+
+                // Calculate file size from base64
+                const stringLength = base64Gif.length - 'data:image/gif;base64,'.length;
+                const sizeInBytes = 4 * Math.ceil(stringLength / 3) * 0.562489633438347;
+                const sizeInMB = (sizeInBytes / (1024 * 1024)).toFixed(2);
+                resultFileSize.textContent = `${sizeInMB} MB`;
+                resultDimension.textContent = `${outW} × ${outH} px`;
+                resultFrameCount.textContent = `${totalFrames} frames`;
+
+                resultCard.style.display = 'block';
+                resultCard.scrollIntoView({ behavior: 'smooth' });
+            });
+
+        } catch (err) {
+            btnGenerate.disabled = false;
+            progressWrap.style.display = 'none';
+            console.error(err);
+            alert('처리 중 오류가 발생했습니다: ' + err.message);
+        }
+    });
+
+    function setProgress(pct, statusText) {
+        progressBarFill.style.width = `${pct}%`;
+        progressPercent.textContent = `${pct}%`;
+        progressStatus.textContent = statusText;
+    }
+
+    function seekVideo(time) {
+        return new Promise((resolve) => {
+            const onSeeked = () => {
+                mainVideo.removeEventListener('seeked', onSeeked);
+                resolve();
+            };
+            mainVideo.addEventListener('seeked', onSeeked);
+            mainVideo.currentTime = time;
+        });
+    }
+
+    function roundRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+    }
+</script>
+
+</body>
+</html>

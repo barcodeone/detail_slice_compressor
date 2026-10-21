@@ -67,9 +67,10 @@ flowchart TD
 ## 🛠️ 3. 단계별 전과정 작업 절차 (Step-by-Step Pipeline)
 
 ### [Step 1] 신규 도구 HTML 제작 (클라이언트 사이드 SPA)
-1. 파일명 규격: 영문 소문자 케밥 케이스 (예: `delivery-fee.html`, `watermark.html`).
-2. 모든 연산과 처리는 외부 서버 전송 없이 **브라우저 내(HTML5 Canvas, File API, Web Crypto, JSZip 등)**에서 완결되어야 합니다.
-3. 디자인 스타일 가이드:
+1. 파일명 규격: 영문 소문자 케밥 케이스 (예: `delivery-fee.html`, `watermark.html`, `gif-maker.html`).
+2. **[중요] 파일 저장 위치**: GitHub Pages 배포 워크플로우는 `public/` 폴더를 기준으로 배포되므로, 신규 HTML 파일은 **반드시 `public/` 디렉토리 내부(및 루트)에 생성/복사**해야 합니다! (예: `public/gif-maker.html`)
+3. 모든 연산과 처리는 외부 서버 전송 없이 **브라우저 내(HTML5 Canvas, File API, Web Crypto, JSZip 등)**에서 완결되어야 합니다.
+4. 디자인 스타일 가이드:
    - 폰트: `Pretendard`, `-apple-system`, `sans-serif`
    - 모던하고 깔끔한 대시보드 카드 스타일 (`background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px;`)
    - 메인 포인트 컬러: 인디고/블루 계열 (`#4f46e5`, `#2563eb`)
