@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한전 주택용 전기세 계산기 | 에어컨·가전제품 누진세 시뮬레이터</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #eef2ff;
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+            --emerald-600: #059669;
+            --emerald-50: #ecfdf5;
+            --amber-600: #d97706;
+            --amber-50: #fffbeb;
+            --rose-600: #e11d48;
+            --rose-50: #fff1f2;
+            --radius-xl: 20px;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--slate-50);
+            color: var(--slate-800);
+            line-height: 1.5;
+            padding: 24px 16px 60px 16px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 12.5px;
+            font-weight: 700;
+            border-radius: 999px;
+            margin-bottom: 12px;
+        }
+
+        .app-title {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--slate-900);
+            letter-spacing: -0.6px;
+            margin-bottom: 8px;
+        }
+
+        .app-subtitle {
+            font-size: 14px;
+            color: var(--slate-500);
+        }
+
+        /* Grid Layout */
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 820px) {
+            .calc-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+        }
+
+        .card-header {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--slate-700);
+            margin-bottom: 6px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 1.5px solid var(--slate-200);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: #ffffff;
+            transition: border-color 0.15s;
+        }
+
+        .input-group:focus-within {
+            border-color: var(--primary);
+        }
+
+        .input-group input, .input-group select {
+            flex: 1;
+            padding: 10px 14px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--slate-900);
+            background: transparent;
+        }
+
+        .input-addon {
+            padding: 0 14px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--slate-500);
+            background: var(--slate-50);
+            border-left: 1px solid var(--slate-200);
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Appliance Quick Calculator */
+        .appliance-box {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-top: 18px;
+        }
+
+        .appliance-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chip-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .chip-btn {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: 8px;
+            padding: 8px 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--slate-700);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .chip-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .chip-btn.active {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Result Card */
+        .result-box {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            margin-bottom: 20px;
+        }
+
+        .result-hero-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--slate-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .result-hero-value {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        /* Progressive Tier Bar */
+        .tier-wrap {
+            margin: 14px 0;
+        }
+
+        .tier-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .tier-bar-bg {
+            height: 10px;
+            background: var(--slate-200);
+            border-radius: 5px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .tier-seg {
+            height: 100%;
+            transition: width 0.3s;
+        }
+        .tier-seg.t1 { background: #10b981; } /* 1단계 Green */
+        .tier-seg.t2 { background: #f59e0b; } /* 2단계 Yellow */
+        .tier-seg.t3 { background: #ef4444; } /* 3단계 Red */
+
+        .breakdown-list {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            border-top: 1px dashed var(--slate-200);
+            padding-top: 16px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--slate-600);
+        }
+
+        .breakdown-item.total {
+            font-weight: 800;
+            color: var(--slate-900);
+            padding-top: 8px;
+            border-top: 1px solid var(--slate-200);
+        }
+
+        .tag-info {
+            font-size: 11.5px;
+            color: var(--slate-500);
+            line-height: 1.5;
+            margin-top: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="app-header">
+        <div class="badge-pill">
+            <span>⚡</span> 한전 주택용 누진제 최신 요율 반영
+        </div>
+        <h1 class="app-title">주택용 전기세 계산기 &amp; 누진세 시뮬레이터</h1>
+        <p class="app-subtitle">에어컨, 전열기, 건조기 사용량에 따른 예상 전기요금과 누진세 폭탄 구간을 1초 만에 확인합니다.</p>
+    </header>
+
+    <div class="calc-grid">
+        <!-- Input Panel -->
+        <div class="card">
+            <div class="card-header">
+                <span>🔌 사용 조건 및 사용량 입력</span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">계약 종별</label>
+                <div class="input-group">
+                    <select id="voltageType">
+                        <option value="low" selected>주택용 저압 (일반 주택, 빌라, 원룸)</option>
+                        <option value="high">주택용 고압 (대단지 아파트 등)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">적용 계절</label>
+                <div class="input-group">
+                    <select id="seasonType">
+                        <option value="other" selected>기타 계절 (봄·가을·겨울 1~6월, 9~12월)</option>
+                        <option value="summer">하계 (7~8월 에어컨 누진세 완화 구간)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">월간 총 전기 사용량</label>
+                <div class="input-group">
+                    <input type="number" id="monthlyKwh" value="350" min="0" max="5000" step="10">
+                    <span class="input-addon">kWh</span>
+                </div>
+            </div>
+
+            <!-- Appliance Quick Simulator -->
+            <div class="appliance-box">
+                <div class="appliance-title">
+                    <span>💡 가전제품 추가 사용량 간편 계산</span>
+                    <span style="font-size:11.5px; color:var(--slate-500);">선택 시 월 사용량에 즉시 합산</span>
+                </div>
+                <div class="chip-grid">
+                    <button type="button" class="chip-btn" onclick="addAppliance(1800, 5, '스탠드 에어컨')">스탠드 에어컨 (5h)</button>
+                    <button type="button" class="chip-btn" onclick="addAppliance(700, 8, '벽걸이 에어컨')">벽걸이 에어컨 (8h)</button>
+                    <button type="button" class="chip-btn" onclick="addAppliance(300, 8, '전기장판')">전기장판 (8h)</button>
+                    <button type="button" class="chip-btn" onclick="addAppliance(1500, 1, '의류 건조기')">의류 건조기 (1회)</button>
+                    <button type="button" class="chip-btn" onclick="addAppliance(400, 6, '게이밍 PC')">게이밍 PC (6h)</button>
+                    <button type="button" class="chip-btn" onclick="resetAppliance()">초기화 (기본값)</button>
+                </div>
+                <div style="font-size:12px; color:var(--slate-600);" id="applianceDesc">
+                    가전 버튼을 누르면 한 달 예상 추가 소비전력량이 계산됩니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Panel -->
+        <div class="card">
+            <div class="card-header">
+                <span>📊 예상 전기요금 및 누진 구간</span>
+            </div>
+
+            <div class="result-box">
+                <div class="result-hero-title">최종 납부 예상 전기요금 (VAT 포함)</div>
+                <div class="result-hero-value" id="totalBill">0원</div>
+                <div style="font-size:13px; color:var(--slate-600);">
+                    월 사용량 <strong id="kwhDisplay" style="color:var(--slate-900);">350 kWh</strong> 기준
+                </div>
+
+                <!-- Progressive Tier Bar -->
+                <div class="tier-wrap">
+                    <div class="tier-header">
+                        <span id="tierBadge" style="color:#f59e0b;">누진 2단계 적용 중</span>
+                        <span id="tierDesc">안전 구간</span>
+                    </div>
+                    <div class="tier-bar-bg">
+                        <div class="tier-seg t1" id="seg1" style="width: 50%;"></div>
+                        <div class="tier-seg t2" id="seg2" style="width: 35%;"></div>
+                        <div class="tier-seg t3" id="seg3" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="breakdown-list">
+                <div class="breakdown-item">
+                    <span>기본 요금</span>
+                    <span id="baseRate">0원</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>전력량 요금 (누진제 적용)</span>
+                    <span id="energyRate">0원</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>기후환경요금 (9.0원/kWh)</span>
+                    <span id="climateRate">0원</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>연료비조정액 (+5원/kWh)</span>
+                    <span id="fuelRate">0원</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>전기요금 계 (소계)</span>
+                    <span id="subTotal" style="font-weight:700;">0원</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>부가가치세 (10%)</span>
+                    <span id="vatRate">0원</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>전력산업기반기금 (3.7%)</span>
+                    <span id="fundRate">0원</span>
+                </div>
+                <div class="breakdown-item total">
+                    <span>청구금액 (10원 미만 절사)</span>
+                    <span id="finalBill" style="color:var(--primary);">0원</span>
+                </div>
+            </div>
+
+            <div class="tag-info">
+                ※ 한국전력공사의 주택용 전력 누진제 요금표를 기준으로 자동 계산되었습니다. 복지할인(대가족, 3자녀, 장애인 등) 및 태양광 상계거래 여부에 따라 실제 청구서와 소폭 차이가 있을 수 있습니다.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const voltageType = document.getElementById('voltageType');
+    const seasonType = document.getElementById('seasonType');
+    const monthlyKwh = document.getElementById('monthlyKwh');
+
+    function formatWon(num) {
+        return Math.round(num).toLocaleString('ko-KR') + '원';
+    }
+
+    let baseUsageKwh = 300;
+
+    function addAppliance(watts, hoursPerDay, name) {
+        // kWh per month = (watts * hours * 30) / 1000
+        const addKwh = Math.round((watts * hoursPerDay * 30) / 1000);
+        const current = parseInt(monthlyKwh.value) || 0;
+        monthlyKwh.value = current + addKwh;
+        document.getElementById('applianceDesc').textContent = `👉 ${name} (하루 ${hoursPerDay}시간 가동 시 월 +${addKwh} kWh 추가됨)`;
+        calcElectricBill();
+    }
+
+    function resetAppliance() {
+        monthlyKwh.value = 350;
+        document.getElementById('applianceDesc').textContent = '가전 버튼을 누르면 한 달 예상 추가 소비전력량이 계산됩니다.';
+        calcElectricBill();
+    }
+
+    function calcElectricBill() {
+        const kwh = parseFloat(monthlyKwh.value) || 0;
+        const isHigh = voltageType.value === 'high';
+        const isSummer = seasonType.value === 'summer';
+
+        // Rates (저압 vs 고압)
+        // 1) 기본요금 & 2) 전력량 요금 단가
+        let t1_base, t2_base, t3_base;
+        let t1_rate, t2_rate, t3_rate;
+
+        if (!isHigh) {
+            // 주택용 저압
+            t1_base = 910;
+            t2_base = 1600;
+            t3_base = 7300;
+            t1_rate = 120.0;
+            t2_rate = 214.6;
+            t3_rate = 307.3;
+        } else {
+            // 주택용 고압
+            t1_base = 730;
+            t2_base = 1260;
+            t3_base = 6060;
+            t1_rate = 105.0;
+            t2_rate = 174.0;
+            t3_rate = 242.3;
+        }
+
+        // 누진 구간 한도 (기타 계절: 200 / 400 vs 하계 7~8월: 300 / 450)
+        const limit1 = isSummer ? 300 : 200;
+        const limit2 = isSummer ? 450 : 400;
+
+        let baseFee = 0;
+        let energyFee = 0;
+        let tierLevel = 1;
+
+        if (kwh <= limit1) {
+            baseFee = t1_base;
+            energyFee = kwh * t1_rate;
+            tierLevel = 1;
+        } else if (kwh <= limit2) {
+            baseFee = t2_base;
+            energyFee = (limit1 * t1_rate) + ((kwh - limit1) * t2_rate);
+            tierLevel = 2;
+        } else {
+            baseFee = t3_base;
+            energyFee = (limit1 * t1_rate) + ((limit2 - limit1) * t2_rate) + ((kwh - limit2) * t3_rate);
+            tierLevel = 3;
+        }
+
+        // 3) 기후환경요금: 9.0원/kWh
+        const climateFee = kwh * 9.0;
+
+        // 4) 연료비조정액: +5원/kWh
+        const fuelFee = kwh * 5.0;
+
+        // 전기요금 계 (소계)
+        const subTotal = baseFee + energyFee + climateFee + fuelFee;
+
+        // 부가가치세: 소계 * 10% (원 미만 반올림)
+        const vat = Math.round(subTotal * 0.1);
+
+        // 전력산업기반기금: 소계 * 3.7% (10원 미만 절사)
+        const fund = Math.floor((subTotal * 0.037) / 10) * 10;
+
+        // 총 청구금액 (10원 미만 절사)
+        const finalBill = Math.floor((subTotal + vat + fund) / 10) * 10;
+
+        // UI Updates
+        document.getElementById('totalBill').textContent = formatWon(finalBill);
+        document.getElementById('kwhDisplay').textContent = `${kwh.toLocaleString()} kWh`;
+        document.getElementById('baseRate').textContent = formatWon(baseFee);
+        document.getElementById('energyRate').textContent = formatWon(energyFee);
+        document.getElementById('climateRate').textContent = formatWon(climateFee);
+        document.getElementById('fuelRate').textContent = formatWon(fuelFee);
+        document.getElementById('subTotal').textContent = formatWon(subTotal);
+        document.getElementById('vatRate').textContent = formatWon(vat);
+        document.getElementById('fundRate').textContent = formatWon(fund);
+        document.getElementById('finalBill').textContent = formatWon(finalBill);
+
+        // Tier Bar Visualization
+        const tierBadge = document.getElementById('tierBadge');
+        const tierDesc = document.getElementById('tierDesc');
+        const seg1 = document.getElementById('seg1');
+        const seg2 = document.getElementById('seg2');
+        const seg3 = document.getElementById('seg3');
+
+        if (tierLevel === 1) {
+            tierBadge.textContent = '누진 1단계 (안전)';
+            tierBadge.style.color = '#10b981';
+            tierDesc.textContent = `${limit1}kWh 이하 기본 요율`;
+            seg1.style.width = '100%';
+            seg2.style.width = '0%';
+            seg3.style.width = '0%';
+        } else if (tierLevel === 2) {
+            tierBadge.textContent = '누진 2단계 (주의)';
+            tierBadge.style.color = '#f59e0b';
+            tierDesc.textContent = `${limit1}~${limit2}kWh 구간`;
+            seg1.style.width = '50%';
+            seg2.style.width = '50%';
+            seg3.style.width = '0%';
+        } else {
+            tierBadge.textContent = '누진 3단계 (요금 폭탄 주의!)';
+            tierBadge.style.color = '#ef4444';
+            tierDesc.textContent = `${limit2}kWh 초과 최고 요율`;
+            seg1.style.width = '33%';
+            seg2.style.width = '33%';
+            seg3.style.width = '34%';
+        }
+    }
+
+    voltageType.addEventListener('change', calcElectricBill);
+    seasonType.addEventListener('change', calcElectricBill);
+    monthlyKwh.addEventListener('input', calcElectricBill);
+
+    calcElectricBill();
+</script>
+
+</body>
+</html>
