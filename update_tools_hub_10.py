@@ -10,6 +10,47 @@ headers = {
 
 html_raw = """
 <style>
+/* 0. [옵션 A] 초슬림 미니멀 헤더 최적화 */
+.site-header {
+    padding: 8px 0 !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+.inside-header {
+    padding: 4px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+.site-branding .main-title {
+    margin: 0 !important;
+    font-size: 19px !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+}
+.site-branding .main-title a {
+    color: #0f172a !important;
+    text-decoration: none !important;
+}
+.main-navigation .main-nav ul li a {
+    padding: 6px 14px !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    color: #4f46e5 !important;
+    background: #eef2ff !important;
+    border-radius: 6px !important;
+    transition: all 0.15s ease !important;
+}
+.main-navigation .main-nav ul li a:hover {
+    background: #e0e7ff !important;
+}
+.separate-containers .site-main {
+    margin-top: 8px !important;
+}
+.inside-article {
+    padding-top: 8px !important;
+}
+
 /* 1. 사이드바 숨김 및 와이드 컨테이너 */
 #left-sidebar, #right-sidebar { display: none !important; }
 #primary.content-area, .site-content .content-area { width: 100% !important; max-width: 100% !important; float: none !important; }
