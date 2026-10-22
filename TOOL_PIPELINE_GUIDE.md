@@ -290,22 +290,39 @@ raw_content = f"""<!-- wp:html -->
             </div>
         </div>
 
-        <!-- 3) 쿠팡 실시간 검색 위젯 (표준 탑재) -->
+        <!-- 3) 쿠팡 실시간 검색 위젯 (표준 탑재) & [2번 방안] 인기 키워드 태그 칩 -->
         <div style="margin-top:24px; padding-top:20px; border-top:1px solid #e2e8f0;">
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
-                <span style="font-size:13px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                <span style="font-size:13.5px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     원하는 상품 직접 검색
                 </span>
                 <span style="font-size:11.5px; color:#64748b;">쿠팡 실시간 최저가 &amp; 로켓배송 상품 검색</span>
             </div>
+
+            <!-- [2번 방안] 인기 검색어 클릭 태그 칩 -->
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:12px;">
+                <span style="font-size:11.5px; font-weight:800; color:#4338ca; background:#e0e7ff; padding:3px 8px; border-radius:6px;">🔥 지금 많이 찾는 검색어:</span>
+                <a href="https://link.coupang.com/a/아이템1링크" target="_blank" referrerpolicy="unsafe-url" style="font-size:11.5px; font-weight:700; color:#334155; background:#ffffff; border:1px solid #cbd5e1; padding:3px 10px; border-radius:999px; text-decoration:none;">🏷️ #키워드1</a>
+                <a href="https://link.coupang.com/a/아이템2링크" target="_blank" referrerpolicy="unsafe-url" style="font-size:11.5px; font-weight:700; color:#334155; background:#ffffff; border:1px solid #cbd5e1; padding:3px 10px; border-radius:999px; text-decoration:none;">🏷️ #키워드2</a>
+            </div>
+
             <div style="border-radius:14px; overflow:hidden; background:#ffffff; box-shadow:0 2px 8px rgba(0,0,0,0.04); border:1px solid #e2e8f0; line-height:0;">
                 <iframe src="https://coupa.ng/cqkfar" width="100%" height="75" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" style="width:100%; height:75px; border:none; display:block;"></iframe>
             </div>
         </div>
 
         <!-- 4) 공정위 필수 문구 -->
-        <p style="text-align:center; font-size:11px; color:#94a3b8; margin:24px 0 0 0;">이 포스팅은 쿠팡 파트너스 활동의 일환으로 이에 따른 일정액의 수수료를 제공받습니다.</p>
+        <p style="text-align:center; font-size:11px; color:#94a3b8; margin:20px 0 0 0;">이 포스팅은 쿠팡 파트너스 활동의 일환으로 이에 따른 일정액의 수수료를 제공받습니다.</p>
+    </div>
+
+    <!-- [3번 방안] 검색 노출(SEO) 상세 가이드 및 FAQ 아코디언 -->
+    <div style="margin-top:40px; background:#ffffff; border:1px solid #e2e8f0; border-radius:24px; padding:36px; box-shadow:0 4px 16px rgba(0,0,0,0.02);">
+        <div style="margin-bottom:28px; border-bottom:1px solid #f1f5f9; padding-bottom:16px;">
+            <span style="font-size:12px; font-weight:800; color:#2563eb; text-transform:uppercase; letter-spacing:0.5px;">SEO GUIDE &amp; FAQ</span>
+            <h2 style="font-size:22px; font-weight:900; color:#0f172a; margin:6px 0 8px 0; line-height:1.35;">도구 상세 활용 및 검색엔진 색인 가이드</h2>
+        </div>
+        <!-- 롱테일 본문 및 <details> FAQ 태그 배치 -->
     </div>
 </div>
 <!-- /wp:html -->"""

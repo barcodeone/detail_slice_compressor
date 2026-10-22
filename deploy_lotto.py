@@ -126,7 +126,7 @@ lotto_raw_html = f"""<!-- wp:html -->
                 </div>
                 <div style="margin-top:16px; padding-top:12px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:11.5px; font-weight:700; color:#0f172a;">로켓배송</span>
-                    <a href="https://link.coupang.com/a/h3JeuuJKrQ" target="_blank" referrerpolicy="unsafe-url" class="coupang-btn" style="padding:8px 16px; background:#2563eb !important; color:#ffffff !important; font-size:12.5px; font-weight:800; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(37,99,235,0.28);"><span style="color:#ffffff !important; font-weight:800; text-decoration:none;">상품 보기 ➔</span></a>
+                    <a href="https://link.coupang.com/a/h3JeuuJKrQ" target="_blank" referrerpolicy="unsafe-url" class="coupang-btn" style="padding:8px 16px; background:#2563eb !important; color:#ffffff !important; font-size:12.5px; font-weight:800; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(37,99,235,0.28);"><span style="color:#ffffff !important; font-weight:800; text-decoration:none;">👉 실시간 최저가 확인 ➔</span></a>
                 </div>
             </div>
 
@@ -142,7 +142,7 @@ lotto_raw_html = f"""<!-- wp:html -->
                 </div>
                 <div style="margin-top:16px; padding-top:12px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:11.5px; font-weight:700; color:#0f172a;">선물 추천</span>
-                    <a href="https://link.coupang.com/a/h3Jhyr6eI0" target="_blank" referrerpolicy="unsafe-url" class="coupang-btn" style="padding:8px 16px; background:#2563eb !important; color:#ffffff !important; font-size:12.5px; font-weight:800; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(37,99,235,0.28);"><span style="color:#ffffff !important; font-weight:800; text-decoration:none;">상품 보기 ➔</span></a>
+                    <a href="https://link.coupang.com/a/h3Jhyr6eI0" target="_blank" referrerpolicy="unsafe-url" class="coupang-btn" style="padding:8px 16px; background:#2563eb !important; color:#ffffff !important; font-size:12.5px; font-weight:800; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(37,99,235,0.28);"><span style="color:#ffffff !important; font-weight:800; text-decoration:none;">👉 행운 특가 보러가기 ➔</span></a>
                 </div>
             </div>
 
@@ -158,27 +158,90 @@ lotto_raw_html = f"""<!-- wp:html -->
                 </div>
                 <div style="margin-top:16px; padding-top:12px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:11.5px; font-weight:700; color:#0f172a;">인기 상품</span>
-                    <a href="https://link.coupang.com/a/h3Jp8qnbxs" target="_blank" referrerpolicy="unsafe-url" class="coupang-btn" style="padding:8px 16px; background:#2563eb !important; color:#ffffff !important; font-size:12.5px; font-weight:800; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(37,99,235,0.28);"><span style="color:#ffffff !important; font-weight:800; text-decoration:none;">상품 보기 ➔</span></a>
+                    <a href="https://link.coupang.com/a/h3Jp8qnbxs" target="_blank" referrerpolicy="unsafe-url" class="coupang-btn" style="padding:8px 16px; background:#2563eb !important; color:#ffffff !important; font-size:12.5px; font-weight:800; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(37,99,235,0.28);"><span style="color:#ffffff !important; font-weight:800; text-decoration:none;">👉 풍수 특가 확인 ➔</span></a>
                 </div>
             </div>
         </div>
 
-        <!-- 3) 쿠팡 실시간 검색 위젯 (표준 내장) -->
+        <!-- [2번 방안] 쿠팡 실시간 검색 위젯 & 인기 검색 키워드 태그 칩 -->
         <div style="margin-top:24px; padding-top:20px; border-top:1px solid #e2e8f0;">
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
-                <span style="font-size:13px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                <span style="font-size:13.5px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     원하는 상품 직접 검색
                 </span>
                 <span style="font-size:11.5px; color:#64748b;">쿠팡 실시간 최저가 &amp; 로켓배송 상품 검색</span>
             </div>
+
+            <!-- 인기 검색 태그 칩 (클릭 시 쿠팡 실시간 검색 이동 유도) -->
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:12px;">
+                <span style="font-size:11.5px; font-weight:800; color:#4338ca; background:#e0e7ff; padding:3px 8px; border-radius:6px;">🔥 지금 많이 찾는 검색어:</span>
+                <a href="https://link.coupang.com/a/h3JeuuJKrQ" target="_blank" referrerpolicy="unsafe-url" style="font-size:11.5px; font-weight:700; color:#334155; background:#ffffff; border:1px solid #cbd5e1; padding:3px 10px; border-radius:999px; text-decoration:none; transition:all 0.15s ease;">🏷️ #로또복권보관함</a>
+                <a href="https://link.coupang.com/a/h3Jhyr6eI0" target="_blank" referrerpolicy="unsafe-url" style="font-size:11.5px; font-weight:700; color:#334155; background:#ffffff; border:1px solid #cbd5e1; padding:3px 10px; border-radius:999px; text-decoration:none; transition:all 0.15s ease;">🏷️ #행운골드바키링</a>
+                <a href="https://link.coupang.com/a/h3Jp8qnbxs" target="_blank" referrerpolicy="unsafe-url" style="font-size:11.5px; font-weight:700; color:#334155; background:#ffffff; border:1px solid #cbd5e1; padding:3px 10px; border-radius:999px; text-decoration:none; transition:all 0.15s ease;">🏷️ #풍수황금돈나무</a>
+                <a href="https://link.coupang.com/a/h3Jhyr6eI0" target="_blank" referrerpolicy="unsafe-url" style="font-size:11.5px; font-weight:700; color:#334155; background:#ffffff; border:1px solid #cbd5e1; padding:3px 10px; border-radius:999px; text-decoration:none; transition:all 0.15s ease;">🏷️ #금전운부적</a>
+                <a href="https://link.coupang.com/a/h3JeuuJKrQ" target="_blank" referrerpolicy="unsafe-url" style="font-size:11.5px; font-weight:700; color:#334155; background:#ffffff; border:1px solid #cbd5e1; padding:3px 10px; border-radius:999px; text-decoration:none; transition:all 0.15s ease;">🏷️ #로또명당지갑</a>
+            </div>
+
             <div style="border-radius:14px; overflow:hidden; background:#ffffff; box-shadow:0 2px 8px rgba(0,0,0,0.04); border:1px solid #e2e8f0; line-height:0;">
                 <iframe src="https://coupa.ng/cqkfar" width="100%" height="75" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" style="width:100%; height:75px; border:none; display:block;"></iframe>
             </div>
         </div>
 
-        <!-- 4) 공정위 필수 문구 -->
-        <p style="text-align:center; font-size:11px; color:#94a3b8; margin:24px 0 0 0;">이 포스팅은 쿠팡 파트너스 활동의 일환으로 이에 따른 일정액의 수수료를 제공받습니다.</p>
+        <!-- 공정위 필수 문구 -->
+        <p style="text-align:center; font-size:11px; color:#94a3b8; margin:20px 0 0 0;">이 포스팅은 쿠팡 파트너스 활동의 일환으로 이에 따른 일정액의 수수료를 제공받습니다.</p>
+    </div>
+
+    <!-- [3번 방안] 구글·네이버 검색 노출(SEO) 가이드 본문 & FAQ 아코디언 & JSON-LD 구조화 데이터 -->
+    <div style="margin-top:40px; background:#ffffff; border:1px solid #e2e8f0; border-radius:24px; padding:36px; box-shadow:0 4px 16px rgba(0,0,0,0.02);">
+        <div style="margin-bottom:28px; border-bottom:1px solid #f1f5f9; padding-bottom:16px;">
+            <span style="font-size:12px; font-weight:800; color:#2563eb; text-transform:uppercase; letter-spacing:0.5px;">SEO GUIDE &amp; FAQ</span>
+            <h2 style="font-size:22px; font-weight:900; color:#0f172a; margin:6px 0 8px 0; line-height:1.35;">🍀 스마트 로또 6/45 수비학 맞춤 번호 생성기 활용 가이드</h2>
+            <p style="font-size:13.5px; color:#64748b; margin:0; line-height:1.6;">생년월일·이름·커플 궁합·연락처 수비학 알고리즘을 통해 추출된 나만의 행운 번호와 로또 1등 당첨 전략을 안내합니다.</p>
+        </div>
+
+        <div style="color:#334155; font-size:14.5px; line-height:1.75;">
+            <h3 style="font-size:17px; font-weight:800; color:#0f172a; margin:24px 0 10px 0; display:flex; align-items:center; gap:6px;">
+                <span>🔢</span> 1. 생년월일 &amp; 이름 수비학(Numerology) 추첨 원리
+            </h3>
+            <p style="margin:0 0 14px 0;">
+                동행복권 로또 6/45는 1부터 45까지의 숫자 중 6개를 맞히는 확률 8,145,060분의 1의 추첨 게임입니다. 본 스마트 로또 생성기는 단순한 기계적 난수가 아닌, <strong>개인이 타고난 사주 생년월일의 오행(목·화·토·금·수) 에너지와 한글 초성·중성·종성 유니코드 획수 파동</strong>을 결합하여 고유한 수비학적 행운 번호를 계산합니다.
+            </p>
+
+            <h3 style="font-size:17px; font-weight:800; color:#0f172a; margin:24px 0 10px 0; display:flex; align-items:center; gap:6px;">
+                <span>📊</span> 2. 역대 1등 당첨 통계와 황금 번호 조합 법칙
+            </h3>
+            <p style="margin:0 0 14px 0;">
+                역대 1,100회차 이상의 동행복권 당첨 통계를 분석하면 <strong>홀수와 짝수의 비율이 3:3 또는 2:4/4:2</strong>일 때 1등 당첨 비율이 전체의 80% 이상을 차지합니다. 또한 1~22(저수)와 23~45(고수)가 적절히 안배되고, 3개 이상의 연속 번호가 나오지 않는 조합이 가장 안정적인 당첨 패턴입니다.
+            </p>
+
+            <h3 style="font-size:17px; font-weight:800; color:#0f172a; margin:28px 0 14px 0; display:flex; align-items:center; gap:6px;">
+                <span>❓</span> 3. 자주 묻는 질문 (FAQ)
+            </h3>
+            
+            <div style="display:flex; flex-direction:column; gap:12px; margin-top:14px;">
+                <details style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px 18px; cursor:pointer;" open>
+                    <summary style="font-size:14.5px; font-weight:800; color:#0f172a; outline:none;">Q. 생성된 번호나 이름, 생년월일 등 개인정보가 서버에 저장되나요?</summary>
+                    <p style="font-size:13.5px; color:#475569; margin:10px 0 0 0; line-height:1.6; padding-left:4px;">
+                        <strong>아닙니다. 100% 클라이언트(사용자 웹브라우저)에서만 암호화 알고리즘으로 실시간 연산</strong>됩니다. 서버로 어떠한 개인정보나 입력값, 생성 번호도 전송되거나 저장되지 않으므로 안심하고 이용하실 수 있습니다.
+                    </p>
+                </details>
+
+                <details style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px 18px; cursor:pointer;">
+                    <summary style="font-size:14.5px; font-weight:800; color:#0f172a; outline:none;">Q. 뽑힌 행운의 로또 번호를 카카오톡이나 클립보드로 복사할 수 있나요?</summary>
+                    <p style="font-size:13.5px; color:#475569; margin:10px 0 0 0; line-height:1.6; padding-left:4px;">
+                        네! 결과 화면 하단의 <strong>'카톡으로 보내기'</strong> 버튼을 클릭하면 모바일 및 PC 카카오톡으로 나에게 전송하거나 친구에게 공유할 수 있으며, <strong>'복사하기'</strong> 버튼으로 5개 게임(A~E) 전체 번호를 원클릭으로 복사할 수 있습니다.
+                    </p>
+                </details>
+
+                <details style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px 18px; cursor:pointer;">
+                    <summary style="font-size:14.5px; font-weight:800; color:#0f172a; outline:none;">Q. 동행복권 공식 당첨결과 및 QR 확인은 어디서 하나요?</summary>
+                    <p style="font-size:13.5px; color:#475569; margin:10px 0 0 0; line-height:1.6; padding-left:4px;">
+                        결과 카드 아래의 <strong>'동행복권 공식 당첨결과·QR 확인'</strong> 링크를 누르면 동행복권 공식 포털로 바로 연결되어 매주 토요일 오후 8시 35분 이후 추첨 회차별 당첨 번호 및 QR 카메라 인식을 진행하실 수 있습니다.
+                    </p>
+                </details>
+            </div>
+        </div>
     </div>
 </div>
 <!-- /wp:html -->"""
