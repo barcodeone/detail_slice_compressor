@@ -143,9 +143,53 @@ SLIM_HEADER_CSS = """
 .inside-header { padding: 4px 16px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; }
 .site-branding .main-title { margin: 0 !important; font-size: 19px !important; font-weight: 800 !important; line-height: 1.2 !important; }
 .site-branding .main-title a { color: #0f172a !important; text-decoration: none !important; }
-.main-navigation .main-nav ul { display: flex !important; gap: 8px !important; }
-.main-navigation .main-nav ul li a { padding: 6px 14px !important; font-size: 12.5px !important; font-weight: 700 !important; color: #4f46e5 !important; background: #eef2ff !important; border-radius: 6px !important; transition: all 0.15s ease !important; }
-.main-navigation .main-nav ul li a:hover { background: #e0e7ff !important; }
+.main-navigation .main-nav ul {
+    display: flex !important;
+    gap: 12px !important;
+    align-items: center !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.main-navigation .main-nav ul li {
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+.main-navigation .main-nav ul li a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 7px 16px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: normal !important;
+    height: auto !important;
+    color: #334155 !important;
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    text-decoration: none !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.main-navigation .main-nav ul li:first-child a::before {
+    content: "💼";
+    margin-right: 6px;
+    font-size: 13px;
+}
+.main-navigation .main-nav ul li:last-child a::before {
+    content: "🍀";
+    margin-right: 6px;
+    font-size: 13px;
+}
+.main-navigation .main-nav ul li a:hover {
+    color: #ffffff !important;
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+    transform: translateY(-1px) !important;
+}
 .separate-containers .site-main { margin-top: 8px !important; }
 .separate-containers .inside-article { padding: 0 !important; background: transparent !important; box-shadow: none !important; border: none !important; }
 #left-sidebar, #right-sidebar { display: none !important; }
