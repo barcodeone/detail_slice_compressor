@@ -70,8 +70,10 @@ flowchart TD
 1. 파일명 규격: 영문 소문자 케밥 케이스 (예: `delivery-fee.html`, `watermark.html`, `gif-maker.html`).
 2. **[중요] 파일 저장 위치**: GitHub Pages 배포 워크플로우는 `public/` 폴더를 기준으로 배포되므로, 신규 HTML 파일은 **반드시 `public/` 디렉토리 내부(및 루트)에 생성/복사**해야 합니다! (예: `public/gif-maker.html`)
 3. 모든 연산과 처리는 외부 서버 전송 없이 **브라우저 내(HTML5 Canvas, File API, Web Crypto, JSZip 등)**에서 완결되어야 합니다.
-4. 디자인 스타일 가이드:
+4. 디자인 스타일 및 일체형 임베드 가이드:
    - 폰트: `Pretendard`, `-apple-system`, `sans-serif`
+   - **[핵심] 이중 포장(이중 박스) 방지**: 도구 HTML의 `body`는 반드시 **`background-color: transparent;`**로 설정하고, 상단 여백은 `padding: 10px 0 20px 0;`으로 최소화합니다.
+   - **가로폭 최적화**: `.container { max-width: 1200px; margin: 0 auto; }`를 적용하여 1280px 와이드 화면에 시원하게 렌더링되도록 합니다.
    - 모던하고 깔끔한 대시보드 카드 스타일 (`background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px;`)
    - 메인 포인트 컬러: 인디고/블루 계열 (`#4f46e5`, `#2563eb`)
 
@@ -134,27 +136,58 @@ TOOL_TITLE = "스마트스토어·쿠팡 신규 자동화 툴 | Barcode128"
 IFRAME_URL = f"https://barcodeone.github.io/detail_slice_compressor/{TOOL_SLUG}.html"
 IFRAME_HEIGHT = "1050px"  # 도구 높이에 맞게 조절 (보통 950px ~ 1150px)
 
-# 3. 워드프레스 본문 HTML 구성
+# 3. 워드프레스 본문 HTML 구성 (★ 최신 표준: 와이드 1280px, 무포장 일체형 iframe, 로켓블루 버튼, 검색위젯 포함)
+SLIM_HEADER_CSS = """
+/* 0. 초슬림 미니멀 헤더 최적화 */
+.site-header { padding: 8px 0 !important; background: #ffffff !important; border-bottom: 1px solid #e2e8f0 !important; }
+.inside-header { padding: 4px 16px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; }
+.site-branding .main-title { margin: 0 !important; font-size: 19px !important; font-weight: 800 !important; line-height: 1.2 !important; }
+.site-branding .main-title a { color: #0f172a !important; text-decoration: none !important; }
+.main-navigation .main-nav ul { display: flex !important; gap: 8px !important; }
+.main-navigation .main-nav ul li a { padding: 6px 14px !important; font-size: 12.5px !important; font-weight: 700 !important; color: #4f46e5 !important; background: #eef2ff !important; border-radius: 6px !important; transition: all 0.15s ease !important; }
+.main-navigation .main-nav ul li a:hover { background: #e0e7ff !important; }
+.separate-containers .site-main { margin-top: 8px !important; }
+.separate-containers .inside-article { padding: 0 !important; background: transparent !important; box-shadow: none !important; border: none !important; }
+#left-sidebar, #right-sidebar { display: none !important; }
+#primary.content-area, .site-content .content-area { width: 100% !important; max-width: 100% !important; float: none !important; }
+.grid-container { max-width: 1280px !important; }
+.entry-header { display: none !important; }
+
+/* Coupang Button Protection against visited / theme color overwrite */
+a.coupang-btn, a.coupang-btn:visited, a.coupang-btn:hover, a.coupang-btn:active, a.coupang-btn:focus,
+a.coupang-btn *, a.coupang-btn span {
+    color: #ffffff !important;
+    text-decoration: none !important;
+}
+a.coupang-btn {
+    padding: 8px 16px !important;
+    background: #2563eb !important;
+    font-size: 12.5px !important;
+    font-weight: 800 !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    box-shadow: 0 2px 6px rgba(37,99,235,0.28) !important;
+    transition: all 0.15s ease !important;
+}
+a.coupang-btn:hover {
+    background: #1d4ed8 !important;
+}
+"""
+
 raw_content = f"""<!-- wp:html -->
-<style>
-/* 테마 레이아웃 클린업 (사이드바 제거 및 컨테이너 100% 확장) */
-#left-sidebar, #right-sidebar {{ display: none !important; }}
-#primary.content-area, .site-content .content-area {{ width: 100% !important; max-width: 100% !important; float: none !important; }}
-.grid-container {{ max-width: 1280px !important; }}
-.inside-article {{ padding: 10px 16px !important; }}
-.entry-header {{ display: none !important; }}
-</style>
-
+<style>{SLIM_HEADER_CSS}</style>
 <div style="width:100%; max-width:1200px; margin:0 auto; padding-bottom:50px; font-family:'Pretendard', sans-serif;">
-    <!-- 1) 도구 Iframe 삽입 (ModSecurity 방화벽 회피를 위해 JS 리사이저 대신 CSS 고정 높이 사용) -->
-    <iframe src="{IFRAME_URL}" style="width:100%; height:{IFRAME_HEIGHT}; border:none; border-radius:20px; box-shadow:0 4px 20px rgba(0,0,0,0.06); margin-bottom:40px; display:block;" scrolling="auto"></iframe>
+    <!-- 1) 도구 Iframe 삽입 (★ 무포장 일체형: 불필요한 그림자와 외곽선을 완전히 제거하여 단일 웹페이지처럼 자연스럽게 렌더링) -->
+    <iframe src="{IFRAME_URL}" style="width:100%; height:{IFRAME_HEIGHT}; border:none; margin-bottom:30px; display:block;" scrolling="auto"></iframe>
 
-    <!-- 2) 하단 단일 추천 쿠팡 파트너스 배너 섹션 (3개 아이템 그리드) -->
-    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:24px; padding:32px; margin-top:30px;">
+    <!-- 2) 하단 단일 추천 쿠팡 파트너스 배너 섹션 (3개 아이템 가로 3열 그리드) -->
+    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:24px; padding:32px; margin-top:20px;">
         <div style="margin-bottom:24px;">
-            <span style="font-size:12px; font-weight:800; color:#4f46e5; text-transform:uppercase; letter-spacing:0.5px;">SELLER RECOMMENDATION</span>
-            <h3 style="font-size:20px; font-weight:900; color:#0f172a; margin:4px 0 6px 0;">⚡ 오픈마켓 셀러 추천 장비 &amp; 필수 아이템 3종</h3>
-            <p style="font-size:13px; color:#64748b; margin:0;">업무 효율성과 작업 생산성을 극대화해주는 셀러 맞춤 추천 장비입니다.</p>
+            <span style="font-size:12px; font-weight:800; color:#4f46e5; text-transform:uppercase; letter-spacing:0.5px;">RECOMMENDATION</span>
+            <h3 style="font-size:20px; font-weight:900; color:#0f172a; margin:4px 0 6px 0;">⚡ 추천 필수 아이템 3종</h3>
+            <p style="font-size:13px; color:#64748b; margin:0;">업무 효율성과 편의성을 높여주는 인기 베스트셀러 추천템입니다.</p>
         </div>
 
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
@@ -168,11 +201,11 @@ raw_content = f"""<!-- wp:html -->
                     </div>
                     <span style="font-size:11px; font-weight:700; background:#eef2ff; color:#4338ca; padding:3px 8px; border-radius:6px; display:inline-block; margin-bottom:8px;">추천 태그 1</span>
                     <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin:0 0 6px 0; line-height:1.4;">추천 상품 1 타이틀</h4>
-                    <p style="font-size:12.5px; color:#64748b; margin:0; line-height:1.5;">상품에 대한 한 줄 설명 및 셀러에게 필요한 이유</p>
+                    <p style="font-size:12.5px; color:#64748b; margin:0; line-height:1.5;">상품에 대한 한 줄 설명</p>
                 </div>
                 <div style="margin-top:16px; padding-top:12px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:11.5px; font-weight:700; color:#0f172a;">로켓배송</span>
-                    <a href="https://link.coupang.com/a/아이템1링크" target="_blank" referrerpolicy="unsafe-url" style="padding:7px 14px; background:#0f172a; color:#ffffff; font-size:12px; font-weight:700; border-radius:8px; text-decoration:none;">상품 보기 ➔</a>
+                    <a href="https://link.coupang.com/a/아이템1링크" target="_blank" referrerpolicy="unsafe-url" class="coupang-btn" style="padding:8px 16px; background:#2563eb !important; color:#ffffff !important; font-size:12.5px; font-weight:800; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(37,99,235,0.28);"><span style="color:#ffffff !important; font-weight:800; text-decoration:none;">상품 보기 ➔</span></a>
                 </div>
             </div>
 
@@ -189,8 +222,8 @@ raw_content = f"""<!-- wp:html -->
                     <p style="font-size:12.5px; color:#64748b; margin:0; line-height:1.5;">상품에 대한 한 줄 설명</p>
                 </div>
                 <div style="margin-top:16px; padding-top:12px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:11.5px; font-weight:700; color:#0f172a;">무료배송</span>
-                    <a href="https://link.coupang.com/a/아이템2링크" target="_blank" referrerpolicy="unsafe-url" style="padding:7px 14px; background:#0f172a; color:#ffffff; font-size:12px; font-weight:700; border-radius:8px; text-decoration:none;">상품 보기 ➔</a>
+                    <span style="font-size:11.5px; font-weight:700; color:#0f172a;">만족도 1위</span>
+                    <a href="https://link.coupang.com/a/아이템2링크" target="_blank" referrerpolicy="unsafe-url" class="coupang-btn" style="padding:8px 16px; background:#2563eb !important; color:#ffffff !important; font-size:12.5px; font-weight:800; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(37,99,235,0.28);"><span style="color:#ffffff !important; font-weight:800; text-decoration:none;">상품 보기 ➔</span></a>
                 </div>
             </div>
 
@@ -207,13 +240,27 @@ raw_content = f"""<!-- wp:html -->
                     <p style="font-size:12.5px; color:#64748b; margin:0; line-height:1.5;">상품에 대한 한 줄 설명</p>
                 </div>
                 <div style="margin-top:16px; padding-top:12px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:11.5px; font-weight:700; color:#0f172a;">가성비 최고</span>
-                    <a href="https://link.coupang.com/a/아이템3링크" target="_blank" referrerpolicy="unsafe-url" style="padding:7px 14px; background:#0f172a; color:#ffffff; font-size:12px; font-weight:700; border-radius:8px; text-decoration:none;">상품 보기 ➔</a>
+                    <span style="font-size:11.5px; font-weight:700; color:#0f172a;">로켓배송</span>
+                    <a href="https://link.coupang.com/a/아이템3링크" target="_blank" referrerpolicy="unsafe-url" class="coupang-btn" style="padding:8px 16px; background:#2563eb !important; color:#ffffff !important; font-size:12.5px; font-weight:800; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(37,99,235,0.28);"><span style="color:#ffffff !important; font-weight:800; text-decoration:none;">상품 보기 ➔</span></a>
                 </div>
             </div>
         </div>
 
-        <!-- 3) 공정위 필수 문구 -->
+        <!-- 3) 쿠팡 실시간 검색 위젯 (표준 탑재) -->
+        <div style="margin-top:24px; padding-top:20px; border-top:1px solid #e2e8f0;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                <span style="font-size:13px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    원하는 상품 직접 검색
+                </span>
+                <span style="font-size:11.5px; color:#64748b;">쿠팡 실시간 최저가 &amp; 로켓배송 상품 검색</span>
+            </div>
+            <div style="border-radius:14px; overflow:hidden; background:#ffffff; box-shadow:0 2px 8px rgba(0,0,0,0.04); border:1px solid #e2e8f0; line-height:0;">
+                <iframe src="https://coupa.ng/cqkfar" width="100%" height="75" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" style="width:100%; height:75px; border:none; display:block;"></iframe>
+            </div>
+        </div>
+
+        <!-- 4) 공정위 필수 문구 -->
         <p style="text-align:center; font-size:11px; color:#94a3b8; margin:24px 0 0 0;">이 포스팅은 쿠팡 파트너스 활동의 일환으로 이에 따른 일정액의 수수료를 제공받습니다.</p>
     </div>
 </div>
