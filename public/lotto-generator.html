@@ -466,31 +466,27 @@
                     <!-- Dynamic game rows rendered here -->
                 </div>
 
-                <!-- Action Buttons: 카톡 / 문자 / 복사 / QR -->
-                <div class="result-actions" style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 18px;">
-                    <!-- 카카오톡 공유 버튼 (카카오 노란색 시그니처) -->
+                <!-- Action Buttons: 카톡 / 복사 / 공식 당첨확인 -->
+                <div class="result-actions" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px;">
+                    <!-- 카카오톡으로 보내기 (카카오 노란색 시그니처) -->
                     <button class="btn-sub" onclick="shareKakaoOrWeb()" style="background:#fee500; border-color:#fee500; color:#191919; font-weight:800;">
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="#191919"><path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.557 1.707 4.8 4.27 6.054-.188.702-.682 2.545-.78 2.94-.122.493.18.486.379.354.157-.104 2.495-1.696 3.504-2.383.535.077 1.077.119 1.627.119 4.97 0 9-3.185 9-7.115S16.97 3 12 3z"/></svg>
-                        카톡으로 번호 보내기
+                        카톡으로 보내기
                     </button>
 
-                    <!-- 핸드폰 문자로 전송 버튼 -->
-                    <button class="btn-sub" onclick="sendViaSMS()" style="background:#f0fdf4; border-color:#bbf7d0; color:#15803d; font-weight:800;">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                        핸드폰 문자로 전송
-                    </button>
-
-                    <!-- 번호 간편 복사 버튼 -->
-                    <button class="btn-sub" onclick="copyNumbers()">
+                    <!-- 복사하기 -->
+                    <button class="btn-sub" onclick="copyNumbers()" style="background:#ffffff; border-color:#cbd5e1; color:#0f172a; font-weight:800;">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        텍스트 전체 복사
+                        복사하기
                     </button>
+                </div>
 
-                    <!-- 동행복권 QR 당첨 확인 버튼 -->
-                    <button class="btn-sub" onclick="window.open('https://m.dhlottery.co.kr/qr.do?method=checkNumber', '_blank')">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><rect x="7" y="7" width="10" height="10"></rect></svg>
-                        동행복권 QR 확인
-                    </button>
+                <div style="margin-top: 8px;">
+                    <!-- 동행복권 공식 당첨결과 및 QR 확인 -->
+                    <a href="https://dhlottery.co.kr/gameResult.do?method=byWin" target="_blank" rel="noopener noreferrer" class="btn-sub" style="width:100%; text-decoration:none; background:#f8fafc; border-color:#e2e8f0; color:#475569; font-weight:700;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        동행복권 공식 당첨결과·QR 확인 ➔
+                    </a>
                 </div>
 
                 <!-- Color Ball Legend -->
@@ -808,8 +804,19 @@
                     copyTextToClipboard(txt, "카카오톡 전송용 번호가 복사되었습니다!\n카카오톡 대화방에 [붙여넣기(Ctrl+V)]하여 전송해 보세요. 💬");
                 });
             } else {
-                // PC 브라우저: 클립보드 복사
-                copyTextToClipboard(txt, "카카오톡 전송용 번호와 행운 문구가 복사되었습니다!\n카카오톡 대화방에 [붙여넣기(Ctrl+V)]하여 친구나 가족에게 바로 보내보세요. 💬");
+                // PC 브라우저: 클립보드 복사 후 카카오톡 PC 앱 자동 실행
+                copyTextToClipboard(txt, "카카오톡 PC 앱을 실행하고 번호를 복사했습니다!\n대화방에서 [Ctrl + V]를 누르면 번호가 바로 전송됩니다. 💬");
+
+                try {
+                    const kakaoLink = document.createElement('a');
+                    kakaoLink.href = 'kakaotalk://';
+                    kakaoLink.target = '_top';
+                    document.body.appendChild(kakaoLink);
+                    kakaoLink.click();
+                    setTimeout(() => document.body.removeChild(kakaoLink), 200);
+                } catch (e) {
+                    // Ignore protocol error
+                }
             }
         }
 
