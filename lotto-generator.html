@@ -400,6 +400,14 @@
             <span class="badge-pill">🍀 인생 대박 기원 맞춤 추첨</span>
             <h1 class="app-title">스마트 로또 6/45 번호 생성기</h1>
             <p class="app-subtitle">생년월일·이름·커플 궁합·연락처 수비학 분석을 통한 나만의 맞춤형 행운 번호 추출</p>
+            <div style="display:flex; justify-content:center; gap:8px; margin-top:12px;">
+                <button onclick="bookmarkPage()" style="padding:5px 13px; font-size:12px; font-weight:700; color:#475569; background:#ffffff; border:1px solid #cbd5e1; border-radius:999px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(0,0,0,0.04); transition:all 0.15s ease;">
+                    ⭐ 즐겨찾기 추가 (Ctrl+D)
+                </button>
+                <button onclick="copyPageUrl()" style="padding:5px 13px; font-size:12px; font-weight:700; color:#2563eb; background:#eff6ff; border:1px solid #bfdbfe; border-radius:999px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(37,99,235,0.08); transition:all 0.15s ease;">
+                    🔗 사이트 링크 복사
+                </button>
+            </div>
         </div>
 
         <!-- Mode Navigation -->
@@ -835,6 +843,17 @@
                     // Ignore protocol error
                 }
             }
+        }
+
+        // 2-1. 사이트 링크 복사
+        function copyPageUrl() {
+            const url = "https://barcode128.mycafe24.com/lotto-generator/";
+            copyTextToClipboard(url, "로또 생성기 링크가 복사되었습니다!\n단톡방이나 SNS에 붙여넣어 친구들과 행운을 나눠보세요 🍀");
+        }
+
+        // 2-2. 즐겨찾기 추가 안내
+        function bookmarkPage() {
+            alert("키보드의 [Ctrl + D] (Mac은 Cmd + D)를 누르시면 즐겨찾기에 등록됩니다!\n매주 로또 살 때 편리하게 이용해 보세요 🌟");
         }
 
         // 3. 스마트폰 문자(SMS) 바로 전송
