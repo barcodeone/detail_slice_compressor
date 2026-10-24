@@ -51,7 +51,7 @@ SLIM_HEADER_CSS = """
     margin-right: 6px;
     font-size: 13px;
 }
-.main-navigation .main-nav ul li:last-child a::before {
+.main-navigation .main-nav ul li:nth-child(2) a::before {
     content: "🍀";
     margin-right: 6px;
     font-size: 13px;
@@ -62,6 +62,36 @@ SLIM_HEADER_CSS = """
     border-color: #2563eb !important;
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
     transform: translateY(-1px) !important;
+}
+
+/* 3번째 메뉴: 방문자 카운터 뱃지 스타일 */
+.main-navigation .main-nav ul li:nth-child(3) a {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 6px 14px !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    cursor: default !important;
+    pointer-events: none !important;
+}
+.main-navigation .main-nav ul li:nth-child(3) a::before {
+    content: "●";
+    color: #10b981;
+    margin-right: 6px;
+    font-size: 10px;
+    animation: livePulse 1.8s infinite;
+}
+.main-navigation .main-nav ul li:nth-child(3) a:hover {
+    color: #475569 !important;
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 .separate-containers .site-main { margin-top: 8px !important; }
 .separate-containers .inside-article { padding: 0 !important; background: transparent !important; box-shadow: none !important; border: none !important; }

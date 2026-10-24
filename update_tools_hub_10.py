@@ -67,7 +67,7 @@ html_raw = """
     margin-right: 6px;
     font-size: 13px;
 }
-.main-navigation .main-nav ul li:last-child a::before {
+.main-navigation .main-nav ul li:nth-child(2) a::before {
     content: "🍀";
     margin-right: 6px;
     font-size: 13px;
@@ -78,6 +78,36 @@ html_raw = """
     border-color: #2563eb !important;
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
     transform: translateY(-1px) !important;
+}
+
+/* 3번째 메뉴: 방문자 카운터 뱃지 스타일 */
+.main-navigation .main-nav ul li:nth-child(3) a {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 6px 14px !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    cursor: default !important;
+    pointer-events: none !important;
+}
+.main-navigation .main-nav ul li:nth-child(3) a::before {
+    content: "●";
+    color: #10b981;
+    margin-right: 6px;
+    font-size: 10px;
+    animation: livePulse 1.8s infinite;
+}
+.main-navigation .main-nav ul li:nth-child(3) a:hover {
+    color: #475569 !important;
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 .separate-containers .site-main {
     margin-top: 8px !important;
@@ -267,6 +297,14 @@ html_raw = """
         <span class="hub-pill">⚡ 100% 무료 · 무설치 · 클라이언트 사이드</span>
         <h1 class="hub-title">이커머스 셀러 필수 업무 도구 모음</h1>
         <p class="hub-subtitle">스마트스토어, 쿠팡 등 오픈마켓 판매자의 업무 시간을 획기적으로 줄여주는 10대 핵심 유틸리티입니다.</p>
+        <div style="display:flex; justify-content:center; gap:8px; margin-top:14px;">
+            <span style="padding:6px 14px; font-size:12px; font-weight:700; color:#475569; background:#ffffff; border:1px solid #cbd5e1; border-radius:999px; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                ⭐ 즐겨찾기 등록 (Ctrl + D)
+            </span>
+            <a href="https://barcode128.mycafe24.com/tools/" style="padding:6px 14px; font-size:12px; font-weight:700; color:#2563eb; background:#eff6ff; border:1px solid #bfdbfe; border-radius:999px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(37,99,235,0.08);">
+                🔗 tools 링크 공유
+            </a>
+        </div>
     </div>
 
     <!-- Quick List (1줄 빠른 링크) -->
@@ -509,6 +547,35 @@ html_raw = """
             <a href="/gif-maker/" class="tool-go-btn">도구 실행하기 ➔</a>
         </div>
 
+    </div>
+
+    <!-- 검색엔진 최적화(SEO) 가이드 및 FAQ 아코디언 -->
+    <div style="margin-top:50px; background:#ffffff; border:1px solid #e2e8f0; border-radius:24px; padding:36px; box-shadow:0 4px 16px rgba(0,0,0,0.02);">
+        <div style="margin-bottom:24px; border-bottom:1px solid #f1f5f9; padding-bottom:16px;">
+            <span style="font-size:12px; font-weight:800; color:#2563eb; text-transform:uppercase; letter-spacing:0.5px;">SELLER GUIDE &amp; FAQ</span>
+            <h2 style="font-size:22px; font-weight:900; color:#0f172a; margin:6px 0 8px 0; line-height:1.35;">📦 이커머스 셀러 필수 업무 도구 100% 활용 가이드</h2>
+            <p style="font-size:13.5px; color:#64748b; margin:0; line-height:1.6;">스마트스토어, 쿠팡, 11번가, G마켓 등 오픈마켓 판매자들을 위한 무설치 무료 업무 자동화 솔루션 안내입니다.</p>
+        </div>
+
+        <div style="color:#334155; font-size:14.5px; line-height:1.75;">
+            <h3 style="font-size:16.5px; font-weight:800; color:#0f172a; margin:22px 0 8px 0;">⚡ 1. 서버 전송 없는 100% 안전한 클라이언트 사이드 연산</h3>
+            <p style="margin:0 0 14px 0;">본 도구 모음의 모든 기능(상세페이지 분할, 썸네일 누끼, 바코드 생성, 마진 계산 등)은 사용자의 웹브라우저 메모리 안에서만 처리됩니다. 업로드한 상품 이미지나 매출 데이터가 외부 서버로 전송되거나 저장되지 않으므로, 유출 걱정 없이 안전하게 이용하실 수 있습니다.</p>
+
+            <h3 style="font-size:16.5px; font-weight:800; color:#0f172a; margin:22px 0 8px 0;">🚀 2. 상품 등록 시간 80% 단축과 마진 극대화</h3>
+            <p style="margin:0 0 14px 0;">포토샵 없이도 긴 상세페이지를 슬라이스 단위로 자동 분할하고 WebP 압축하여 로딩 속도를 최적화합니다. 또한 복잡한 마켓 수수료와 부가세, 배송비를 1초 만에 자동 계산하여 역마진을 방지합니다.</p>
+
+            <h3 style="font-size:16.5px; font-weight:800; color:#0f172a; margin:26px 0 12px 0;">❓ 자주 묻는 질문 (FAQ)</h3>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <details style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px 18px; cursor:pointer;" open>
+                    <summary style="font-size:14px; font-weight:800; color:#0f172a; outline:none;">Q. 이용료나 설치 프로그램이 필요한가요?</summary>
+                    <p style="font-size:13px; color:#475569; margin:8px 0 0 0; line-height:1.6;">별도의 회원가입, 로그인, 프로그램 설치 없이 웹브라우저에서 100% 무료로 즉시 실행하실 수 있습니다.</p>
+                </details>
+                <details style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px 18px; cursor:pointer;">
+                    <summary style="font-size:14px; font-weight:800; color:#0f172a; outline:none;">Q. 생성된 바코드나 이미지 규격이 네이버·쿠팡에 호환되나요?</summary>
+                    <p style="font-size:13px; color:#475569; margin:8px 0 0 0; line-height:1.6;">네, 스마트스토어 1000x1000 썸네일 규격과 표준 Code 128 바코드, 고품질 WebP/JPG 규격을 완벽히 준수합니다.</p>
+                </details>
+            </div>
+        </div>
     </div>
 </div>
 """
