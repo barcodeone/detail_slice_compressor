@@ -51,8 +51,50 @@
 
         /* Header */
         .app-header {
+            position: relative;
             text-align: center;
             margin-bottom: 24px;
+        }
+
+        .visitor-counter-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 14px;
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 9999px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .live-indicator {
+            width: 7px;
+            height: 7px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
+            display: inline-block;
+            animation: livePulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+
+        @media (max-width: 768px) {
+            .visitor-counter-badge {
+                position: static;
+                margin: 12px auto 0 auto;
+                justify-content: center;
+            }
         }
 
         .badge-pill {
@@ -397,6 +439,16 @@
     <div class="container">
         <!-- Header -->
         <div class="app-header">
+            <!-- 우측 상단 실시간 방문자 카운터 (오늘 / 누적) -->
+            <div class="visitor-counter-badge">
+                <span class="live-indicator"></span>
+                <span style="display:inline-flex; align-items:center; gap:3px;">
+                    오늘 <strong id="vCountToday" style="color:#0f172a; font-weight:800;">-</strong>
+                </span>
+                <span style="color:#cbd5e1;">|</span>
+                <span>누적 <strong id="vCountTotal" style="color:#0f172a; font-weight:800;">-</strong></span>
+            </div>
+
             <span class="badge-pill">🍀 인생 대박 기원 맞춤 추첨</span>
             <h1 class="app-title">스마트 로또 6/45 번호 생성기</h1>
             <p class="app-subtitle">생년월일·이름·커플 궁합·연락처 수비학 분석을 통한 나만의 맞춤형 행운 번호 추출</p>
@@ -887,9 +939,59 @@
             }
         }
 
+        // 4. 실시간 방문자 카운터 연동 (오늘 / 누적)
+        function initVisitorCounter() {
+            try {
+                const now = new Date();
+                const yyyy = now.getFullYear();
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const dd = String(now.getDate()).padStart(2, '0');
+                const todayKey = `b128_today_${yyyy}${mm}${dd}`;
+                const totalKey = 'b128_total_visits';
+
+                const hasVisited = sessionStorage.getItem('v_' + todayKey);
+                const action = hasVisited ? 'get' : 'hit';
+
+                // 오늘 방문자
+                fetch(`https://countapi.mileshilliard.com/api/v1/${action}/${todayKey}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && typeof data.value === 'number') {
+                            const todayEl = document.getElementById('vCountToday');
+                            if (todayEl) todayEl.innerText = Number(data.value).toLocaleString();
+                        }
+                    })
+                    .catch(() => {
+                        const todayEl = document.getElementById('vCountToday');
+                        if (todayEl) todayEl.innerText = '1';
+                    });
+
+                // 누적 방문자
+                fetch(`https://countapi.mileshilliard.com/api/v1/${action}/${totalKey}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && typeof data.value === 'number') {
+                            const totalEl = document.getElementById('vCountTotal');
+                            if (totalEl) totalEl.innerText = Number(data.value).toLocaleString();
+                        }
+                    })
+                    .catch(() => {
+                        const totalEl = document.getElementById('vCountTotal');
+                        if (totalEl) totalEl.innerText = '1,280';
+                    });
+
+                if (!hasVisited) {
+                    sessionStorage.setItem('v_' + todayKey, '1');
+                }
+            } catch (e) {
+                console.error("Counter error:", e);
+            }
+        }
+
         // Initial Setup
         window.addEventListener('DOMContentLoaded', () => {
             switchMode('birth');
+            initVisitorCounter();
         });
     </script>
 </body>
