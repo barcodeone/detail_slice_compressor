@@ -689,9 +689,18 @@
             </div>
         </div>
 
+        <!-- 1일 단위 결과 텍스트 박스 (복사용) -->
+        <div class="card" style="padding:18px; margin-bottom:20px;" id="resultTextBoxCard">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div style="font-size:14px; font-weight:800; color:var(--slate-900);" id="resultTextCardTitle">📝 1일 단위 결과 텍스트 (복사용)</div>
+                <button type="button" class="action-btn btn-copy" style="height:32px; padding:0 14px; font-size:12px; width:auto;" onclick="copyResults()">📋 텍스트 복사</button>
+            </div>
+            <textarea id="dailyResultTextArea" readonly style="width:100%; height:190px; padding:12px; font-size:12px; font-family:'Pretendard', monospace, sans-serif; line-height:1.6; border:1.5px solid var(--slate-200); border-radius:10px; background:var(--slate-50); color:var(--slate-800); resize:vertical; outline:none; white-space:pre; box-sizing:border-box;"></textarea>
+        </div>
+
         <!-- 하단 액션 버튼 -->
         <div class="action-row">
-            <button class="action-btn btn-copy" onclick="copyResults()">📋 결과 텍스트 복사</button>
+            <button class="action-btn btn-copy" onclick="copyResults()">📋 전체 결과 텍스트 복사</button>
             <button class="action-btn btn-reset" onclick="scrollToTopForm()">🔄 조건 변경하기</button>
         </div>
     </div>
@@ -882,52 +891,50 @@
         let currentBalance = init;
         let cumulativePrincipal = init;
         let simpleGrossProfit = 0;
+        let textBreakdownList = [];
 
         if (compType === 'daily') {
-            // === 일복리 (일단위 수익률 & 일단위 복리) ===
+            // === 일복리 (일단위 수익률 & 100% 1일 단위 출력) ===
             const r_daily = rate / 100; // 하루 수익률
             const steps = totalDays;
-
-            let sampleInterval = 1;
-            if (steps > 180) {
-                sampleInterval = 30; // 30일 간격
-            } else if (steps > 60) {
-                sampleInterval = 10; // 10일 간격
-            } else if (steps > 31) {
-                sampleInterval = 5;  // 5일 간격
-            } else {
-                sampleInterval = 1;  // 1일 간격 (31일 이하는 매일 출력)
-            }
-
             let prevNetProfit = 0;
+
+            // 차트 가독성을 위한 샘플링 주기 (차트만 40개 내외로 샘플링)
+            const chartInterval = steps <= 40 ? 1 : Math.ceil(steps / 40);
 
             for (let day = 1; day <= steps; day++) {
                 currentBalance = (currentBalance + deposit) * (1 + r_daily);
                 cumulativePrincipal += deposit;
 
-                if (day % sampleInterval === 0 || day === steps) {
-                    const grossProfitSoFar = Math.max(0, currentBalance - cumulativePrincipal);
-                    const netProfitSoFar = applyTax ? grossProfitSoFar * (1 - taxRate) : grossProfitSoFar;
-                    const finalBalanceStep = cumulativePrincipal + netProfitSoFar;
-                    const stepProfit = netProfitSoFar - prevNetProfit;
-                    prevNetProfit = netProfitSoFar;
-                    const roiStep = cumulativePrincipal > 0 ? ((netProfitSoFar / cumulativePrincipal) * 100).toFixed(1) : 0;
+                const grossProfitSoFar = Math.max(0, currentBalance - cumulativePrincipal);
+                const netProfitSoFar = applyTax ? grossProfitSoFar * (1 - taxRate) : grossProfitSoFar;
+                const finalBalanceStep = cumulativePrincipal + netProfitSoFar;
+                const stepProfit = netProfitSoFar - prevNetProfit;
+                prevNetProfit = netProfitSoFar;
+                const roiStep = cumulativePrincipal > 0 ? ((netProfitSoFar / cumulativePrincipal) * 100).toFixed(1) : 0;
 
-                    const label = `${day}일차`;
+                const label = `${day}일차`;
+
+                // 1일 단위 결과 텍스트 라인 생성
+                textBreakdownList.push(`${label}: ${formatNumber(finalBalanceStep)}원 (당기 +${formatNumber(stepProfit)}원 | 누적 +${formatNumber(netProfitSoFar)}원 | +${roiStep}%)`);
+
+                // 테이블은 1일 단위로 매일 전부 출력!
+                tableRowsHtml += `
+                    <tr>
+                        <td>${label}</td>
+                        <td>${formatNumber(cumulativePrincipal)}원</td>
+                        <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(stepProfit)}원</td>
+                        <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(netProfitSoFar)}원</td>
+                        <td style="font-weight:800; color:var(--primary);">${formatNumber(finalBalanceStep)}원</td>
+                        <td>+${roiStep}%</td>
+                    </tr>
+                `;
+
+                // 차트 데이터 추가
+                if (day % chartInterval === 0 || day === steps) {
                     chartLabels.push(label);
                     principalData.push(Math.round(cumulativePrincipal));
                     profitData.push(Math.round(netProfitSoFar));
-
-                    tableRowsHtml += `
-                        <tr>
-                            <td>${label}</td>
-                            <td>${formatNumber(cumulativePrincipal)}원</td>
-                            <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(stepProfit)}원</td>
-                            <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(netProfitSoFar)}원</td>
-                            <td style="font-weight:800; color:var(--primary);">${formatNumber(finalBalanceStep)}원</td>
-                            <td>+${roiStep}%</td>
-                        </tr>
-                    `;
                 }
             }
 
@@ -953,6 +960,8 @@
                 const roiStep = cumulativePrincipal > 0 ? ((netProfitSoFar / cumulativePrincipal) * 100).toFixed(1) : 0;
 
                 const label = `${y}년차`;
+                textBreakdownList.push(`${label}: ${formatNumber(finalBalanceStep)}원 (당기 +${formatNumber(stepProfit)}원 | 누적 +${formatNumber(netProfitSoFar)}원 | +${roiStep}%)`);
+
                 chartLabels.push(label);
                 principalData.push(Math.round(cumulativePrincipal));
                 profitData.push(Math.round(netProfitSoFar));
@@ -983,22 +992,25 @@
                 currentBalance = (currentBalance + deposit) * (1 + r_monthly);
                 cumulativePrincipal += deposit;
 
-                if (m % sampleInterval === 0 || m === steps) {
-                    const grossProfitSoFar = Math.max(0, currentBalance - cumulativePrincipal);
-                    const netProfitSoFar = applyTax ? grossProfitSoFar * (1 - taxRate) : grossProfitSoFar;
-                    const finalBalanceStep = cumulativePrincipal + netProfitSoFar;
-                    const stepProfit = netProfitSoFar - prevNetProfit;
-                    prevNetProfit = netProfitSoFar;
-                    const roiStep = cumulativePrincipal > 0 ? ((netProfitSoFar / cumulativePrincipal) * 100).toFixed(1) : 0;
+                const grossProfitSoFar = Math.max(0, currentBalance - cumulativePrincipal);
+                const netProfitSoFar = applyTax ? grossProfitSoFar * (1 - taxRate) : grossProfitSoFar;
+                const finalBalanceStep = cumulativePrincipal + netProfitSoFar;
+                const stepProfit = netProfitSoFar - prevNetProfit;
+                prevNetProfit = netProfitSoFar;
+                const roiStep = cumulativePrincipal > 0 ? ((netProfitSoFar / cumulativePrincipal) * 100).toFixed(1) : 0;
 
-                    const label = (sampleInterval === 1) ? `${m}개월차` : `${Math.round(m / 12)}년차`;
-                    chartLabels.push(label);
+                const label = `${m}개월차`;
+                textBreakdownList.push(`${label}: ${formatNumber(finalBalanceStep)}원 (당기 +${formatNumber(stepProfit)}원 | 누적 +${formatNumber(netProfitSoFar)}원 | +${roiStep}%)`);
+
+                if (m % sampleInterval === 0 || m === steps) {
+                    const chartLabel = (sampleInterval === 1) ? `${m}개월차` : `${Math.round(m / 12)}년차`;
+                    chartLabels.push(chartLabel);
                     principalData.push(Math.round(cumulativePrincipal));
                     profitData.push(Math.round(netProfitSoFar));
 
                     tableRowsHtml += `
                         <tr>
-                            <td>${label}</td>
+                            <td>${chartLabel}</td>
                             <td>${formatNumber(cumulativePrincipal)}원</td>
                             <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(stepProfit)}원</td>
                             <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(netProfitSoFar)}원</td>
@@ -1073,6 +1085,31 @@
 
         document.getElementById('timelineTbody').innerHTML = tableRowsHtml;
 
+        // 1일 단위 결과 텍스트 박스 내용 구성
+        const sectionTitle = compType === 'daily' ? '1일 단위 일자별 수익 내역' : compType === 'monthly' ? '월별 상세 내역' : '연도별 상세 내역';
+        const fullResultText = `[복리 계산 결과 요약]\n` +
+            `- 복리 주기 및 수익률: ${compBadgeStr}\n` +
+            `- 투자 기간: ${periodStr}\n` +
+            `- 초기 투자 원금: ${formatNumber(init)}원\n` +
+            (deposit > 0 ? `- 정기 적립액: ${formatNumber(deposit)}원\n` : '') +
+            `- 총 납입 원금: ${formatNumber(finalPrincipal)}원\n` +
+            `- ${applyTax ? '세후 순수익' : '총 복리 수익'}: +${formatNumber(finalNetProfit)}원 (+${finalRoi}%)\n` +
+            `- 단리 대비 복리효과: +${formatNumber(compoundBonus)}원\n` +
+            `- 세금 공제: ${applyTax ? `-${formatNumber(finalTax)}원 (15.4%)` : '0원 (비과세/세전)'}\n` +
+            `- 만기 최종 자산: ${formatNumber(finalTotal)}원\n\n` +
+            `[${sectionTitle}]\n` +
+            textBreakdownList.join('\n') +
+            `\n\n📌 출처: Barcode128 복리 계산기 (https://barcode128.mycafe24.com/compound-calculator/)`;
+
+        document.getElementById('dailyResultTextArea').value = fullResultText;
+        if (compType === 'daily') {
+            document.getElementById('resultTextCardTitle').textContent = '📝 1일 단위 결과 텍스트 (복사용)';
+        } else if (compType === 'monthly') {
+            document.getElementById('resultTextCardTitle').textContent = '📝 월별 결과 텍스트 (복사용)';
+        } else {
+            document.getElementById('resultTextCardTitle').textContent = '📝 연도별 결과 텍스트 (복사용)';
+        }
+
         // 차트 렌더링
         const profitLegend = applyTax ? '세후 복리수익' : '복리 수익';
         renderChart(chartLabels, principalData, profitData, profitLegend);
@@ -1146,28 +1183,22 @@
     }
 
     function copyResults() {
-        const finalTotal = document.getElementById('finalTotalDisplay').textContent;
-        const roi = document.getElementById('heroRoiDisplay').textContent;
-        const principal = document.getElementById('totalPrincipalDisplay').textContent;
-        const profit = document.getElementById('netProfitDisplay').textContent;
-        const period = document.getElementById('heroPeriodDisplay').textContent;
-        const comp = document.getElementById('heroCompDisplay').textContent;
-        const applyTax = document.getElementById('applyTaxCheckbox').checked;
-        const taxVal = document.getElementById('taxDisplay').textContent;
+        const textarea = document.getElementById('dailyResultTextArea');
+        const text = textarea ? textarea.value : '';
+        if (!text) return;
 
-        const text = `[복리 계산 결과 요약]\n` +
-                     `- 복리 주기 및 수익률: ${comp}\n` +
-                     `- 투자 기간: ${period}\n` +
-                     `- 총 납입 원금: ${principal}\n` +
-                     `- ${applyTax ? '세후 순수익' : '총 복리 수익'}: ${profit} (${roi})\n` +
-                     `- 공제 세금: ${taxVal}\n` +
-                     `- 만기 최종 금액: ${finalTotal}\n` +
-                     `📌 출처: Barcode128 복리 계산기 (https://barcode128.mycafe24.com/compound-calculator/)`;
+        const compType = document.getElementById('compoundTypeVal').value;
+        const msg = compType === 'daily' 
+            ? '📋 1일 단위 결과 텍스트가 클립보드에 복사되었습니다!' 
+            : '📋 결과 텍스트가 클립보드에 복사되었습니다!';
 
         navigator.clipboard.writeText(text).then(() => {
-            showToast('📋 결과 요약이 클립보드에 복사되었습니다!');
+            showToast(msg);
         }).catch(() => {
-            showToast('복사에 실패했습니다.');
+            // fallback: select textarea
+            textarea.select();
+            document.execCommand('copy');
+            showToast(msg);
         });
     }
 
