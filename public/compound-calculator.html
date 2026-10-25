@@ -216,6 +216,61 @@
             border-color: var(--primary);
         }
 
+        /* Tax Option Box (기본 미적용 / 비과세) */
+        .tax-option-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .tax-option-box:hover {
+            background: #ffffff;
+            border-color: var(--primary-light);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .tax-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--slate-700);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tax-checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .tax-status-badge {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--slate-500);
+            background: #ffffff;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            border: 1px solid var(--slate-200);
+            transition: all 0.15s ease;
+        }
+
+        .tax-status-badge.active {
+            color: var(--rose-600);
+            border-color: #fecdd3;
+            background: #fff1f2;
+        }
+
         /* Big Submit Button */
         .submit-btn {
             width: 100%;
@@ -534,16 +589,25 @@
             </div>
         </div>
 
-        <!-- 5) 이자율 (연 수익률) -->
+        <!-- 5) 이자율 (수익률) -->
         <div class="form-group">
             <div class="form-label-row">
-                <label class="form-label" for="annualRate">5. 연 이자율 (수익률)</label>
+                <label class="form-label" for="annualRate" id="rateLabel">5. 연 이자율 (수익률)</label>
                 <span class="form-hint" id="annualRateKo">연 7.0%</span>
             </div>
             <div class="input-group">
                 <input type="number" id="annualRate" class="form-input" value="7.0" step="0.1" min="0" max="1000" oninput="updateRateHint()">
-                <span class="input-unit">%</span>
+                <span class="input-unit" id="rateUnitText">%</span>
             </div>
+        </div>
+
+        <!-- 세금 옵션 (기본 미적용 / 비과세) -->
+        <div class="tax-option-box" onclick="toggleTaxOptionBox(event)">
+            <label class="tax-checkbox-label" onclick="event.stopPropagation()">
+                <input type="checkbox" id="applyTaxCheckbox" onchange="updateTaxOptionUI()">
+                <span>이자소득세(15.4%) 공제 반영하기</span>
+            </label>
+            <span class="tax-status-badge" id="taxStatusBadge">기본: 비과세/세전</span>
         </div>
 
         <!-- 계산하기 큰 버튼만 표시 -->
@@ -556,7 +620,7 @@
     <div id="resultSection">
         <!-- Hero Box -->
         <div class="hero-result">
-            <div class="hero-label">만기 예상 최종 자산 (원금 + 세후 수익)</div>
+            <div class="hero-label" id="heroLabel">만기 예상 최종 자산 (원금 + 총 수익)</div>
             <div class="hero-value" id="finalTotalDisplay">0원</div>
             <div class="hero-meta-row">
                 <span class="hero-meta-badge" id="heroPeriodDisplay">10년 (120개월)</span>
@@ -572,7 +636,7 @@
                 <div class="stat-val" id="totalPrincipalDisplay">0원</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">세후 순수익 (복리 이자)</div>
+                <div class="stat-label" id="netProfitLabel">총 복리 수익 (이자)</div>
                 <div class="stat-val profit" id="netProfitDisplay">+0원</div>
             </div>
             <div class="stat-card">
@@ -580,8 +644,8 @@
                 <div class="stat-val bonus" id="compoundBonusDisplay">+0원</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">이자소득세 (15.4% 기본)</div>
-                <div class="stat-val tax" id="taxDisplay">-0원</div>
+                <div class="stat-label" id="taxCardLabel">공제 세금 (옵션 미적용)</div>
+                <div class="stat-val tax" id="taxDisplay">0원 (미적용)</div>
             </div>
         </div>
 
@@ -595,7 +659,7 @@
         <div class="chart-card">
             <div class="chart-title">
                 <span>📊 자산 성장 추이 그래프</span>
-                <span style="font-size:12px; color:var(--slate-500); font-weight:600;">(납입 원금 vs 복리 이자)</span>
+                <span style="font-size:12px; color:var(--slate-500); font-weight:600;" id="chartSubLabel">(납입 원금 vs 복리 수익)</span>
             </div>
             <div style="position:relative; height:240px;">
                 <canvas id="growthChart"></canvas>
@@ -606,7 +670,7 @@
         <div class="card" style="padding:18px; margin-bottom:20px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <div style="font-size:14px; font-weight:800; color:var(--slate-900);">📅 기간별 자산 성장 상세표</div>
-                <span style="font-size:11.5px; color:var(--slate-500);">(세후 기준)</span>
+                <span style="font-size:11.5px; color:var(--slate-500);" id="tableTaxHint">(세전 / 비과세 기준)</span>
             </div>
             <div class="table-wrap">
                 <table>
@@ -614,8 +678,8 @@
                         <tr>
                             <th>회차</th>
                             <th>누적 납입 원금</th>
-                            <th>당기 이자</th>
-                            <th>누적 순수익</th>
+                            <th id="thStepProfit">당기 수익</th>
+                            <th id="thCumulProfit">누적 수익</th>
                             <th>최종 자산</th>
                             <th>수익률</th>
                         </tr>
@@ -670,7 +734,17 @@
 
     function updateRateHint() {
         const rate = parseFloat(document.getElementById('annualRate').value) || 0;
-        document.getElementById('annualRateKo').textContent = `연 ${rate.toFixed(1)}%`;
+        const compType = document.getElementById('compoundTypeVal').value;
+        const koEl = document.getElementById('annualRateKo');
+
+        if (compType === 'daily') {
+            const compounding30 = ((Math.pow(1 + rate / 100, 30) - 1) * 100).toFixed(1);
+            koEl.textContent = `일 ${rate.toFixed(1)}% (30일 복리 시 약 +${compounding30}%)`;
+        } else if (compType === 'monthly') {
+            koEl.textContent = `연 ${rate.toFixed(1)}% (월 약 ${(rate / 12).toFixed(2)}%)`;
+        } else {
+            koEl.textContent = `연 ${rate.toFixed(1)}%`;
+        }
     }
 
     function updatePeriodHint() {
@@ -684,28 +758,90 @@
             const y = (val / 12).toFixed(1);
             koEl.textContent = `${val}개월 (약 ${y}년)`;
         } else {
-            const y = (val / 365).toFixed(1);
-            koEl.textContent = `${val}일 (약 ${y}년)`;
+            const m = (val / 30.416).toFixed(1);
+            koEl.textContent = `${val}일 (약 ${m}개월)`;
         }
     }
 
-    // 복리 주기 세그먼트 버튼 선택
+    // 복리 주기 세그먼트 버튼 선택 (일복리 / 월복리 / 연복리)
     function setCompType(type) {
         document.getElementById('compoundTypeVal').value = type;
-        
         document.querySelectorAll('.compound-opt-btn').forEach(btn => btn.classList.remove('active'));
+
+        const rateInput = document.getElementById('annualRate');
+        const rateLabel = document.getElementById('rateLabel');
+        const rateUnitText = document.getElementById('rateUnitText');
+        const depositLabel = document.getElementById('depositLabel');
+        const compBadgeHint = document.getElementById('compBadgeHint');
+        const periodUnit = document.getElementById('periodUnit');
+        const periodInput = document.getElementById('periodInput');
+
         if (type === 'daily') {
             document.getElementById('btnCompDaily').classList.add('active');
-            document.getElementById('compBadgeHint').textContent = '매일 복리 적용 (365일)';
-            document.getElementById('depositLabel').textContent = '3. 정기 적립액 (월 또는 주기)';
+            compBadgeHint.textContent = '⚡ 일단위 복리 연산 (목표 일수익률)';
+            depositLabel.textContent = '3. 정기 적립액 (매일, 거치식은 0원)';
+            rateLabel.textContent = '5. 목표 일 수익률 (일이자율)';
+            rateUnitText.textContent = '% / 일';
+
+            // 일복리로 전환 시 사용하기 편하도록 스마트 값 조정 (7.0 등 연이율이었으면 1.0으로 추천)
+            if (parseFloat(rateInput.value) === 7 || parseFloat(rateInput.value) > 20) {
+                rateInput.value = '1.0';
+            }
+            if (periodUnit.value === 'year') {
+                periodUnit.value = 'day';
+                periodInput.value = '30';
+            }
         } else if (type === 'yearly') {
             document.getElementById('btnCompYearly').classList.add('active');
-            document.getElementById('compBadgeHint').textContent = '매년 복리 적용';
-            document.getElementById('depositLabel').textContent = '3. 정기 적립액 (매년 합산)';
+            compBadgeHint.textContent = '📅 연간 복리 적용';
+            depositLabel.textContent = '3. 정기 적립액 (매년 합산)';
+            rateLabel.textContent = '5. 연 이자율 (수익률)';
+            rateUnitText.textContent = '%';
+
+            if (parseFloat(rateInput.value) <= 1) {
+                rateInput.value = '7.0';
+            }
+            if (periodUnit.value === 'day') {
+                periodUnit.value = 'year';
+                periodInput.value = '10';
+            }
         } else {
+            // monthly (기본)
             document.getElementById('btnCompMonthly').classList.add('active');
-            document.getElementById('compBadgeHint').textContent = '매월 복리 적용 (추천)';
-            document.getElementById('depositLabel').textContent = '3. 정기 적립액 (매월)';
+            compBadgeHint.textContent = '✨ 매월 복리 적용 (추천)';
+            depositLabel.textContent = '3. 정기 적립액 (매월)';
+            rateLabel.textContent = '5. 연 이자율 (수익률)';
+            rateUnitText.textContent = '%';
+
+            if (parseFloat(rateInput.value) <= 1) {
+                rateInput.value = '7.0';
+            }
+            if (periodUnit.value === 'day') {
+                periodUnit.value = 'year';
+                periodInput.value = '10';
+            }
+        }
+
+        updateRateHint();
+        updatePeriodHint();
+    }
+
+    // 세금 옵션 토글 및 UI 갱신 (기본: 비과세/세전)
+    function toggleTaxOptionBox(e) {
+        const cb = document.getElementById('applyTaxCheckbox');
+        cb.checked = !cb.checked;
+        updateTaxOptionUI();
+    }
+
+    function updateTaxOptionUI() {
+        const cb = document.getElementById('applyTaxCheckbox');
+        const badge = document.getElementById('taxStatusBadge');
+        if (cb.checked) {
+            badge.textContent = '이자소득세 15.4% 공제 반영';
+            badge.classList.add('active');
+        } else {
+            badge.textContent = '기본: 비과세/세전';
+            badge.classList.remove('active');
         }
     }
 
@@ -715,33 +851,28 @@
         const deposit = parseNum(document.getElementById('monthlyAmount').value);
         const periodVal = Math.max(1, parseInt(document.getElementById('periodInput').value) || 1);
         const periodUnit = document.getElementById('periodUnit').value;
-        const annualRate = Math.max(0, parseFloat(document.getElementById('annualRate').value) || 0);
+        const rate = Math.max(0, parseFloat(document.getElementById('annualRate').value) || 0);
         const compType = document.getElementById('compoundTypeVal').value;
-        const taxRate = 0.154; // 기본 이자소득세 15.4%
+        const applyTax = document.getElementById('applyTaxCheckbox').checked;
+        const taxRate = applyTax ? 0.154 : 0;
 
-        // 환산: 총 일수, 총 개월수, 총 년수
-        let totalYears = 0;
-        let totalMonths = 0;
         let totalDays = 0;
+        let totalMonths = 0;
+        let totalYears = 0;
 
-        if (periodUnit === 'year') {
-            totalYears = periodVal;
-            totalMonths = periodVal * 12;
-            totalDays = periodVal * 365;
-        } else if (periodUnit === 'month') {
-            totalMonths = periodVal;
-            totalYears = Math.max(1, Math.round(periodVal / 12));
-            totalDays = Math.round(periodVal * 30.416);
-        } else {
+        if (periodUnit === 'day') {
             totalDays = periodVal;
             totalMonths = Math.max(1, Math.round(periodVal / 30.416));
             totalYears = Math.max(1, Math.round(periodVal / 365));
+        } else if (periodUnit === 'month') {
+            totalMonths = periodVal;
+            totalDays = Math.round(periodVal * 30.416);
+            totalYears = Math.max(1, Math.round(periodVal / 12));
+        } else {
+            totalYears = periodVal;
+            totalMonths = periodVal * 12;
+            totalDays = periodVal * 365;
         }
-
-        // Rates
-        const r_daily = (annualRate / 100) / 365;
-        const r_monthly = (annualRate / 100) / 12;
-        const r_yearly = annualRate / 100;
 
         let chartLabels = [];
         let principalData = [];
@@ -750,114 +881,209 @@
 
         let currentBalance = init;
         let cumulativePrincipal = init;
+        let simpleGrossProfit = 0;
 
-        // 시뮬레이션 루프 (단위가 '일'이고 1년 미만인 경우 일/주 단위, 일반적인 경우 연 단위 분할)
-        const stepCount = (periodUnit === 'day' && totalDays <= 365) ? Math.min(totalDays, 12) : totalYears;
-        const daysPerStep = Math.round(totalDays / stepCount);
-        const monthsPerStep = Math.max(1, Math.round(totalMonths / stepCount));
+        if (compType === 'daily') {
+            // === 일복리 (일단위 수익률 & 일단위 복리) ===
+            const r_daily = rate / 100; // 하루 수익률
+            const steps = totalDays;
 
-        for (let s = 1; s <= stepCount; s++) {
-            let stepPrincipalAdded = 0;
-
-            if (compType === 'daily') {
-                if (periodUnit === 'day' && totalDays <= 365) {
-                    // 일 단위 집중 시뮬레이션
-                    currentBalance = currentBalance * Math.pow(1 + r_daily, daysPerStep);
-                } else {
-                    // 연/월 단위: 매월 적립금 반영 + 일복리
-                    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-                    for (let m = 0; m < 12; m++) {
-                        currentBalance = (currentBalance + deposit) * Math.pow(1 + r_daily, daysInMonth[m]);
-                        stepPrincipalAdded += deposit;
-                    }
-                }
-            } else if (compType === 'yearly') {
-                const added = deposit * 12;
-                currentBalance = (currentBalance + added) * (1 + r_yearly);
-                stepPrincipalAdded = added;
+            let sampleInterval = 1;
+            if (steps > 180) {
+                sampleInterval = 30; // 30일 간격
+            } else if (steps > 60) {
+                sampleInterval = 10; // 10일 간격
+            } else if (steps > 31) {
+                sampleInterval = 5;  // 5일 간격
             } else {
-                // monthly (기본)
-                for (let m = 1; m <= 12; m++) {
-                    currentBalance = (currentBalance + deposit) * (1 + r_monthly);
-                    stepPrincipalAdded += deposit;
+                sampleInterval = 1;  // 1일 간격 (31일 이하는 매일 출력)
+            }
+
+            let prevNetProfit = 0;
+
+            for (let day = 1; day <= steps; day++) {
+                currentBalance = (currentBalance + deposit) * (1 + r_daily);
+                cumulativePrincipal += deposit;
+
+                if (day % sampleInterval === 0 || day === steps) {
+                    const grossProfitSoFar = Math.max(0, currentBalance - cumulativePrincipal);
+                    const netProfitSoFar = applyTax ? grossProfitSoFar * (1 - taxRate) : grossProfitSoFar;
+                    const finalBalanceStep = cumulativePrincipal + netProfitSoFar;
+                    const stepProfit = netProfitSoFar - prevNetProfit;
+                    prevNetProfit = netProfitSoFar;
+                    const roiStep = cumulativePrincipal > 0 ? ((netProfitSoFar / cumulativePrincipal) * 100).toFixed(1) : 0;
+
+                    const label = `${day}일차`;
+                    chartLabels.push(label);
+                    principalData.push(Math.round(cumulativePrincipal));
+                    profitData.push(Math.round(netProfitSoFar));
+
+                    tableRowsHtml += `
+                        <tr>
+                            <td>${label}</td>
+                            <td>${formatNumber(cumulativePrincipal)}원</td>
+                            <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(stepProfit)}원</td>
+                            <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(netProfitSoFar)}원</td>
+                            <td style="font-weight:800; color:var(--primary);">${formatNumber(finalBalanceStep)}원</td>
+                            <td>+${roiStep}%</td>
+                        </tr>
+                    `;
                 }
             }
 
-            cumulativePrincipal += stepPrincipalAdded;
+            // 일단위 단리 비교
+            simpleGrossProfit = (init * r_daily * steps) + (deposit * r_daily * (steps * (steps - 1) / 2));
 
-            const grossProfitSoFar = Math.max(0, currentBalance - cumulativePrincipal);
-            const netProfitSoFar = grossProfitSoFar * (1 - taxRate);
-            const finalBalanceStep = cumulativePrincipal + netProfitSoFar;
+        } else if (compType === 'yearly') {
+            // === 연복리 ===
+            const r_yearly = rate / 100;
+            const steps = totalYears;
+            let prevNetProfit = 0;
 
-            const prevProfit = profitData.length > 0 ? profitData[profitData.length - 1] : 0;
-            const stepNetProfit = netProfitSoFar - prevProfit;
-            const roiStep = cumulativePrincipal > 0 ? ((netProfitSoFar / cumulativePrincipal) * 100).toFixed(1) : 0;
+            for (let y = 1; y <= steps; y++) {
+                const added = deposit * 12;
+                currentBalance = (currentBalance + added) * (1 + r_yearly);
+                cumulativePrincipal += added;
 
-            const stepLabel = (periodUnit === 'day' && totalDays <= 365) ? `${s * daysPerStep}일` : `${s}년`;
-            chartLabels.push(stepLabel);
-            principalData.push(Math.round(cumulativePrincipal));
-            profitData.push(Math.round(netProfitSoFar));
+                const grossProfitSoFar = Math.max(0, currentBalance - cumulativePrincipal);
+                const netProfitSoFar = applyTax ? grossProfitSoFar * (1 - taxRate) : grossProfitSoFar;
+                const finalBalanceStep = cumulativePrincipal + netProfitSoFar;
+                const stepProfit = netProfitSoFar - prevNetProfit;
+                prevNetProfit = netProfitSoFar;
+                const roiStep = cumulativePrincipal > 0 ? ((netProfitSoFar / cumulativePrincipal) * 100).toFixed(1) : 0;
 
-            tableRowsHtml += `
-                <tr>
-                    <td>${stepLabel}</td>
-                    <td>${formatNumber(cumulativePrincipal)}원</td>
-                    <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(stepNetProfit)}원</td>
-                    <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(netProfitSoFar)}원</td>
-                    <td style="font-weight:800; color:var(--primary);">${formatNumber(finalBalanceStep)}원</td>
-                    <td>+${roiStep}%</td>
-                </tr>
-            `;
+                const label = `${y}년차`;
+                chartLabels.push(label);
+                principalData.push(Math.round(cumulativePrincipal));
+                profitData.push(Math.round(netProfitSoFar));
+
+                tableRowsHtml += `
+                    <tr>
+                        <td>${label}</td>
+                        <td>${formatNumber(cumulativePrincipal)}원</td>
+                        <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(stepProfit)}원</td>
+                        <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(netProfitSoFar)}원</td>
+                        <td style="font-weight:800; color:var(--primary);">${formatNumber(finalBalanceStep)}원</td>
+                        <td>+${roiStep}%</td>
+                    </tr>
+                `;
+            }
+
+            simpleGrossProfit = (init * r_yearly * steps) + (deposit * 12 * r_yearly * (steps / 2));
+
+        } else {
+            // === 월복리 (기본) ===
+            const r_monthly = (rate / 100) / 12;
+            const steps = totalMonths;
+            let prevNetProfit = 0;
+
+            const sampleInterval = steps <= 36 ? 1 : 12;
+
+            for (let m = 1; m <= steps; m++) {
+                currentBalance = (currentBalance + deposit) * (1 + r_monthly);
+                cumulativePrincipal += deposit;
+
+                if (m % sampleInterval === 0 || m === steps) {
+                    const grossProfitSoFar = Math.max(0, currentBalance - cumulativePrincipal);
+                    const netProfitSoFar = applyTax ? grossProfitSoFar * (1 - taxRate) : grossProfitSoFar;
+                    const finalBalanceStep = cumulativePrincipal + netProfitSoFar;
+                    const stepProfit = netProfitSoFar - prevNetProfit;
+                    prevNetProfit = netProfitSoFar;
+                    const roiStep = cumulativePrincipal > 0 ? ((netProfitSoFar / cumulativePrincipal) * 100).toFixed(1) : 0;
+
+                    const label = (sampleInterval === 1) ? `${m}개월차` : `${Math.round(m / 12)}년차`;
+                    chartLabels.push(label);
+                    principalData.push(Math.round(cumulativePrincipal));
+                    profitData.push(Math.round(netProfitSoFar));
+
+                    tableRowsHtml += `
+                        <tr>
+                            <td>${label}</td>
+                            <td>${formatNumber(cumulativePrincipal)}원</td>
+                            <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(stepProfit)}원</td>
+                            <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(netProfitSoFar)}원</td>
+                            <td style="font-weight:800; color:var(--primary);">${formatNumber(finalBalanceStep)}원</td>
+                            <td>+${roiStep}%</td>
+                        </tr>
+                    `;
+                }
+            }
+
+            simpleGrossProfit = (init * (rate / 100) * (totalMonths / 12)) + (deposit * r_monthly * (totalMonths * (totalMonths - 1) / 2));
         }
 
-        // Final Values
+        // 최종 결과 계산
         const finalPrincipal = cumulativePrincipal;
         const finalGrossProfit = Math.max(0, currentBalance - finalPrincipal);
-        const finalTax = finalGrossProfit * taxRate;
+        const finalTax = applyTax ? finalGrossProfit * 0.154 : 0;
         const finalNetProfit = finalGrossProfit - finalTax;
         const finalTotal = finalPrincipal + finalNetProfit;
         const finalRoi = finalPrincipal > 0 ? ((finalNetProfit / finalPrincipal) * 100).toFixed(1) : 0;
 
-        // Simple interest comparison
-        const simpleGrossProfit = (init * r_yearly * totalYears) + (deposit * 12 * r_yearly * (totalYears / 2));
-        const simpleNetProfit = simpleGrossProfit * (1 - taxRate);
+        const simpleNetProfit = applyTax ? simpleGrossProfit * (1 - 0.154) : simpleGrossProfit;
         const compoundBonus = Math.max(0, finalNetProfit - simpleNetProfit);
 
-        // Update Result DOM
+        // 결과 영역 DOM 업데이트
         document.getElementById('finalTotalDisplay').textContent = `${formatNumber(finalTotal)}원`;
-        document.getElementById('heroRoiDisplay').textContent = `수익률 +${finalRoi}%`;
         document.getElementById('totalPrincipalDisplay').textContent = `${formatNumber(finalPrincipal)}원`;
         document.getElementById('netProfitDisplay').textContent = `+${formatNumber(finalNetProfit)}원`;
         document.getElementById('compoundBonusDisplay').textContent = `+${formatNumber(compoundBonus)}원`;
-        document.getElementById('taxDisplay').textContent = `-${formatNumber(finalTax)}원`;
 
-        // Hero Badges
+        if (applyTax) {
+            document.getElementById('heroLabel').textContent = '만기 예상 최종 자산 (원금 + 세후 수익)';
+            document.getElementById('heroRoiDisplay').textContent = `수익률 +${finalRoi}% (세후)`;
+            document.getElementById('netProfitLabel').textContent = '세후 순수익 (복리 이자)';
+            document.getElementById('taxCardLabel').textContent = '이자소득세 (15.4% 공제)';
+            document.getElementById('taxDisplay').textContent = `-${formatNumber(finalTax)}원`;
+            document.getElementById('chartSubLabel').textContent = '(납입 원금 vs 세후 복리수익)';
+            document.getElementById('tableTaxHint').textContent = '(이자소득세 15.4% 공제 기준)';
+            document.getElementById('thStepProfit').textContent = '당기 이자(세후)';
+            document.getElementById('thCumulProfit').textContent = '누적 순수익';
+        } else {
+            document.getElementById('heroLabel').textContent = '만기 예상 최종 자산 (원금 + 총 수익)';
+            document.getElementById('heroRoiDisplay').textContent = `수익률 +${finalRoi}% (세전/비과세)`;
+            document.getElementById('netProfitLabel').textContent = '총 복리 수익 (이자)';
+            document.getElementById('taxCardLabel').textContent = '공제 세금 (옵션 미적용)';
+            document.getElementById('taxDisplay').textContent = '0원 (미적용)';
+            document.getElementById('chartSubLabel').textContent = '(납입 원금 vs 복리 수익)';
+            document.getElementById('tableTaxHint').textContent = '(세전 / 비과세 기준)';
+            document.getElementById('thStepProfit').textContent = '당기 수익';
+            document.getElementById('thCumulProfit').textContent = '누적 수익';
+        }
+
+        // 상단 뱃지 표시
         const periodStr = periodUnit === 'year' ? `${periodVal}년 (${periodVal * 12}개월)` : periodUnit === 'month' ? `${periodVal}개월` : `${periodVal}일`;
         document.getElementById('heroPeriodDisplay').textContent = periodStr;
 
-        const compBadgeStr = compType === 'daily' ? '⚡ 일복리 적용 (365일)' : compType === 'yearly' ? '📅 연복리 적용' : '✨ 월복리 적용';
+        const compBadgeStr = compType === 'daily' ? `⚡ 일복리 (${rate}%/일)` : compType === 'yearly' ? `📅 연복리 (${rate}%/연)` : `✨ 월복리 (${rate}%/연)`;
         document.getElementById('heroCompDisplay').textContent = compBadgeStr;
 
-        // 72 Rule
-        if (annualRate > 0) {
-            const doubleYears = (72 / annualRate).toFixed(1);
-            document.getElementById('rule72Text').innerHTML = `연 ${annualRate.toFixed(1)}% 복리 기준, 내 원금이 2배가 되는 데 약 <strong>${doubleYears}년</strong>이 걸립니다.`;
+        // 72의 법칙
+        if (rate > 0) {
+            if (compType === 'daily') {
+                const doubleDays = Math.round(72 / rate);
+                document.getElementById('rule72Text').innerHTML = `일 <strong>${rate.toFixed(1)}%</strong> 복리 기준, 내 원금이 2배가 되는 데 약 <strong>${doubleDays}일</strong>이 걸립니다. (72의 법칙)`;
+            } else {
+                const doubleYears = (72 / rate).toFixed(1);
+                document.getElementById('rule72Text').innerHTML = `연 <strong>${rate.toFixed(1)}%</strong> 복리 기준, 내 원금이 2배가 되는 데 약 <strong>${doubleYears}년</strong>이 걸립니다. (72의 법칙)`;
+            }
         } else {
             document.getElementById('rule72Text').textContent = '수익률이 0%인 경우 원금이 불어나지 않습니다.';
         }
 
         document.getElementById('timelineTbody').innerHTML = tableRowsHtml;
 
-        // Render / Update Chart
-        renderChart(chartLabels, principalData, profitData);
+        // 차트 렌더링
+        const profitLegend = applyTax ? '세후 복리수익' : '복리 수익';
+        renderChart(chartLabels, principalData, profitData, profitLegend);
 
-        // Show Result Area & Smooth Scroll
+        // 결과 영역 표시 및 스크롤 이동
         const resultSection = document.getElementById('resultSection');
         resultSection.style.display = 'block';
         resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    function renderChart(labels, principal, profit) {
+    function renderChart(labels, principal, profit, profitLegend = '복리 수익') {
         const ctx = document.getElementById('growthChart').getContext('2d');
         if (growthChart) {
             growthChart.destroy();
@@ -875,7 +1101,7 @@
                         borderRadius: 4
                     },
                     {
-                        label: '세후 복리수익',
+                        label: profitLegend,
                         data: profit,
                         backgroundColor: '#10b981',
                         borderRadius: 4
@@ -926,14 +1152,15 @@
         const profit = document.getElementById('netProfitDisplay').textContent;
         const period = document.getElementById('heroPeriodDisplay').textContent;
         const comp = document.getElementById('heroCompDisplay').textContent;
-        const rate = document.getElementById('annualRate').value;
+        const applyTax = document.getElementById('applyTaxCheckbox').checked;
+        const taxVal = document.getElementById('taxDisplay').textContent;
 
         const text = `[복리 계산 결과 요약]\n` +
-                     `- 복리 주기: ${comp}\n` +
+                     `- 복리 주기 및 수익률: ${comp}\n` +
                      `- 투자 기간: ${period}\n` +
-                     `- 연 수익률: 연 ${rate}%\n` +
                      `- 총 납입 원금: ${principal}\n` +
-                     `- 세후 이자 순수익: ${profit} (${roi})\n` +
+                     `- ${applyTax ? '세후 순수익' : '총 복리 수익'}: ${profit} (${roi})\n` +
+                     `- 공제 세금: ${taxVal}\n` +
                      `- 만기 최종 금액: ${finalTotal}\n` +
                      `📌 출처: Barcode128 복리 계산기 (https://barcode128.mycafe24.com/compound-calculator/)`;
 
