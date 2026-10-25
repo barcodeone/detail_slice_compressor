@@ -260,19 +260,21 @@
             padding: 4px;
             border-radius: var(--radius-md);
             gap: 4px;
+            flex-wrap: wrap;
         }
 
         .radio-pill-label {
-            flex: 1;
+            flex: 1 1 auto;
             text-align: center;
-            padding: 7px 10px;
-            font-size: 12.5px;
+            padding: 7px 6px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--slate-600);
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.15s ease;
             user-select: none;
+            white-space: nowrap;
         }
 
         .radio-pills input[type="radio"] {
@@ -645,14 +647,17 @@
                 <div class="form-group">
                     <label class="form-label" style="margin-bottom:6px; display:block;">복리 계산 주기</label>
                     <div class="radio-pills">
+                        <input type="radio" name="compoundType" id="compDaily" value="daily" onchange="calcCompound()">
+                        <label for="compDaily" class="radio-pill-label">⚡ 일복리 (매일)</label>
+
                         <input type="radio" name="compoundType" id="compMonthly" value="monthly" checked onchange="calcCompound()">
-                        <label for="compMonthly" class="radio-pill-label">매월 복리 (추천)</label>
+                        <label for="compMonthly" class="radio-pill-label">✨ 월복리 (매월)</label>
 
                         <input type="radio" name="compoundType" id="compYearly" value="yearly" onchange="calcCompound()">
-                        <label for="compYearly" class="radio-pill-label">매년 복리</label>
+                        <label for="compYearly" class="radio-pill-label">📅 연복리 (매년)</label>
 
                         <input type="radio" name="compoundType" id="compSimple" value="simple" onchange="calcCompound()">
-                        <label for="compSimple" class="radio-pill-label">단리 (비교용)</label>
+                        <label for="compSimple" class="radio-pill-label">📊 단리</label>
                     </div>
                 </div>
 
@@ -890,13 +895,18 @@
             </div>
 
             <div>
-                <h3 style="font-size:18px; font-weight:800; color:var(--slate-900); margin-bottom:8px;">📈 2. 단리 vs 복리의 차이점</h3>
+                <h3 style="font-size:18px; font-weight:800; color:var(--slate-900); margin-bottom:8px;">📈 2. 단리 vs 복리, 그리고 복리 주기(일·월·연)</h3>
                 <p style="font-size:14px; margin-bottom:10px;">
-                    <strong>단리(Simple Interest)</strong>는 오직 '원금'에 대해서만 이자가 붙는 반면, <strong>복리(Compound Interest)</strong>는 '원금 + 발생한 이자' 전체에 다시 이자가 붙는 스노우볼(Snowball) 효과를 가집니다.
+                    <strong>단리(Simple Interest)</strong>는 오직 초기에 투자한 '원금'에 대해서만 이자가 붙는 반면, <strong>복리(Compound Interest)</strong>는 '원금 + 발생한 이자' 전체에 다시 이자가 붙는 스노우볼(Snowball) 효과를 가집니다.
                 </p>
-                <p style="font-size:14px;">
-                    시간이 지날수록 원금보다 '이자가 벌어오는 이자'의 규모가 기하급수적으로 커지며, 10년, 20년 장기 투자 시 단리와 복리의 최종 자산 격차는 수억 원에 달하게 됩니다.
+                <p style="font-size:14px; margin-bottom:10px;">
+                    <strong>복리 주기(Compounding Frequency)</strong>가 짧을수록 이자가 더 자주 원금에 재투자되어 복리 마법 효과가 극대화됩니다:
                 </p>
+                <ul style="font-size:13.5px; color:var(--slate-600); margin-left:20px; line-height:1.7;">
+                    <li><strong>일복리(Daily)</strong>: 매일(365일) 이자가 정산되어 재투자 (코인 스테이킹, 파킹통장, 일일 트레이딩 시뮬레이션)</li>
+                    <li><strong>월복리(Monthly)</strong>: 매월 1회 이자가 재투자 (적립식 주식, 배당 재투자, 일반 정기적금 표준)</li>
+                    <li><strong>연복리(Yearly)</strong>: 1년에 1회 이자가 정산되어 재투자 (일반 정기예금, 장기 채권 만기 연계)</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -1077,7 +1087,8 @@
 
         // Badge update
         const compBadge = document.getElementById('compBadgeText');
-        if (compType === 'monthly') compBadge.textContent = '✨ 월복리 적용';
+        if (compType === 'daily') compBadge.textContent = '⚡ 일복리 적용 (365일)';
+        else if (compType === 'monthly') compBadge.textContent = '✨ 월복리 적용';
         else if (compType === 'yearly') compBadge.textContent = '📅 연복리 적용';
         else compBadge.textContent = '📊 단리 적용';
 
@@ -1101,6 +1112,7 @@
         let totalInterestGross = 0;
 
         const totalMonths = years * 12;
+        const r_daily = (annualRate / 100) / 365;
         const r_monthly = (annualRate / 100) / 12;
         const r_yearly = annualRate / 100;
 
@@ -1108,7 +1120,14 @@
             let yearStartBalance = currentBalance;
             let yearPrincipalAdded = 0;
 
-            if (compType === 'monthly') {
+            if (compType === 'daily') {
+                // 일복리: 1년 365일 (매월 적립금은 월초 투입 후 일별 복리 증식)
+                const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                for (let m = 0; m < 12; m++) {
+                    currentBalance = (currentBalance + monthly) * Math.pow(1 + r_daily, daysInMonth[m]);
+                    yearPrincipalAdded += monthly;
+                }
+            } else if (compType === 'monthly') {
                 for (let m = 1; m <= 12; m++) {
                     currentBalance = (currentBalance + monthly) * (1 + r_monthly);
                     yearPrincipalAdded += monthly;
@@ -1239,7 +1258,11 @@
         const years = document.getElementById('periodYears').value;
         const rate = document.getElementById('annualRate').value;
 
+        const compType = document.querySelector('input[name="compoundType"]:checked').value;
+        const compTypeName = compType === 'daily' ? '일복리(매일)' : compType === 'monthly' ? '월복리(매월)' : compType === 'yearly' ? '연복리(매년)' : '단리';
+
         const text = `[복리 계산 결과 요약]\n` +
+                     `- 계산 방식: ${compTypeName}\n` +
                      `- 투자 기간: ${years}년\n` +
                      `- 예상 연수익률: 연 ${rate}%\n` +
                      `- 총 납입 원금: ${principal}\n` +
