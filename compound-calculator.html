@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>복리 계산기 & 72의 법칙 (주식·코인·적금 복리이자 시뮬레이터)</title>
+    <title>복리 계산기 (일복리 · 월복리 · 연복리 시뮬레이터)</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -24,8 +24,6 @@
             --emerald-500: #10b981;
             --emerald-50: #ecfdf5;
             --rose-600: #e11d48;
-            --amber-600: #d97706;
-            --amber-50: #fffbeb;
             --radius-xl: 20px;
             --radius-lg: 14px;
             --radius-md: 10px;
@@ -43,11 +41,11 @@
             background-color: transparent;
             color: var(--slate-800);
             line-height: 1.5;
-            padding: 10px 16px 50px 16px;
+            padding: 10px 16px 40px 16px;
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 760px;
             margin: 0 auto;
         }
 
@@ -62,133 +60,63 @@
             align-items: center;
             gap: 6px;
             padding: 5px 14px;
+            border-radius: 9999px;
             background: var(--primary-light);
             color: var(--primary);
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 700;
-            border-radius: 999px;
             margin-bottom: 10px;
         }
 
         .app-title {
             font-size: 26px;
-            font-weight: 900;
+            font-weight: 800;
             color: var(--slate-900);
-            letter-spacing: -0.6px;
+            letter-spacing: -0.5px;
             margin-bottom: 6px;
         }
 
         .app-subtitle {
             font-size: 14px;
             color: var(--slate-500);
+            line-height: 1.5;
         }
 
-        /* Tab Navigation */
-        .tab-nav {
-            display: flex;
-            background: #ffffff;
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius-lg);
-            padding: 6px;
-            gap: 6px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 11px 16px;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--slate-600);
-            background: transparent;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .tab-btn.active {
-            color: #ffffff;
-            background: var(--primary);
-            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
-        }
-
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Grid Layout */
-        .calc-grid {
-            display: grid;
-            grid-template-columns: 1fr 1.15fr;
-            gap: 24px;
-            align-items: start;
-        }
-
-        @media (max-width: 860px) {
-            .calc-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Card Panels */
+        /* Card Box */
         .card {
             background: #ffffff;
             border: 1px solid var(--slate-200);
             border-radius: var(--radius-xl);
-            padding: 26px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+            padding: 28px 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+            margin-bottom: 24px;
         }
 
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 14px;
-            border-bottom: 1px solid var(--slate-100);
-        }
-
-        .card-title {
-            font-size: 17px;
-            font-weight: 800;
-            color: var(--slate-900);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Form Inputs */
+        /* Form Group */
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
 
         .form-label-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
+            align-items: baseline;
+            margin-bottom: 8px;
         }
 
         .form-label {
-            font-size: 13.5px;
+            font-size: 14px;
             font-weight: 700;
             color: var(--slate-700);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .form-hint {
-            font-size: 12px;
-            color: var(--primary);
+            font-size: 12.5px;
             font-weight: 700;
+            color: var(--primary);
         }
 
         .input-group {
@@ -199,321 +127,311 @@
 
         .form-input {
             width: 100%;
-            height: 46px;
-            padding: 0 42px 0 14px;
-            font-size: 15px;
+            height: 48px;
+            padding: 0 48px 0 16px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--slate-900);
-            background: var(--slate-50);
+            background: #ffffff;
             border: 1.5px solid var(--slate-200);
             border-radius: var(--radius-md);
             outline: none;
-            transition: all 0.15s ease;
-            text-align: right;
+            transition: all 0.2s ease;
         }
 
         .form-input:focus {
-            background: #ffffff;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
         }
 
         .input-unit {
             position: absolute;
-            right: 14px;
-            font-size: 13.5px;
+            right: 16px;
+            font-size: 14px;
             font-weight: 700;
-            color: var(--slate-400);
+            color: var(--slate-500);
             pointer-events: none;
         }
 
-        /* Quick Option Buttons */
-        .quick-btn-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 6px;
-        }
-
-        .quick-btn {
-            padding: 4px 9px;
-            font-size: 11.5px;
-            font-weight: 600;
-            color: var(--slate-600);
+        /* Compound Cycle Segmented Buttons (일복리 / 월복리 / 연복리) */
+        .compound-segmented {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
             background: var(--slate-100);
-            border: 1px solid transparent;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.12s ease;
+            padding: 6px;
+            border-radius: 12px;
         }
 
-        .quick-btn:hover {
-            color: var(--primary);
-            background: var(--primary-light);
-            border-color: #c7d2fe;
-        }
-
-        /* Radio Toggle Groups */
-        .radio-pills {
-            display: flex;
-            background: var(--slate-100);
-            padding: 4px;
-            border-radius: var(--radius-md);
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-
-        .radio-pill-label {
-            flex: 1 1 auto;
+        .compound-opt-btn {
+            padding: 12px 10px;
             text-align: center;
-            padding: 7px 6px;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 700;
             color: var(--slate-600);
-            border-radius: 6px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.15s ease;
-            user-select: none;
-            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
-        .radio-pills input[type="radio"] {
-            display: none;
-        }
-
-        .radio-pills input[type="radio"]:checked + .radio-pill-label {
+        .compound-opt-btn.active {
             background: #ffffff;
             color: var(--primary);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            font-weight: 800;
         }
 
-        /* Result Panel */
+        .compound-opt-btn:hover:not(.active) {
+            color: var(--slate-900);
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Period with Unit Select */
+        .period-row {
+            display: grid;
+            grid-template-columns: 1fr 110px;
+            gap: 10px;
+        }
+
+        .unit-select {
+            height: 48px;
+            padding: 0 12px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--slate-700);
+            background: #ffffff;
+            border: 1.5px solid var(--slate-200);
+            border-radius: var(--radius-md);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .unit-select:focus {
+            border-color: var(--primary);
+        }
+
+        /* Big Submit Button */
+        .submit-btn {
+            width: 100%;
+            height: 52px;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+            margin-top: 26px;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.38);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Result Section */
+        #resultSection {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Result Banner */
         .hero-result {
             background: linear-gradient(135deg, #4338ca 0%, #312e81 100%);
-            border-radius: var(--radius-lg);
+            border-radius: 16px;
             padding: 24px;
             color: #ffffff;
+            text-align: center;
             margin-bottom: 20px;
-            box-shadow: 0 8px 24px -4px rgba(67, 56, 202, 0.35);
             position: relative;
             overflow: hidden;
-        }
-
-        .hero-result::after {
-            content: "💰";
-            position: absolute;
-            right: 16px;
-            bottom: 8px;
-            font-size: 64px;
-            opacity: 0.15;
-            pointer-events: none;
         }
 
         .hero-label {
             font-size: 13px;
             font-weight: 700;
-            color: #c7d2fe;
+            color: rgba(255, 255, 255, 0.8);
             margin-bottom: 4px;
-            letter-spacing: -0.2px;
         }
 
-        .hero-amount {
+        .hero-value {
             font-size: 32px;
             font-weight: 900;
-            letter-spacing: -0.8px;
-            line-height: 1.2;
+            letter-spacing: -0.5px;
             margin-bottom: 12px;
         }
 
-        .hero-stats-row {
+        .hero-meta-row {
             display: flex;
+            justify-content: center;
             gap: 16px;
+            flex-wrap: wrap;
             padding-top: 12px;
             border-top: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 13px;
         }
 
-        .hero-stat {
-            flex: 1;
+        .hero-meta-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-weight: 700;
         }
 
-        .hero-stat-label {
-            font-size: 11.5px;
-            color: #a5b4fc;
-            margin-bottom: 2px;
-        }
-
-        .hero-stat-val {
-            font-size: 16px;
-            font-weight: 800;
-            color: #ffffff;
-        }
-
-        /* Breakdown Cards Grid */
-        .breakdown-grid {
+        /* Result Stat Grid */
+        .stat-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 14px;
             margin-bottom: 20px;
         }
 
-        .breakdown-item {
-            background: var(--slate-50);
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius-md);
-            padding: 14px 16px;
+        @media (max-width: 580px) {
+            .stat-grid { grid-template-columns: 1fr; }
         }
 
-        .breakdown-label {
-            font-size: 12px;
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: 14px;
+            padding: 16px 18px;
+        }
+
+        .stat-label {
+            font-size: 12.5px;
             font-weight: 700;
             color: var(--slate-500);
             margin-bottom: 4px;
+        }
+
+        .stat-val {
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--slate-900);
+            letter-spacing: -0.3px;
+        }
+
+        .stat-val.profit { color: var(--emerald-600); }
+        .stat-val.bonus { color: #4338ca; }
+        .stat-val.tax { color: var(--rose-600); }
+
+        /* Chart Card */
+        .chart-card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: var(--slate-800);
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        .breakdown-val {
-            font-size: 17px;
-            font-weight: 800;
-            color: var(--slate-900);
-        }
-
-        .breakdown-val.profit {
-            color: var(--emerald-600);
-        }
-        .breakdown-val.bonus {
-            color: #7c3aed;
-        }
-
-        /* 72 Rule Banner */
-        .rule-72-box {
-            background: var(--amber-50);
-            border: 1px solid #fde68a;
-            border-radius: var(--radius-md);
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .rule-72-icon {
-            font-size: 24px;
-        }
-
-        .rule-72-title {
-            font-size: 13px;
-            font-weight: 800;
-            color: var(--amber-600);
-            margin-bottom: 2px;
-        }
-
-        .rule-72-desc {
-            font-size: 12.5px;
-            color: var(--slate-700);
-            line-height: 1.4;
-        }
-
-        /* Chart Canvas Area */
-        .chart-box {
-            background: var(--slate-50);
+        /* Timeline Table */
+        .table-wrap {
+            max-height: 280px;
+            overflow-y: auto;
             border: 1px solid var(--slate-200);
-            border-radius: var(--radius-md);
-            padding: 16px;
+            border-radius: 12px;
             margin-bottom: 20px;
-            position: relative;
-            height: 250px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+            text-align: right;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--slate-100);
+            white-space: nowrap;
+        }
+
+        th {
+            background: var(--slate-50);
+            font-weight: 700;
+            color: var(--slate-600);
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        th:first-child, td:first-child { text-align: left; }
+
+        tr:hover td {
+            background: #fdfdfe;
         }
 
         /* Action Buttons */
         .action-row {
-            display: flex;
-            gap: 8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
 
-        .btn {
-            flex: 1;
-            padding: 12px 16px;
+        .action-btn {
+            height: 44px;
+            border-radius: 10px;
             font-size: 13.5px;
-            font-weight: 800;
-            border-radius: 8px;
+            font-weight: 700;
             cursor: pointer;
-            border: none;
-            display: inline-flex;
+            display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
             transition: all 0.15s ease;
         }
 
-        .btn-primary {
+        .btn-copy {
             background: var(--slate-900);
             color: #ffffff;
-        }
-        .btn-primary:hover {
-            background: var(--primary);
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+            border: none;
         }
 
-        .btn-secondary {
-            background: var(--slate-100);
-            color: var(--slate-700);
-        }
-        .btn-secondary:hover {
-            background: var(--slate-200);
+        .btn-copy:hover {
+            background: #1e293b;
         }
 
-        /* Table Section */
-        .table-wrap {
-            margin-top: 24px;
+        .btn-reset {
             background: #ffffff;
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius-xl);
-            padding: 24px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
-            overflow-x: auto;
-        }
-
-        .timeline-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            text-align: right;
-        }
-
-        .timeline-table th {
-            background: var(--slate-50);
-            color: var(--slate-600);
-            font-weight: 800;
-            padding: 11px 14px;
-            border-bottom: 1.5px solid var(--slate-200);
-            white-space: nowrap;
-        }
-        .timeline-table th:first-child,
-        .timeline-table td:first-child {
-            text-align: center;
-        }
-
-        .timeline-table td {
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--slate-100);
             color: var(--slate-700);
-            font-weight: 600;
-            white-space: nowrap;
+            border: 1.5px solid var(--slate-200);
         }
 
-        .timeline-table tr:hover td {
+        .btn-reset:hover {
             background: var(--slate-50);
-        }
-
-        .timeline-table td.total-highlight {
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .timeline-table td.profit-highlight {
-            color: var(--emerald-600);
+            border-color: var(--slate-300);
         }
 
         /* Toast */
@@ -521,20 +439,23 @@
             position: fixed;
             bottom: 24px;
             left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: rgba(15, 23, 42, 0.95);
+            transform: translateX(-50%) translateY(50px);
+            background: rgba(15, 23, 42, 0.9);
             color: #ffffff;
             padding: 10px 20px;
-            border-radius: 999px;
+            border-radius: 9999px;
             font-size: 13px;
             font-weight: 700;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 1000;
+            opacity: 0;
+            transition: all 0.25s ease;
             pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
+
         .toast.show {
             transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
     </style>
 </head>
@@ -543,379 +464,181 @@
 <div class="container">
     <!-- Header -->
     <header class="app-header">
-        <span class="badge-pill">⚡ 100% 무료 · 실시간 연산 · 72의 법칙 탑재</span>
-        <h1 class="app-title">복리 계산기 &amp; 72의 법칙 시뮬레이터</h1>
-        <p class="app-subtitle">초기 투자금과 매월 적립금, 예상 수익률을 입력해 미래의 자산 성장과 복리의 마법을 시각적으로 확인하세요.</p>
+        <span class="badge-pill">⚡ 실시간 정밀 연산 · 72의 법칙 탑재</span>
+        <h1 class="app-title">복리 계산기</h1>
+        <p class="app-subtitle">일복리 · 월복리 · 연복리 주기를 선택하고 만기 수익과 복리의 마법을 확인하세요.</p>
     </header>
 
-    <!-- Tab Nav -->
-    <nav class="tab-nav">
-        <button class="tab-btn active" onclick="switchTab('calc')">📈 복리 수익률 계산기</button>
-        <button class="tab-btn" onclick="switchTab('target')">🎯 목표 금액 역산기</button>
-        <button class="tab-btn" onclick="switchTab('guide')">💡 72의 법칙 &amp; 복리 원리</button>
-    </nav>
-
-    <!-- TAB 1: 복리 계산기 -->
-    <div id="tab-calc" class="tab-content active">
-        <div class="calc-grid">
-            <!-- Left: Input Form -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">⚙️ 투자 조건 입력</h2>
-                    <button class="quick-btn" onclick="resetForm()">초기화</button>
-                </div>
-
-                <!-- 1. 초기 원금 -->
-                <div class="form-group">
-                    <div class="form-label-row">
-                        <label class="form-label" for="initAmount">초기 투자 원금 (거치금)</label>
-                        <span class="form-hint" id="initAmountKo">1,000만 원</span>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" id="initAmount" class="form-input" value="10,000,000" oninput="formatAndCalc()">
-                        <span class="input-unit">원</span>
-                    </div>
-                    <div class="quick-btn-row">
-                        <button class="quick-btn" onclick="addAmount('initAmount', 0, true)">0원</button>
-                        <button class="quick-btn" onclick="addAmount('initAmount', 1000000)">+100만</button>
-                        <button class="quick-btn" onclick="addAmount('initAmount', 5000000)">+500만</button>
-                        <button class="quick-btn" onclick="addAmount('initAmount', 10000000)">+1,000만</button>
-                        <button class="quick-btn" onclick="addAmount('initAmount', 50000000)">+5,000만</button>
-                        <button class="quick-btn" onclick="addAmount('initAmount', 100000000)">+1억</button>
-                    </div>
-                </div>
-
-                <!-- 2. 매월 적립금 -->
-                <div class="form-group">
-                    <div class="form-label-row">
-                        <label class="form-label" for="monthlyAmount">매월 정기 적립액</label>
-                        <span class="form-hint" id="monthlyAmountKo">50만 원</span>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" id="monthlyAmount" class="form-input" value="500,000" oninput="formatAndCalc()">
-                        <span class="input-unit">원</span>
-                    </div>
-                    <div class="quick-btn-row">
-                        <button class="quick-btn" onclick="addAmount('monthlyAmount', 0, true)">0원 (거치식)</button>
-                        <button class="quick-btn" onclick="addAmount('monthlyAmount', 100000)">+10만</button>
-                        <button class="quick-btn" onclick="addAmount('monthlyAmount', 300000)">+30만</button>
-                        <button class="quick-btn" onclick="addAmount('monthlyAmount', 500000)">+50만</button>
-                        <button class="quick-btn" onclick="addAmount('monthlyAmount', 1000000)">+100만</button>
-                    </div>
-                </div>
-
-                <!-- 3. 목표 기간 -->
-                <div class="form-group">
-                    <div class="form-label-row">
-                        <label class="form-label" for="periodYears">투자 기간</label>
-                        <span class="form-hint" id="periodYearsKo">10년</span>
-                    </div>
-                    <div class="input-group">
-                        <input type="number" id="periodYears" class="form-input" value="10" min="1" max="50" oninput="calcCompound()">
-                        <span class="input-unit">년</span>
-                    </div>
-                    <div class="quick-btn-row">
-                        <button class="quick-btn" onclick="setVal('periodYears', 1)">1년</button>
-                        <button class="quick-btn" onclick="setVal('periodYears', 3)">3년</button>
-                        <button class="quick-btn" onclick="setVal('periodYears', 5)">5년</button>
-                        <button class="quick-btn" onclick="setVal('periodYears', 10)">10년</button>
-                        <button class="quick-btn" onclick="setVal('periodYears', 20)">20년</button>
-                        <button class="quick-btn" onclick="setVal('periodYears', 30)">30년</button>
-                    </div>
-                </div>
-
-                <!-- 4. 연간 수익률 -->
-                <div class="form-group">
-                    <div class="form-label-row">
-                        <label class="form-label" for="annualRate">예상 연간 수익률 (이자율)</label>
-                        <span class="form-hint" id="annualRateKo">연 7.0%</span>
-                    </div>
-                    <div class="input-group">
-                        <input type="number" id="annualRate" class="form-input" value="7.0" step="0.1" min="0" max="100" oninput="calcCompound()">
-                        <span class="input-unit">%</span>
-                    </div>
-                    <div class="quick-btn-row">
-                        <button class="quick-btn" onclick="setVal('annualRate', 3.5)">3.5% (예금)</button>
-                        <button class="quick-btn" onclick="setVal('annualRate', 5)">5% (채권/배당)</button>
-                        <button class="quick-btn" onclick="setVal('annualRate', 7)">7% (S&P500 평균)</button>
-                        <button class="quick-btn" onclick="setVal('annualRate', 10)">10% (성장주)</button>
-                        <button class="quick-btn" onclick="setVal('annualRate', 15)">15% (적극투자)</button>
-                    </div>
-                </div>
-
-                <!-- 5. 복리 주기 -->
-                <div class="form-group">
-                    <label class="form-label" style="margin-bottom:6px; display:block;">복리 계산 주기</label>
-                    <div class="radio-pills">
-                        <input type="radio" name="compoundType" id="compDaily" value="daily" onchange="calcCompound()">
-                        <label for="compDaily" class="radio-pill-label">⚡ 일복리 (매일)</label>
-
-                        <input type="radio" name="compoundType" id="compMonthly" value="monthly" checked onchange="calcCompound()">
-                        <label for="compMonthly" class="radio-pill-label">✨ 월복리 (매월)</label>
-
-                        <input type="radio" name="compoundType" id="compYearly" value="yearly" onchange="calcCompound()">
-                        <label for="compYearly" class="radio-pill-label">📅 연복리 (매년)</label>
-
-                        <input type="radio" name="compoundType" id="compSimple" value="simple" onchange="calcCompound()">
-                        <label for="compSimple" class="radio-pill-label">📊 단리</label>
-                    </div>
-                </div>
-
-                <!-- 6. 이자 과세 -->
-                <div class="form-group" style="margin-bottom:0;">
-                    <label class="form-label" style="margin-bottom:6px; display:block;">이자소득세 과세 방식</label>
-                    <div class="radio-pills">
-                        <input type="radio" name="taxType" id="taxGeneral" value="0.154" checked onchange="calcCompound()">
-                        <label for="taxGeneral" class="radio-pill-label">일반과세 (15.4%)</label>
-
-                        <input type="radio" name="taxType" id="taxNone" value="0" onchange="calcCompound()">
-                        <label for="taxNone" class="radio-pill-label">비과세 / ISA (0%)</label>
-
-                        <input type="radio" name="taxType" id="taxPrefer" value="0.095" onchange="calcCompound()">
-                        <label for="taxPrefer" class="radio-pill-label">세금우대 (9.5%)</label>
-                    </div>
-                </div>
+    <!-- 1. Input Form Card (단순 & 직관적인 입력 화면) -->
+    <div class="card">
+        <!-- 1) 복리 주기 선택 (일복리 / 월복리 / 연복리) -->
+        <div class="form-group">
+            <div class="form-label-row">
+                <label class="form-label">1. 복리 계산 주기</label>
+                <span class="form-hint" id="compBadgeHint">매월 복리 적용</span>
             </div>
+            <div class="compound-segmented">
+                <button type="button" class="compound-opt-btn" id="btnCompDaily" onclick="setCompType('daily')">
+                    ⚡ 일복리 (매일)
+                </button>
+                <button type="button" class="compound-opt-btn active" id="btnCompMonthly" onclick="setCompType('monthly')">
+                    ✨ 월복리 (매월)
+                </button>
+                <button type="button" class="compound-opt-btn" id="btnCompYearly" onclick="setCompType('yearly')">
+                    📅 연복리 (매년)
+                </button>
+            </div>
+            <input type="hidden" id="compoundTypeVal" value="monthly">
+        </div>
 
-            <!-- Right: Results Panel -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">📊 자산 시뮬레이션 결과</h2>
-                    <span style="font-size:12px; font-weight:700; color:var(--emerald-600);" id="compBadgeText">✨ 월복리 적용</span>
-                </div>
-
-                <!-- Hero Final Amount -->
-                <div class="hero-result">
-                    <div class="hero-label">만기 예상 총 자산 (원금 + 세후이자)</div>
-                    <div class="hero-amount" id="finalTotalDisplay">0원</div>
-                    <div class="hero-stats-row">
-                        <div class="hero-stat">
-                            <div class="hero-stat-label">원금 대비 총 수익률</div>
-                            <div class="hero-stat-val" id="roiDisplay">+0.0%</div>
-                        </div>
-                        <div class="hero-stat">
-                            <div class="hero-stat-label">투자 기간</div>
-                            <div class="hero-stat-val" id="periodDisplay">10년 (120개월)</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Breakdown Grid -->
-                <div class="breakdown-grid">
-                    <div class="breakdown-item">
-                        <div class="breakdown-label">총 납입 원금 <span>(투자금)</span></div>
-                        <div class="breakdown-val" id="totalPrincipalDisplay">0원</div>
-                    </div>
-                    <div class="breakdown-item">
-                        <div class="breakdown-label">세후 순수익 <span>(총 이자)</span></div>
-                        <div class="breakdown-val profit" id="netProfitDisplay">+0원</div>
-                    </div>
-                    <div class="breakdown-item">
-                        <div class="breakdown-label">단리 대비 추가 수익 <span>(복리효과)</span></div>
-                        <div class="breakdown-val bonus" id="compoundBonusDisplay">+0원</div>
-                    </div>
-                    <div class="breakdown-item">
-                        <div class="breakdown-label">공제 세금 <span>(이자소득세)</span></div>
-                        <div class="breakdown-val" id="taxDisplay" style="color:var(--slate-500);">0원</div>
-                    </div>
-                </div>
-
-                <!-- 72 Rule Box -->
-                <div class="rule-72-box">
-                    <div class="rule-72-icon">💡</div>
-                    <div>
-                        <div class="rule-72-title">72의 법칙: 원금 2배 달성 시점</div>
-                        <div class="rule-72-desc" id="rule72Text">연 7.0% 수익 시, 원금이 2배가 되는 데 약 <strong>10.3년</strong>이 걸립니다.</div>
-                    </div>
-                </div>
-
-                <!-- Chart Box -->
-                <div class="chart-box">
-                    <canvas id="growthChart"></canvas>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="action-row">
-                    <button class="btn btn-primary" onclick="copyResults()">📋 결과 텍스트 복사</button>
-                    <button class="btn btn-secondary" onclick="shareUrl()">🔗 계산 링크 복사</button>
-                </div>
+        <!-- 2) 투자 원금 (초기 거치금) -->
+        <div class="form-group">
+            <div class="form-label-row">
+                <label class="form-label" for="initAmount">2. 초기 투자 원금</label>
+                <span class="form-hint" id="initAmountKo">1,000만 원</span>
+            </div>
+            <div class="input-group">
+                <input type="text" id="initAmount" class="form-input" value="10,000,000" oninput="formatMoneyInput(this, 'initAmountKo')">
+                <span class="input-unit">원</span>
             </div>
         </div>
 
-        <!-- Yearly Breakdown Table -->
-        <div class="table-wrap">
-            <h3 style="font-size:16px; font-weight:800; color:var(--slate-900); margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
-                <span>📅 연도별 자산 성장 타임라인</span>
-                <span style="font-size:12px; font-weight:600; color:var(--slate-500);">(단위: 원, 세후 기준)</span>
-            </h3>
-            <table class="timeline-table">
-                <thead>
-                    <tr>
-                        <th>연차</th>
-                        <th>납입 누적 원금</th>
-                        <th>당해 연간 수익</th>
-                        <th>누적 순수익</th>
-                        <th>기말 총 자산</th>
-                        <th>수익률</th>
-                    </tr>
-                </thead>
-                <tbody id="timelineTbody">
-                    <!-- Dynamic Rows -->
-                </tbody>
-            </table>
+        <!-- 3) 정기 적립액 -->
+        <div class="form-group">
+            <div class="form-label-row">
+                <label class="form-label" for="monthlyAmount" id="depositLabel">3. 정기 적립액 (매월)</label>
+                <span class="form-hint" id="monthlyAmountKo">50만 원</span>
+            </div>
+            <div class="input-group">
+                <input type="text" id="monthlyAmount" class="form-input" value="500,000" oninput="formatMoneyInput(this, 'monthlyAmountKo')">
+                <span class="input-unit">원</span>
+            </div>
+            <div style="font-size:12px; color:var(--slate-400); margin-top:5px;">※ 거치식(원금만 굴리기) 투자는 0원을 입력하세요.</div>
         </div>
+
+        <!-- 4) 투자 기간 -->
+        <div class="form-group">
+            <div class="form-label-row">
+                <label class="form-label" for="periodInput">4. 투자 기간</label>
+                <span class="form-hint" id="periodKo">10년 (120개월)</span>
+            </div>
+            <div class="period-row">
+                <div class="input-group">
+                    <input type="number" id="periodInput" class="form-input" value="10" min="1" max="10000" oninput="updatePeriodHint()">
+                </div>
+                <select id="periodUnit" class="unit-select" onchange="updatePeriodHint()">
+                    <option value="year" selected>년 (Years)</option>
+                    <option value="month">개월 (Months)</option>
+                    <option value="day">일 (Days)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 5) 이자율 (연 수익률) -->
+        <div class="form-group">
+            <div class="form-label-row">
+                <label class="form-label" for="annualRate">5. 연 이자율 (수익률)</label>
+                <span class="form-hint" id="annualRateKo">연 7.0%</span>
+            </div>
+            <div class="input-group">
+                <input type="number" id="annualRate" class="form-input" value="7.0" step="0.1" min="0" max="1000" oninput="updateRateHint()">
+                <span class="input-unit">%</span>
+            </div>
+        </div>
+
+        <!-- 계산하기 큰 버튼만 표시 -->
+        <button type="button" class="submit-btn" onclick="executeCalculation()">
+            <span>📈 복리 계산하기</span>
+        </button>
     </div>
 
-    <!-- TAB 2: 목표 금액 역산기 -->
-    <div id="tab-target" class="tab-content">
-        <div class="calc-grid">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">🎯 목표 자산 역산 조건</h2>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-label-row">
-                        <label class="form-label" for="targetGoal">목표 달성 자산</label>
-                        <span class="form-hint" id="targetGoalKo">1억 원</span>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" id="targetGoal" class="form-input" value="100,000,000" oninput="formatAndCalcTarget()">
-                        <span class="input-unit">원</span>
-                    </div>
-                    <div class="quick-btn-row">
-                        <button class="quick-btn" onclick="setAmount('targetGoal', 50000000)">5,000만</button>
-                        <button class="quick-btn" onclick="setAmount('targetGoal', 100000000)">1억 원</button>
-                        <button class="quick-btn" onclick="setAmount('targetGoal', 300000000)">3억 원</button>
-                        <button class="quick-btn" onclick="setAmount('targetGoal', 500000000)">5억 원</button>
-                        <button class="quick-btn" onclick="setAmount('targetGoal', 1000000000)">10억 원</button>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-label-row">
-                        <label class="form-label" for="targetInit">현재 보유 초기 자금</label>
-                        <span class="form-hint" id="targetInitKo">1,000만 원</span>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" id="targetInit" class="form-input" value="10,000,000" oninput="formatAndCalcTarget()">
-                        <span class="input-unit">원</span>
-                    </div>
-                    <div class="quick-btn-row">
-                        <button class="quick-btn" onclick="setAmount('targetInit', 0)">0원</button>
-                        <button class="quick-btn" onclick="setAmount('targetInit', 5000000)">500만</button>
-                        <button class="quick-btn" onclick="setAmount('targetInit', 10000000)">1,000만</button>
-                        <button class="quick-btn" onclick="setAmount('targetInit', 30000000)">3,000만</button>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-label-row">
-                        <label class="form-label" for="targetYears">목표 달성 기간</label>
-                        <span class="form-hint" id="targetYearsKo">5년</span>
-                    </div>
-                    <div class="input-group">
-                        <input type="number" id="targetYears" class="form-input" value="5" min="1" max="40" oninput="calcTarget()">
-                        <span class="input-unit">년</span>
-                    </div>
-                    <div class="quick-btn-row">
-                        <button class="quick-btn" onclick="setVal('targetYears', 3)">3년</button>
-                        <button class="quick-btn" onclick="setVal('targetYears', 5)">5년</button>
-                        <button class="quick-btn" onclick="setVal('targetYears', 7)">7년</button>
-                        <button class="quick-btn" onclick="setVal('targetYears', 10)">10년</button>
-                    </div>
-                </div>
-
-                <div class="form-group" style="margin-bottom:0;">
-                    <div class="form-label-row">
-                        <label class="form-label" for="targetRate">예상 연수익률</label>
-                        <span class="form-hint" id="targetRateKo">연 7.0%</span>
-                    </div>
-                    <div class="input-group">
-                        <input type="number" id="targetRate" class="form-input" value="7.0" step="0.1" min="0.1" max="50" oninput="calcTarget()">
-                        <span class="input-unit">%</span>
-                    </div>
-                    <div class="quick-btn-row">
-                        <button class="quick-btn" onclick="setVal('targetRate', 4)">4% (예적금)</button>
-                        <button class="quick-btn" onclick="setVal('targetRate', 7)">7% (지수투자)</button>
-                        <button class="quick-btn" onclick="setVal('targetRate', 10)">10% (우량주)</button>
-                        <button class="quick-btn" onclick="setVal('targetRate', 15)">15% (공격형)</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Target Results -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">💡 목표 달성 솔루션</h2>
-                </div>
-
-                <div class="hero-result" style="background: linear-gradient(135deg, #059669 0%, #064e3b 100%);">
-                    <div class="hero-label">목표 달성을 위해 매월 필요한 적립액</div>
-                    <div class="hero-amount" id="targetMonthlyNeededDisplay">0원 / 월</div>
-                    <div class="hero-stats-row">
-                        <div class="hero-stat">
-                            <div class="hero-stat-label">총 직접 모으는 원금</div>
-                            <div class="hero-stat-val" id="targetTotalPrincipalDisplay">0원</div>
-                        </div>
-                        <div class="hero-stat">
-                            <div class="hero-stat-label">복리 이자가 벌어주는 돈</div>
-                            <div class="hero-stat-val" id="targetInterestSavedDisplay">0원</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="background:var(--slate-50); border:1px solid var(--slate-200); border-radius:var(--radius-md); padding:18px; line-height:1.6; font-size:13.5px; color:var(--slate-700);">
-                    <div style="font-weight:800; color:var(--slate-900); margin-bottom:8px;">💡 스마트 절약 가이드</div>
-                    <p id="targetGuideP">연 7% 수익률로 투자할 경우, 단순히 통장에 저축하는 것보다 매월 적립 부담을 획기적으로 낮출 수 있습니다.</p>
-                </div>
+    <!-- 2. Result Section (계산하기 클릭 시 하단에 출력) -->
+    <div id="resultSection">
+        <!-- Hero Box -->
+        <div class="hero-result">
+            <div class="hero-label">만기 예상 최종 자산 (원금 + 세후 수익)</div>
+            <div class="hero-value" id="finalTotalDisplay">0원</div>
+            <div class="hero-meta-row">
+                <span class="hero-meta-badge" id="heroPeriodDisplay">10년 (120개월)</span>
+                <span class="hero-meta-badge" id="heroCompDisplay">✨ 월복리 적용</span>
+                <span class="hero-meta-badge" style="background:#10b981;" id="heroRoiDisplay">수익률 +44.9%</span>
             </div>
         </div>
-    </div>
 
-    <!-- TAB 3: 72의 법칙 & 복리 가이드 -->
-    <div id="tab-guide" class="tab-content">
-        <div class="card" style="line-height:1.7; color:var(--slate-700);">
-            <div class="card-header">
-                <h2 class="card-title">📚 아인슈타인이 극찬한 복리의 마법 &amp; 72의 법칙</h2>
+        <!-- 4대 요약 카드 그리드 -->
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-label">총 납입 원금 (투자금)</div>
+                <div class="stat-val" id="totalPrincipalDisplay">0원</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-label">세후 순수익 (복리 이자)</div>
+                <div class="stat-val profit" id="netProfitDisplay">+0원</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">단리 대비 추가 수익 (복리 효과)</div>
+                <div class="stat-val bonus" id="compoundBonusDisplay">+0원</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">이자소득세 (15.4% 기본)</div>
+                <div class="stat-val tax" id="taxDisplay">-0원</div>
+            </div>
+        </div>
 
-            <div style="margin-bottom:24px;">
-                <h3 style="font-size:18px; font-weight:800; color:var(--slate-900); margin-bottom:8px;">⚡ 1. 72의 법칙(Rule of 72)이란?</h3>
-                <p style="font-size:14px; margin-bottom:12px;">복리 투자 시 <strong>'내 원금이 정확히 2배가 되는 데 걸리는 시간(년)'</strong>을 암산할 수 있는 수학적 공식입니다.</p>
-                <div style="background:var(--primary-light); border-left:4px solid var(--primary); padding:12px 18px; border-radius:0 var(--radius-md) var(--radius-md) 0; font-weight:800; color:var(--primary); font-size:15px; margin-bottom:14px;">
-                    원금 2배 달성 기간(년) = 72 ÷ 연간 수익률(%)
-                </div>
-                <ul style="padding-left:20px; font-size:13.5px; display:flex; flex-direction:column; gap:6px;">
-                    <li><strong>연 4% (예금)</strong>: 72 ÷ 4 = <strong>18년</strong> 소요</li>
-                    <li><strong>연 7.2% (지수 ETF)</strong>: 72 ÷ 7.2 = <strong>10년</strong> 소요</li>
-                    <li><strong>연 10% (우량주식)</strong>: 72 ÷ 10 = <strong>7.2년</strong> 소요</li>
-                    <li><strong>연 15% (고수익 투자)</strong>: 72 ÷ 15 = <strong>4.8년</strong> 소요</li>
-                </ul>
-            </div>
+        <!-- 72의 법칙 안내 -->
+        <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:14px 16px; margin-bottom:20px; font-size:13.5px; color:#92400e; display:flex; align-items:center; gap:8px;">
+            <span style="font-size:18px;">💡</span>
+            <span id="rule72Text">원금이 2배가 되는 데 약 10.3년이 걸립니다.</span>
+        </div>
 
-            <div>
-                <h3 style="font-size:18px; font-weight:800; color:var(--slate-900); margin-bottom:8px;">📈 2. 단리 vs 복리, 그리고 복리 주기(일·월·연)</h3>
-                <p style="font-size:14px; margin-bottom:10px;">
-                    <strong>단리(Simple Interest)</strong>는 오직 초기에 투자한 '원금'에 대해서만 이자가 붙는 반면, <strong>복리(Compound Interest)</strong>는 '원금 + 발생한 이자' 전체에 다시 이자가 붙는 스노우볼(Snowball) 효과를 가집니다.
-                </p>
-                <p style="font-size:14px; margin-bottom:10px;">
-                    <strong>복리 주기(Compounding Frequency)</strong>가 짧을수록 이자가 더 자주 원금에 재투자되어 복리 마법 효과가 극대화됩니다:
-                </p>
-                <ul style="font-size:13.5px; color:var(--slate-600); margin-left:20px; line-height:1.7;">
-                    <li><strong>일복리(Daily)</strong>: 매일(365일) 이자가 정산되어 재투자 (코인 스테이킹, 파킹통장, 일일 트레이딩 시뮬레이션)</li>
-                    <li><strong>월복리(Monthly)</strong>: 매월 1회 이자가 재투자 (적립식 주식, 배당 재투자, 일반 정기적금 표준)</li>
-                    <li><strong>연복리(Yearly)</strong>: 1년에 1회 이자가 정산되어 재투자 (일반 정기예금, 장기 채권 만기 연계)</li>
-                </ul>
+        <!-- 자산 성장 추이 차트 -->
+        <div class="chart-card">
+            <div class="chart-title">
+                <span>📊 자산 성장 추이 그래프</span>
+                <span style="font-size:12px; color:var(--slate-500); font-weight:600;">(납입 원금 vs 복리 이자)</span>
             </div>
+            <div style="position:relative; height:240px;">
+                <canvas id="growthChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 연도별 상세 테이블 -->
+        <div class="card" style="padding:18px; margin-bottom:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div style="font-size:14px; font-weight:800; color:var(--slate-900);">📅 기간별 자산 성장 상세표</div>
+                <span style="font-size:11.5px; color:var(--slate-500);">(세후 기준)</span>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>회차</th>
+                            <th>누적 납입 원금</th>
+                            <th>당기 이자</th>
+                            <th>누적 순수익</th>
+                            <th>최종 자산</th>
+                            <th>수익률</th>
+                        </tr>
+                    </thead>
+                    <tbody id="timelineTbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 하단 액션 버튼 -->
+        <div class="action-row">
+            <button class="action-btn btn-copy" onclick="copyResults()">📋 결과 텍스트 복사</button>
+            <button class="action-btn btn-reset" onclick="scrollToTopForm()">🔄 조건 변경하기</button>
         </div>
     </div>
 </div>
 
-<div id="toast" class="toast">📋 클립보드에 복사되었습니다!</div>
+<div id="toast" class="toast">📋 결과가 클립보드에 복사되었습니다!</div>
 
 <script>
-    // Utility Formatter
+    let growthChart = null;
+
+    // Number Utilities
     function formatNumber(num) {
         return Math.round(num).toLocaleString('ko-KR');
     }
@@ -928,36 +651,232 @@
     }
 
     function toKoreanCurrency(num) {
-        if (num === 0) return '0원';
+        if (!num || num === 0) return '0원';
         const eok = Math.floor(num / 100000000);
         const man = Math.floor((num % 100000000) / 10000);
         let res = '';
         if (eok > 0) res += `${eok}억 `;
         if (man > 0) res += `${man}만 `;
-        if (!res) res = `${num.toLocaleString()}원`;
-        else res += '원';
-        return res.trim();
+        return (res.trim() || '0') + '원';
     }
 
-    // Chart.js Instance
-    let growthChart = null;
+    function formatMoneyInput(el, hintId) {
+        const num = parseNum(el.value);
+        el.value = num > 0 ? num.toLocaleString('ko-KR') : (el.value === '' ? '' : '0');
+        if (hintId) {
+            document.getElementById(hintId).textContent = toKoreanCurrency(num);
+        }
+    }
 
-    function initChart() {
+    function updateRateHint() {
+        const rate = parseFloat(document.getElementById('annualRate').value) || 0;
+        document.getElementById('annualRateKo').textContent = `연 ${rate.toFixed(1)}%`;
+    }
+
+    function updatePeriodHint() {
+        const val = parseInt(document.getElementById('periodInput').value) || 0;
+        const unit = document.getElementById('periodUnit').value;
+        const koEl = document.getElementById('periodKo');
+
+        if (unit === 'year') {
+            koEl.textContent = `${val}년 (${val * 12}개월)`;
+        } else if (unit === 'month') {
+            const y = (val / 12).toFixed(1);
+            koEl.textContent = `${val}개월 (약 ${y}년)`;
+        } else {
+            const y = (val / 365).toFixed(1);
+            koEl.textContent = `${val}일 (약 ${y}년)`;
+        }
+    }
+
+    // 복리 주기 세그먼트 버튼 선택
+    function setCompType(type) {
+        document.getElementById('compoundTypeVal').value = type;
+        
+        document.querySelectorAll('.compound-opt-btn').forEach(btn => btn.classList.remove('active'));
+        if (type === 'daily') {
+            document.getElementById('btnCompDaily').classList.add('active');
+            document.getElementById('compBadgeHint').textContent = '매일 복리 적용 (365일)';
+            document.getElementById('depositLabel').textContent = '3. 정기 적립액 (월 또는 주기)';
+        } else if (type === 'yearly') {
+            document.getElementById('btnCompYearly').classList.add('active');
+            document.getElementById('compBadgeHint').textContent = '매년 복리 적용';
+            document.getElementById('depositLabel').textContent = '3. 정기 적립액 (매년 합산)';
+        } else {
+            document.getElementById('btnCompMonthly').classList.add('active');
+            document.getElementById('compBadgeHint').textContent = '매월 복리 적용 (추천)';
+            document.getElementById('depositLabel').textContent = '3. 정기 적립액 (매월)';
+        }
+    }
+
+    // [계산하기] 버튼 실행 로직
+    function executeCalculation() {
+        const init = parseNum(document.getElementById('initAmount').value);
+        const deposit = parseNum(document.getElementById('monthlyAmount').value);
+        const periodVal = Math.max(1, parseInt(document.getElementById('periodInput').value) || 1);
+        const periodUnit = document.getElementById('periodUnit').value;
+        const annualRate = Math.max(0, parseFloat(document.getElementById('annualRate').value) || 0);
+        const compType = document.getElementById('compoundTypeVal').value;
+        const taxRate = 0.154; // 기본 이자소득세 15.4%
+
+        // 환산: 총 일수, 총 개월수, 총 년수
+        let totalYears = 0;
+        let totalMonths = 0;
+        let totalDays = 0;
+
+        if (periodUnit === 'year') {
+            totalYears = periodVal;
+            totalMonths = periodVal * 12;
+            totalDays = periodVal * 365;
+        } else if (periodUnit === 'month') {
+            totalMonths = periodVal;
+            totalYears = Math.max(1, Math.round(periodVal / 12));
+            totalDays = Math.round(periodVal * 30.416);
+        } else {
+            totalDays = periodVal;
+            totalMonths = Math.max(1, Math.round(periodVal / 30.416));
+            totalYears = Math.max(1, Math.round(periodVal / 365));
+        }
+
+        // Rates
+        const r_daily = (annualRate / 100) / 365;
+        const r_monthly = (annualRate / 100) / 12;
+        const r_yearly = annualRate / 100;
+
+        let chartLabels = [];
+        let principalData = [];
+        let profitData = [];
+        let tableRowsHtml = '';
+
+        let currentBalance = init;
+        let cumulativePrincipal = init;
+
+        // 시뮬레이션 루프 (단위가 '일'이고 1년 미만인 경우 일/주 단위, 일반적인 경우 연 단위 분할)
+        const stepCount = (periodUnit === 'day' && totalDays <= 365) ? Math.min(totalDays, 12) : totalYears;
+        const daysPerStep = Math.round(totalDays / stepCount);
+        const monthsPerStep = Math.max(1, Math.round(totalMonths / stepCount));
+
+        for (let s = 1; s <= stepCount; s++) {
+            let stepPrincipalAdded = 0;
+
+            if (compType === 'daily') {
+                if (periodUnit === 'day' && totalDays <= 365) {
+                    // 일 단위 집중 시뮬레이션
+                    currentBalance = currentBalance * Math.pow(1 + r_daily, daysPerStep);
+                } else {
+                    // 연/월 단위: 매월 적립금 반영 + 일복리
+                    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                    for (let m = 0; m < 12; m++) {
+                        currentBalance = (currentBalance + deposit) * Math.pow(1 + r_daily, daysInMonth[m]);
+                        stepPrincipalAdded += deposit;
+                    }
+                }
+            } else if (compType === 'yearly') {
+                const added = deposit * 12;
+                currentBalance = (currentBalance + added) * (1 + r_yearly);
+                stepPrincipalAdded = added;
+            } else {
+                // monthly (기본)
+                for (let m = 1; m <= 12; m++) {
+                    currentBalance = (currentBalance + deposit) * (1 + r_monthly);
+                    stepPrincipalAdded += deposit;
+                }
+            }
+
+            cumulativePrincipal += stepPrincipalAdded;
+
+            const grossProfitSoFar = Math.max(0, currentBalance - cumulativePrincipal);
+            const netProfitSoFar = grossProfitSoFar * (1 - taxRate);
+            const finalBalanceStep = cumulativePrincipal + netProfitSoFar;
+
+            const prevProfit = profitData.length > 0 ? profitData[profitData.length - 1] : 0;
+            const stepNetProfit = netProfitSoFar - prevProfit;
+            const roiStep = cumulativePrincipal > 0 ? ((netProfitSoFar / cumulativePrincipal) * 100).toFixed(1) : 0;
+
+            const stepLabel = (periodUnit === 'day' && totalDays <= 365) ? `${s * daysPerStep}일` : `${s}년`;
+            chartLabels.push(stepLabel);
+            principalData.push(Math.round(cumulativePrincipal));
+            profitData.push(Math.round(netProfitSoFar));
+
+            tableRowsHtml += `
+                <tr>
+                    <td>${stepLabel}</td>
+                    <td>${formatNumber(cumulativePrincipal)}원</td>
+                    <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(stepNetProfit)}원</td>
+                    <td style="color:var(--emerald-600); font-weight:700;">+${formatNumber(netProfitSoFar)}원</td>
+                    <td style="font-weight:800; color:var(--primary);">${formatNumber(finalBalanceStep)}원</td>
+                    <td>+${roiStep}%</td>
+                </tr>
+            `;
+        }
+
+        // Final Values
+        const finalPrincipal = cumulativePrincipal;
+        const finalGrossProfit = Math.max(0, currentBalance - finalPrincipal);
+        const finalTax = finalGrossProfit * taxRate;
+        const finalNetProfit = finalGrossProfit - finalTax;
+        const finalTotal = finalPrincipal + finalNetProfit;
+        const finalRoi = finalPrincipal > 0 ? ((finalNetProfit / finalPrincipal) * 100).toFixed(1) : 0;
+
+        // Simple interest comparison
+        const simpleGrossProfit = (init * r_yearly * totalYears) + (deposit * 12 * r_yearly * (totalYears / 2));
+        const simpleNetProfit = simpleGrossProfit * (1 - taxRate);
+        const compoundBonus = Math.max(0, finalNetProfit - simpleNetProfit);
+
+        // Update Result DOM
+        document.getElementById('finalTotalDisplay').textContent = `${formatNumber(finalTotal)}원`;
+        document.getElementById('heroRoiDisplay').textContent = `수익률 +${finalRoi}%`;
+        document.getElementById('totalPrincipalDisplay').textContent = `${formatNumber(finalPrincipal)}원`;
+        document.getElementById('netProfitDisplay').textContent = `+${formatNumber(finalNetProfit)}원`;
+        document.getElementById('compoundBonusDisplay').textContent = `+${formatNumber(compoundBonus)}원`;
+        document.getElementById('taxDisplay').textContent = `-${formatNumber(finalTax)}원`;
+
+        // Hero Badges
+        const periodStr = periodUnit === 'year' ? `${periodVal}년 (${periodVal * 12}개월)` : periodUnit === 'month' ? `${periodVal}개월` : `${periodVal}일`;
+        document.getElementById('heroPeriodDisplay').textContent = periodStr;
+
+        const compBadgeStr = compType === 'daily' ? '⚡ 일복리 적용 (365일)' : compType === 'yearly' ? '📅 연복리 적용' : '✨ 월복리 적용';
+        document.getElementById('heroCompDisplay').textContent = compBadgeStr;
+
+        // 72 Rule
+        if (annualRate > 0) {
+            const doubleYears = (72 / annualRate).toFixed(1);
+            document.getElementById('rule72Text').innerHTML = `연 ${annualRate.toFixed(1)}% 복리 기준, 내 원금이 2배가 되는 데 약 <strong>${doubleYears}년</strong>이 걸립니다.`;
+        } else {
+            document.getElementById('rule72Text').textContent = '수익률이 0%인 경우 원금이 불어나지 않습니다.';
+        }
+
+        document.getElementById('timelineTbody').innerHTML = tableRowsHtml;
+
+        // Render / Update Chart
+        renderChart(chartLabels, principalData, profitData);
+
+        // Show Result Area & Smooth Scroll
+        const resultSection = document.getElementById('resultSection');
+        resultSection.style.display = 'block';
+        resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function renderChart(labels, principal, profit) {
         const ctx = document.getElementById('growthChart').getContext('2d');
+        if (growthChart) {
+            growthChart.destroy();
+        }
+
         growthChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: [],
+                labels: labels,
                 datasets: [
                     {
-                        label: '납입 누적 원금',
-                        data: [],
+                        label: '납입 원금',
+                        data: principal,
                         backgroundColor: '#6366f1',
                         borderRadius: 4
                     },
                     {
-                        label: '세후 누적 수익(이자)',
-                        data: [],
+                        label: '세후 복리수익',
+                        data: profit,
                         backgroundColor: '#10b981',
                         borderRadius: 4
                     }
@@ -966,37 +885,28 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            font: { family: 'Pretendard', size: 11, weight: '700' },
-                            boxWidth: 12
-                        }
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid: { display: false }
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + toKoreanCurrency(context.parsed.y);
+                    y: {
+                        stacked: true,
+                        ticks: {
+                            callback: function(v) {
+                                if (v >= 100000000) return (v / 100000000).toFixed(1) + '억';
+                                if (v >= 10000) return (v / 10000) + '만';
+                                return v;
                             }
                         }
                     }
                 },
-                scales: {
-                    x: {
-                        stacked: true,
-                        grid: { display: false },
-                        ticks: { font: { family: 'Pretendard', size: 10 } }
-                    },
-                    y: {
-                        stacked: true,
-                        grid: { color: '#f1f5f9' },
-                        ticks: {
-                            font: { family: 'Pretendard', size: 10 },
-                            callback: function(val) {
-                                if (val >= 100000000) return (val / 100000000) + '억';
-                                if (val >= 10000) return (val / 10000) + '만';
-                                return val;
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                return ctx.dataset.label + ': ' + formatNumber(ctx.raw) + '원';
                             }
                         }
                     }
@@ -1005,282 +915,32 @@
         });
     }
 
-    // Tab Switcher
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-        const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
-        if (targetBtn) targetBtn.classList.add('active');
-
-        const content = document.getElementById('tab-' + tabId);
-        if (content) content.classList.add('active');
-
-        if (tabId === 'calc' && growthChart) {
-            setTimeout(() => growthChart.resize(), 100);
-        }
-        if (tabId === 'target') {
-            calcTarget();
-        }
+    function scrollToTopForm() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Quick Button Helpers
-    function setVal(id, val) {
-        document.getElementById(id).value = val;
-        calcCompound();
-    }
-
-    function addAmount(id, add, isReplace = false) {
-        const el = document.getElementById(id);
-        const curr = isReplace ? 0 : parseNum(el.value);
-        el.value = (curr + add).toLocaleString('ko-KR');
-        formatAndCalc();
-    }
-
-    function setAmount(id, val) {
-        document.getElementById(id).value = val.toLocaleString('ko-KR');
-        formatAndCalcTarget();
-    }
-
-    function formatAndCalc() {
-        ['initAmount', 'monthlyAmount'].forEach(id => {
-            const el = document.getElementById(id);
-            const val = parseNum(el.value);
-            const koEl = document.getElementById(id + 'Ko');
-            if (koEl) koEl.textContent = toKoreanCurrency(val);
-        });
-        calcCompound();
-    }
-
-    function formatAndCalcTarget() {
-        ['targetGoal', 'targetInit'].forEach(id => {
-            const el = document.getElementById(id);
-            const val = parseNum(el.value);
-            const koEl = document.getElementById(id + 'Ko');
-            if (koEl) koEl.textContent = toKoreanCurrency(val);
-        });
-        calcTarget();
-    }
-
-    function resetForm() {
-        document.getElementById('initAmount').value = '10,000,000';
-        document.getElementById('monthlyAmount').value = '500,000';
-        document.getElementById('periodYears').value = '10';
-        document.getElementById('annualRate').value = '7.0';
-        document.getElementById('compMonthly').checked = true;
-        document.getElementById('taxGeneral').checked = true;
-        formatAndCalc();
-    }
-
-    // Main Compound Calculation
-    function calcCompound() {
-        const init = parseNum(document.getElementById('initAmount').value);
-        const monthly = parseNum(document.getElementById('monthlyAmount').value);
-        const years = Math.max(1, parseInt(document.getElementById('periodYears').value) || 1);
-        const annualRate = Math.max(0, parseFloat(document.getElementById('annualRate').value) || 0);
-
-        document.getElementById('periodYearsKo').textContent = `${years}년 (${years * 12}개월)`;
-        document.getElementById('annualRateKo').textContent = `연 ${annualRate.toFixed(1)}%`;
-
-        const compType = document.querySelector('input[name="compoundType"]:checked').value;
-        const taxRate = parseFloat(document.querySelector('input[name="taxType"]:checked').value);
-
-        // Badge update
-        const compBadge = document.getElementById('compBadgeText');
-        if (compType === 'daily') compBadge.textContent = '⚡ 일복리 적용 (365일)';
-        else if (compType === 'monthly') compBadge.textContent = '✨ 월복리 적용';
-        else if (compType === 'yearly') compBadge.textContent = '📅 연복리 적용';
-        else compBadge.textContent = '📊 단리 적용';
-
-        // 72 Rule
-        const rule72El = document.getElementById('rule72Text');
-        if (annualRate > 0) {
-            const doubleYears = (72 / annualRate).toFixed(1);
-            rule72El.innerHTML = `연 ${annualRate.toFixed(1)}% 수익 시, 원금이 2배가 되는 데 약 <strong>${doubleYears}년</strong>이 걸립니다.`;
-        } else {
-            rule72El.textContent = '수익률이 0%인 경우 원금이 증가하지 않습니다.';
-        }
-
-        // Timeline simulation data
-        let chartLabels = [];
-        let principalData = [];
-        let profitData = [];
-        let tableRowsHtml = '';
-
-        let currentBalance = init;
-        let cumulativePrincipal = init;
-        let totalInterestGross = 0;
-
-        const totalMonths = years * 12;
-        const r_daily = (annualRate / 100) / 365;
-        const r_monthly = (annualRate / 100) / 12;
-        const r_yearly = annualRate / 100;
-
-        for (let y = 1; y <= years; y++) {
-            let yearStartBalance = currentBalance;
-            let yearPrincipalAdded = 0;
-
-            if (compType === 'daily') {
-                // 일복리: 1년 365일 (매월 적립금은 월초 투입 후 일별 복리 증식)
-                const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-                for (let m = 0; m < 12; m++) {
-                    currentBalance = (currentBalance + monthly) * Math.pow(1 + r_daily, daysInMonth[m]);
-                    yearPrincipalAdded += monthly;
-                }
-            } else if (compType === 'monthly') {
-                for (let m = 1; m <= 12; m++) {
-                    currentBalance = (currentBalance + monthly) * (1 + r_monthly);
-                    yearPrincipalAdded += monthly;
-                }
-            } else if (compType === 'yearly') {
-                // 연복리: 매월 적립금은 연말에 이자 반영
-                const addedYearly = monthly * 12;
-                currentBalance = (currentBalance + addedYearly) * (1 + r_yearly);
-                yearPrincipalAdded = addedYearly;
-            } else {
-                // 단리
-                const addedYearly = monthly * 12;
-                cumulativePrincipal += addedYearly;
-                // 단리 이자 누적
-                const currentYearGrossProfit = (init * r_yearly * y) + (addedYearly * r_yearly * (y / 2));
-                currentBalance = cumulativePrincipal + currentYearGrossProfit;
-                yearPrincipalAdded = addedYearly;
-            }
-
-            if (compType !== 'simple') {
-                cumulativePrincipal += yearPrincipalAdded;
-            }
-
-            const grossProfitSoFar = Math.max(0, currentBalance - cumulativePrincipal);
-            const netProfitSoFar = grossProfitSoFar * (1 - taxRate);
-            const finalBalanceYearEnd = cumulativePrincipal + netProfitSoFar;
-
-            const yearNetProfit = netProfitSoFar - (profitData.length > 0 ? profitData[profitData.length - 1] : 0);
-            const roiYear = cumulativePrincipal > 0 ? ((netProfitSoFar / cumulativePrincipal) * 100).toFixed(1) : 0;
-
-            chartLabels.push(`${y}년차`);
-            principalData.push(Math.round(cumulativePrincipal));
-            profitData.push(Math.round(netProfitSoFar));
-
-            tableRowsHtml += `
-                <tr>
-                    <td>${y}년</td>
-                    <td>${formatNumber(cumulativePrincipal)}원</td>
-                    <td class="profit-highlight">+${formatNumber(yearNetProfit)}원</td>
-                    <td class="profit-highlight">+${formatNumber(netProfitSoFar)}원</td>
-                    <td class="total-highlight">${formatNumber(finalBalanceYearEnd)}원</td>
-                    <td>+${roiYear}%</td>
-                </tr>
-            `;
-        }
-
-        // Final Totals
-        const finalPrincipal = cumulativePrincipal;
-        const finalGrossProfit = Math.max(0, currentBalance - finalPrincipal);
-        const finalTax = finalGrossProfit * taxRate;
-        const finalNetProfit = finalGrossProfit - finalTax;
-        const finalTotal = finalPrincipal + finalNetProfit;
-        const finalRoi = finalPrincipal > 0 ? ((finalNetProfit / finalPrincipal) * 100).toFixed(1) : 0;
-
-        // Simple interest comparison for bonus calculation
-        const simpleGrossProfit = (init * r_yearly * years) + (monthly * 12 * r_yearly * (years / 2));
-        const simpleNetProfit = simpleGrossProfit * (1 - taxRate);
-        const compoundBonus = Math.max(0, finalNetProfit - simpleNetProfit);
-
-        // Update DOM
-        document.getElementById('finalTotalDisplay').textContent = `${formatNumber(finalTotal)}원`;
-        document.getElementById('roiDisplay').textContent = `+${finalRoi}%`;
-        document.getElementById('periodDisplay').textContent = `${years}년 (${totalMonths}개월)`;
-        document.getElementById('totalPrincipalDisplay').textContent = `${formatNumber(finalPrincipal)}원`;
-        document.getElementById('netProfitDisplay').textContent = `+${formatNumber(finalNetProfit)}원`;
-        document.getElementById('compoundBonusDisplay').textContent = `+${formatNumber(compoundBonus)}원`;
-        document.getElementById('taxDisplay').textContent = `-${formatNumber(finalTax)}원`;
-
-        document.getElementById('timelineTbody').innerHTML = tableRowsHtml;
-
-        // Update Chart
-        if (growthChart) {
-            growthChart.data.labels = chartLabels;
-            growthChart.data.datasets[0].data = principalData;
-            growthChart.data.datasets[1].data = profitData;
-            growthChart.update();
-        }
-    }
-
-    // Target Goal Calculation
-    function calcTarget() {
-        const goal = parseNum(document.getElementById('targetGoal').value);
-        const init = parseNum(document.getElementById('targetInit').value);
-        const years = Math.max(1, parseInt(document.getElementById('targetYears').value) || 1);
-        const rate = Math.max(0.1, parseFloat(document.getElementById('targetRate').value) || 0.1);
-
-        document.getElementById('targetYearsKo').textContent = `${years}년 (${years * 12}개월)`;
-        document.getElementById('targetRateKo').textContent = `연 ${rate.toFixed(1)}%`;
-
-        const totalMonths = years * 12;
-        const r = (rate / 100) / 12;
-
-        // FV = PV * (1+r)^n + PMT * [ ((1+r)^n - 1) / r ]
-        // PMT = [ FV - PV * (1+r)^n ] / [ ((1+r)^n - 1) / r ]
-        const compoundFactor = Math.pow(1 + r, totalMonths);
-        const initFutureValue = init * compoundFactor;
-
-        let neededMonthly = 0;
-        if (goal > initFutureValue) {
-            const remainingGoal = goal - initFutureValue;
-            const annuityFactor = (compoundFactor - 1) / r;
-            neededMonthly = remainingGoal / annuityFactor;
-        }
-
-        const totalPrincipal = init + (neededMonthly * totalMonths);
-        const interestEarned = Math.max(0, goal - totalPrincipal);
-
-        document.getElementById('targetMonthlyNeededDisplay').textContent = `${formatNumber(neededMonthly)}원 / 월`;
-        document.getElementById('targetTotalPrincipalDisplay').textContent = toKoreanCurrency(totalPrincipal);
-        document.getElementById('targetInterestSavedDisplay').textContent = `+${toKoreanCurrency(interestEarned)}`;
-
-        const savingsWithoutInterest = Math.max(0, (goal - init) / totalMonths);
-        const monthlySaved = Math.max(0, savingsWithoutInterest - neededMonthly);
-
-        document.getElementById('targetGuideP').innerHTML = `
-            목표 <strong>${toKoreanCurrency(goal)}</strong>을 ${years}년 동안 모으려면 단순 저축 시 매월 <strong>${formatNumber(savingsWithoutInterest)}원</strong>이 필요하지만,<br>
-            연 <strong>${rate.toFixed(1)}%</strong> 복리 투자 시 매월 <strong>${formatNumber(neededMonthly)}원</strong>만 모아도 달성 가능합니다.<br>
-            <span style="color:var(--emerald-600); font-weight:800;">👉 복리 이자 덕분에 매월 약 ${formatNumber(monthlySaved)}원의 저축 부담이 줄어듭니다!</span>
-        `;
-    }
-
-    // Copy Results
     function copyResults() {
         const finalTotal = document.getElementById('finalTotalDisplay').textContent;
-        const roi = document.getElementById('roiDisplay').textContent;
+        const roi = document.getElementById('heroRoiDisplay').textContent;
         const principal = document.getElementById('totalPrincipalDisplay').textContent;
         const profit = document.getElementById('netProfitDisplay').textContent;
-        const years = document.getElementById('periodYears').value;
+        const period = document.getElementById('heroPeriodDisplay').textContent;
+        const comp = document.getElementById('heroCompDisplay').textContent;
         const rate = document.getElementById('annualRate').value;
 
-        const compType = document.querySelector('input[name="compoundType"]:checked').value;
-        const compTypeName = compType === 'daily' ? '일복리(매일)' : compType === 'monthly' ? '월복리(매월)' : compType === 'yearly' ? '연복리(매년)' : '단리';
-
         const text = `[복리 계산 결과 요약]\n` +
-                     `- 계산 방식: ${compTypeName}\n` +
-                     `- 투자 기간: ${years}년\n` +
-                     `- 예상 연수익률: 연 ${rate}%\n` +
+                     `- 복리 주기: ${comp}\n` +
+                     `- 투자 기간: ${period}\n` +
+                     `- 연 수익률: 연 ${rate}%\n` +
                      `- 총 납입 원금: ${principal}\n` +
-                     `- 세후 순수익: ${profit} (${roi})\n` +
-                     `- 만기 최종 자산: ${finalTotal}\n` +
+                     `- 세후 이자 순수익: ${profit} (${roi})\n` +
+                     `- 만기 최종 금액: ${finalTotal}\n` +
                      `📌 출처: Barcode128 복리 계산기 (https://barcode128.mycafe24.com/compound-calculator/)`;
 
         navigator.clipboard.writeText(text).then(() => {
-            showToast('📋 결과가 클립보드에 복사되었습니다!');
+            showToast('📋 결과 요약이 클립보드에 복사되었습니다!');
         }).catch(() => {
             showToast('복사에 실패했습니다.');
-        });
-    }
-
-    function shareUrl() {
-        const url = 'https://barcode128.mycafe24.com/compound-calculator/';
-        navigator.clipboard.writeText(url).then(() => {
-            showToast('🔗 계산기 주소가 복사되었습니다!');
         });
     }
 
@@ -1288,15 +948,8 @@
         const t = document.getElementById('toast');
         t.textContent = msg;
         t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2500);
+        setTimeout(() => t.classList.remove('show'), 2200);
     }
-
-    // Initialize
-    window.addEventListener('DOMContentLoaded', () => {
-        initChart();
-        formatAndCalc();
-        formatAndCalcTarget();
-    });
 </script>
 
 </body>
