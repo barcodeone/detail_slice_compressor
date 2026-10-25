@@ -1177,6 +1177,19 @@
         t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), 2200);
     }
+
+    // Auto-resize for iframe embed
+    function notifyParentHeight() {
+        if (window.parent && window.parent !== window) {
+            const height = document.documentElement.scrollHeight || document.body.scrollHeight;
+            window.parent.postMessage({ type: 'TOOL_RESIZE', height: height + 20 }, '*');
+        }
+    }
+    window.addEventListener('load', notifyParentHeight);
+    window.addEventListener('resize', notifyParentHeight);
+    if (window.ResizeObserver) {
+        new ResizeObserver(notifyParentHeight).observe(document.body);
+    }
 </script>
 
 </body>
