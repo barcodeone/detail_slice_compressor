@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 운세 (12간지 띠별 · 별자리 · 생년월일 무료 사주 운세) | Barcode128</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: #eef2ff;
+            --purple: #8b5cf6;
+            --purple-light: #f5f3ff;
+            --amber: #f59e0b;
+            --amber-light: #fffbeb;
+            --emerald: #10b981;
+            --emerald-light: #ecfdf5;
+            --rose: #f43f5e;
+            --rose-light: #fff1f2;
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+            --radius-xl: 20px;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: transparent;
+            color: var(--slate-800);
+            line-height: 1.5;
+            padding: 10px 16px 40px 16px;
+        }
+
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        /* App Header */
+        .app-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 9999px;
+            background: var(--purple-light);
+            color: var(--purple);
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .app-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--slate-900);
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .app-subtitle {
+            font-size: 14px;
+            color: var(--slate-500);
+            line-height: 1.5;
+        }
+
+        .today-date-badge {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--slate-700);
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            padding: 4px 12px;
+            border-radius: 8px;
+        }
+
+        /* Card Box */
+        .card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-xl);
+            padding: 26px 22px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+            margin-bottom: 22px;
+        }
+
+        /* Mode Segmented Tab */
+        .tab-segmented {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background: var(--slate-100);
+            padding: 6px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+        }
+
+        .tab-btn {
+            padding: 12px 6px;
+            text-align: center;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--slate-600);
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            color: var(--purple);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            font-weight: 800;
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--slate-900);
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Form Group */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--slate-700);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            height: 48px;
+            padding: 0 14px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--slate-800);
+            background: #ffffff;
+            border: 1.5px solid var(--slate-200);
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Choice Chips (12간지 & 12별자리) */
+        .chips-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        @media (max-width: 580px) {
+            .chips-grid { grid-template-columns: repeat(3, 1fr); }
+            .tab-btn { font-size: 12.5px; padding: 10px 4px; }
+        }
+
+        .chip-item {
+            background: var(--slate-50);
+            border: 1.5px solid var(--slate-200);
+            border-radius: var(--radius-md);
+            padding: 10px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .chip-item:hover {
+            border-color: var(--purple);
+            background: var(--purple-light);
+            transform: translateY(-2px);
+        }
+
+        .chip-item.active {
+            border-color: var(--purple);
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+        }
+
+        .chip-icon {
+            font-size: 22px;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .chip-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--slate-800);
+        }
+
+        .chip-item.active .chip-title {
+            color: var(--purple);
+        }
+
+        .chip-desc {
+            font-size: 10.5px;
+            color: var(--slate-400);
+            margin-top: 2px;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            height: 52px;
+            background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+            margin-top: 22px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(124, 58, 237, 0.45);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Result Section */
+        #resultSection {
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, #4c1d95 0%, #312e81 100%);
+            border-radius: 18px;
+            padding: 26px 20px;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-target-pill {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .hero-score-val {
+            font-size: 44px;
+            font-weight: 900;
+            color: #fbbf24;
+            line-height: 1.1;
+            margin-bottom: 4px;
+        }
+
+        .hero-score-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 12px;
+        }
+
+        .hero-stars {
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .hero-headline {
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.6;
+            color: #ffffff;
+            max-width: 580px;
+            margin: 0 auto 14px auto;
+            word-break: keep-all;
+        }
+
+        .hero-tags {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .hero-tag {
+            background: rgba(255, 255, 255, 0.18);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 700;
+        }
+
+        /* 4 Detail Luck Cards */
+        .luck-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 580px) {
+            .luck-grid { grid-template-columns: 1fr; }
+        }
+
+        .luck-card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .luck-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .luck-title-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--slate-900);
+        }
+
+        .luck-score-badge {
+            font-size: 12px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 9999px;
+        }
+
+        .gauge-bar {
+            height: 6px;
+            background: var(--slate-100);
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .gauge-fill {
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .luck-desc {
+            font-size: 12.5px;
+            color: var(--slate-600);
+            line-height: 1.6;
+            word-break: keep-all;
+        }
+
+        /* Lucky Booster Items */
+        .booster-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 580px) {
+            .booster-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .booster-card {
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-md);
+            padding: 14px 10px;
+            text-align: center;
+        }
+
+        .booster-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .booster-label {
+            font-size: 11px;
+            color: var(--slate-400);
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .booster-val {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--slate-900);
+        }
+
+        /* Action Buttons */
+        .action-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .action-btn {
+            height: 46px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .btn-copy {
+            background: var(--slate-900);
+            color: #ffffff;
+            border: none;
+        }
+
+        .btn-copy:hover {
+            background: #1e293b;
+        }
+
+        .btn-reset {
+            background: #ffffff;
+            color: var(--slate-700);
+            border: 1.5px solid var(--slate-200);
+        }
+
+        .btn-reset:hover {
+            background: var(--slate-50);
+            border-color: var(--slate-300);
+        }
+
+        .lotto-link-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            height: 42px;
+            background: #fffbeb;
+            color: #b45309;
+            border: 1.5px solid #fde68a;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 800;
+            text-decoration: none;
+            margin-top: 12px;
+            transition: all 0.15s ease;
+        }
+
+        .lotto-link-btn:hover {
+            background: #fef3c7;
+            transform: translateY(-1px);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(50px);
+            background: rgba(15, 23, 42, 0.9);
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 700;
+            opacity: 0;
+            transition: all 0.25s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <header class="app-header">
+        <span class="badge-pill">🔮 정통 사주 · 12간지 · 서양 점성술 완벽 통합</span>
+        <h1 class="app-title">오늘의 운세</h1>
+        <p class="app-subtitle">오늘 하루 나를 이끄는 기운과 재물·직업·애정·건강운, 그리고 행운의 부스터를 확인하세요.</p>
+        <div class="today-date-badge" id="todayDateBadge">📅 오늘: 로딩 중...</div>
+    </header>
+
+    <!-- Input Card -->
+    <div class="card" id="formCard">
+        <!-- Mode Tabs -->
+        <div class="tab-segmented">
+            <button type="button" class="tab-btn active" id="tabBirth" onclick="switchMode('birth')">
+                🎂 생년월일 맞춤
+            </button>
+            <button type="button" class="tab-btn" id="tabZodiac" onclick="switchMode('zodiac')">
+                🐾 12간지 띠별
+            </button>
+            <button type="button" class="tab-btn" id="tabStar" onclick="switchMode('star')">
+                🌌 12 별자리
+            </button>
+        </div>
+        <input type="hidden" id="currentMode" value="birth">
+
+        <!-- 1) Mode: 생년월일 맞춤 -->
+        <div id="sectionBirth">
+            <div class="form-group">
+                <label class="form-label" for="birthDate">생년월일 입력</label>
+                <input type="date" id="birthDate" class="form-input" value="1995-07-07">
+            </div>
+            <div class="grid-2 form-group">
+                <div>
+                    <label class="form-label" for="calendarType">양력 / 음력</label>
+                    <select id="calendarType" class="form-select">
+                        <option value="solar" selected>양력 (Solar)</option>
+                        <option value="lunar">음력 (Lunar)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="genderSelect">성별</label>
+                    <select id="genderSelect" class="form-select">
+                        <option value="male" selected>남성</option>
+                        <option value="female">여성</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2) Mode: 12간지 띠별 -->
+        <div id="sectionZodiac" style="display:none;">
+            <label class="form-label">내 출생 띠 선택</label>
+            <div class="chips-grid" id="zodiacChipsGrid"></div>
+            <input type="hidden" id="selectedZodiac" value="0">
+        </div>
+
+        <!-- 3) Mode: 12 별자리 -->
+        <div id="sectionStar" style="display:none;">
+            <label class="form-label">내 별자리 선택</label>
+            <div class="chips-grid" id="starChipsGrid"></div>
+            <input type="hidden" id="selectedStar" value="0">
+        </div>
+
+        <!-- Submit Button -->
+        <button type="button" class="submit-btn" onclick="executeFortune()">
+            <span>🔮 오늘 내 운세 확인하기</span>
+        </button>
+    </div>
+
+    <!-- Result Section -->
+    <div id="resultSection">
+        <!-- Hero Banner -->
+        <div class="hero-banner">
+            <div class="hero-target-pill" id="resTargetPill">1995년생 돼지띠 · 남성</div>
+            <div class="hero-score-val" id="resScore">92점</div>
+            <div class="hero-score-label">오늘의 종합 행운 지수</div>
+            <div class="hero-stars" id="resStars">⭐⭐⭐⭐⭐</div>
+            <div class="hero-headline" id="resHeadline">
+                "성실히 뿌려둔 씨앗이 탐스러운 결실을 맺는 시기입니다. 주저하지 말고 자신 있게 전진하세요."
+            </div>
+            <div class="hero-tags" id="resTags">
+                <span class="hero-tag">#순풍</span>
+                <span class="hero-tag">#귀인도움</span>
+                <span class="hero-tag">#재물유입</span>
+            </div>
+        </div>
+
+        <!-- 4 Detailed Luck Cards -->
+        <div class="luck-grid">
+            <!-- 1. 재물운 -->
+            <div class="luck-card">
+                <div>
+                    <div class="luck-header">
+                        <div class="luck-title-row">
+                            <span>💰</span>
+                            <span>재물 · 금전운</span>
+                        </div>
+                        <span class="luck-score-badge" id="badgeWealth" style="background:var(--amber-light); color:var(--amber);">95점</span>
+                    </div>
+                    <div class="gauge-bar">
+                        <div class="gauge-fill" id="gaugeWealth" style="width:95%; background:var(--amber);"></div>
+                    </div>
+                    <p class="luck-desc" id="descWealth">
+                        생각지 못한 금전적 보상이나 유리한 계약의 기회가 찾아옵니다. 충동적인 소비만 줄인다면 자산의 곳간이 두둑해지는 날입니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2. 직업·학업운 -->
+            <div class="luck-card">
+                <div>
+                    <div class="luck-header">
+                        <div class="luck-title-row">
+                            <span>💼</span>
+                            <span>직업 · 학업운</span>
+                        </div>
+                        <span class="luck-score-badge" id="badgeCareer" style="background:var(--primary-light); color:var(--primary);">88점</span>
+                    </div>
+                    <div class="gauge-bar">
+                        <div class="gauge-fill" id="gaugeCareer" style="width:88%; background:var(--primary);"></div>
+                    </div>
+                    <p class="luck-desc" id="descCareer">
+                        탁월한 직관과 집중력이 돋보이는 날입니다. 미뤄두었던 기획이나 까다로운 과제를 추진하면 주변의 신뢰와 인정을 한몸에 받습니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 3. 애정·대인운 -->
+            <div class="luck-card">
+                <div>
+                    <div class="luck-header">
+                        <div class="luck-title-row">
+                            <span>❤️</span>
+                            <span>애정 · 대인운</span>
+                        </div>
+                        <span class="luck-score-badge" id="badgeLove" style="background:var(--rose-light); color:var(--rose);">90점</span>
+                    </div>
+                    <div class="gauge-bar">
+                        <div class="gauge-fill" id="gaugeLove" style="width:90%; background:var(--rose);"></div>
+                    </div>
+                    <p class="luck-desc" id="descLove">
+                        따뜻한 배려와 긍정적인 미소가 상대방의 닫힌 마음을 엽니다. 솔로는 우연한 자리에서 마음이 통하는 매력적인 인연을 만날 수 있습니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 4. 건강운 -->
+            <div class="luck-card">
+                <div>
+                    <div class="luck-header">
+                        <div class="luck-title-row">
+                            <span>🩺</span>
+                            <span>건강 · 활력운</span>
+                        </div>
+                        <span class="luck-score-badge" id="badgeHealth" style="background:var(--emerald-light); color:var(--emerald);">85점</span>
+                    </div>
+                    <div class="gauge-bar">
+                        <div class="gauge-fill" id="gaugeHealth" style="width:85%; background:var(--emerald);"></div>
+                    </div>
+                    <p class="luck-desc" id="descHealth">
+                        에너지가 충만하나 무리한 운동은 피하고 가벼운 스트레칭과 수분 섭취로 컨디션을 조율하세요. 충분한 수면이 피로를 씻어줍니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 Lucky Boosters -->
+        <div class="card" style="padding:18px; margin-bottom:20px;">
+            <div style="font-size:14px; font-weight:800; color:var(--slate-900); margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+                <span>🍀 오늘의 행운 부스터</span>
+                <span style="font-size:12px; color:var(--slate-400); font-weight:600;">(하루 운기를 높여주는 럭키 4종)</span>
+            </div>
+            <div class="booster-grid">
+                <div class="booster-card">
+                    <span class="booster-icon">🔢</span>
+                    <div class="booster-label">행운의 숫자</div>
+                    <div class="booster-val" id="boostNumber">7, 14, 23</div>
+                </div>
+                <div class="booster-card">
+                    <span class="booster-icon">🎨</span>
+                    <div class="booster-label">행운의 색상</div>
+                    <div class="booster-val" id="boostColor">에메랄드 그린</div>
+                </div>
+                <div class="booster-card">
+                    <span class="booster-icon">🧭</span>
+                    <div class="booster-label">행운의 방향</div>
+                    <div class="booster-val" id="boostDirection">동남쪽</div>
+                </div>
+                <div class="booster-card">
+                    <span class="booster-icon">⏰</span>
+                    <div class="booster-label">골든 타임</div>
+                    <div class="booster-val" id="boostTime">14시 ~ 16시</div>
+                </div>
+            </div>
+
+            <!-- 행운의 번호 로또 연동 배너 -->
+            <a href="https://barcode128.mycafe24.com/lotto-generator/" target="_parent" class="lotto-link-btn">
+                <span>🎱 오늘의 행운 번호로 로또 6/45 조합 뽑아보기 ➔</span>
+            </a>
+        </div>
+
+        <!-- 마음 챙김 명언 카드 -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px; margin-bottom:20px; font-size:13px; color:var(--slate-600); display:flex; align-items:center; gap:10px;">
+            <span style="font-size:20px;">💡</span>
+            <span id="mindfulnessText">"행운은 준비된 자에게 미소 짓습니다. 오늘 하루 나를 믿고 한 걸음 더 내딛으세요."</span>
+        </div>
+
+        <!-- Action Row -->
+        <div class="action-row">
+            <button type="button" class="action-btn btn-copy" onclick="copyFortune()">📋 운세 결과 텍스트 복사</button>
+            <button type="button" class="action-btn btn-reset" onclick="scrollToTopForm()">🔄 다른 조건으로 보기</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast">📋 오늘의 운세가 클립보드에 복사되었습니다!</div>
+
+<script>
+    // 12간지 데이터
+    const ZODIAC_LIST = [
+        { name: '쥐띠', icon: '🐭', years: '48, 60, 72, 84, 96, 08년생' },
+        { name: '소띠', icon: '🐮', years: '49, 61, 73, 85, 97, 09년생' },
+        { name: '호랑이띠', icon: '🐯', years: '50, 62, 74, 86, 98, 10년생' },
+        { name: '토끼띠', icon: '🐰', years: '51, 63, 75, 87, 99, 11년생' },
+        { name: '용띠', icon: '🐲', years: '52, 64, 76, 88, 00, 12년생' },
+        { name: '뱀띠', icon: '🐍', years: '53, 65, 77, 89, 01, 13년생' },
+        { name: '말띠', icon: '🐴', years: '54, 66, 78, 90, 02, 14년생' },
+        { name: '양띠', icon: '🐑', years: '55, 67, 79, 91, 03, 15년생' },
+        { name: '원숭이띠', icon: '🐵', years: '56, 68, 80, 92, 04, 16년생' },
+        { name: '닭띠', icon: '🐔', years: '57, 69, 81, 93, 05, 17년생' },
+        { name: '개띠', icon: '🐶', years: '58, 70, 82, 94, 06, 18년생' },
+        { name: '돼지띠', icon: '🐷', years: '59, 71, 83, 95, 07, 19년생' }
+    ];
+
+    // 12별자리 데이터
+    const STAR_LIST = [
+        { name: '물병자리', icon: '♒', dates: '1.20 ~ 2.18' },
+        { name: '물고기자리', icon: '♓', dates: '2.19 ~ 3.20' },
+        { name: '양자리', icon: '♈', dates: '3.21 ~ 4.19' },
+        { name: '황소자리', icon: '♉', dates: '4.20 ~ 5.20' },
+        { name: '쌍둥이자리', icon: '♊', dates: '5.21 ~ 6.21' },
+        { name: '게자리', icon: '♋', dates: '6.22 ~ 7.22' },
+        { name: '사자자리', icon: '♌', dates: '7.23 ~ 8.22' },
+        { name: '처녀자리', icon: '♍', dates: '8.23 ~ 9.22' },
+        { name: '천칭자리', icon: '♎', dates: '9.23 ~ 10.23' },
+        { name: '전갈자리', icon: '♏', dates: '10.24 ~ 11.22' },
+        { name: '사수자리', icon: '♐', dates: '11.23 ~ 12.21' },
+        { name: '염소자리', icon: '♑', dates: '12.22 ~ 1.19' }
+    ];
+
+    // 정통 운세 풀이 데이터베이스
+    const HEADLINES = [
+        "맑은 하늘에 따스한 볕이 비추듯, 성실히 준비해 온 일들이 눈부신 결실을 맺는 대길(大吉)의 날입니다.",
+        "새로운 기회와 좋은 인연이 손을 내미는 형국입니다. 작은 망설임을 내려놓고 당당하게 전진하세요.",
+        "주변의 조력과 따뜻한 응원이 든든한 힘이 됩니다. 긍정적인 마음가짐이 더 큰 행운을 끌어당깁니다.",
+        "노력한 만큼 정직한 보상이 따르는 안정적인 하루입니다. 기초를 단단히 다지면 앞으로 도약할 발판이 됩니다.",
+        "뜻밖의 횡재수와 유쾌한 만남이 기다립니다. 작은 호의를 베풀면 몇 배의 복이 되어 돌아옵니다.",
+        "파도가 지나가고 잔잔한 호수를 마주하듯, 마음에 평온과 안정이 깃드는 힐링의 하루입니다.",
+        "목표했던 일에 가속도가 붙는 진취적인 기운입니다. 적극적인 행동과 결단력이 최고의 무기입니다.",
+        "지혜와 직관이 번뜩이는 날입니다. 풀리지 않던 고민의 실마리가 명쾌하게 해결되는 흐름입니다."
+    ];
+
+    const WEALTH_DESCS = [
+        "생각지 못한 금전적 수익이나 유리한 계약의 기회가 찾아옵니다. 충동구매만 자제하면 곳간이 든든해집니다.",
+        "자금 흐름이 원활하고 작지만 쏠쏠한 보너스나 용돈이 들어올 수 있는 길한 기운입니다.",
+        "투자나 매매에 신중함이 결실을 맺습니다. 꼼꼼한 지출 계획이 미래의 큰 자산으로 이어집니다.",
+        "지출보다 수입이 우세한 날입니다. 작은 절약이 쌓여 든든한 종잣돈이 되는 기쁨을 맛봅니다.",
+        "귀인의 조언으로 재테크의 안목이 넓어집니다. 검증된 정보에 귀를 기울이면 행운이 따릅니다."
+    ];
+
+    const CAREER_DESCS = [
+        "탁월한 집중력과 창의적인 아이디어가 돋보여 동료와 상사에게 깊은 신뢰를 얻습니다.",
+        "미뤄두었던 프로젝트나 과제가 일사천리로 해결되며 눈에 띄는 업무 성과를 거두게 됩니다.",
+        "새로운 업무나 도전에 청신호가 켜집니다. 주저하지 말고 당신의 능력을 마음껏 펼쳐보세요.",
+        "성실함이 최고의 경쟁력입니다. 묵묵히 다져온 실력이 마침내 빛을 발하며 인정받습니다.",
+        "협업과 소통에서 주도적인 역할을 맡아 팀의 사기를 높이고 성공적인 마무리를 이끕니다."
+    ];
+
+    const LOVE_DESCS = [
+        "따뜻한 배려와 긍정적인 미소가 상대방의 마음을 활짝 엽니다. 연인과의 애정이 더욱 깊어집니다.",
+        "솔로는 뜻밖의 장소나 모임에서 대화가 잘 통하는 매력적인 인연을 마주칠 운이 높습니다.",
+        "서로의 서운했던 감정이 부드럽게 풀리고 신뢰가 회복되는 평화롭고 달콤한 시간입니다.",
+        "진솔한 고백이나 솔직한 감정 표현이 마법처럼 통하는 날입니다. 마음을 아끼지 마세요.",
+        "주변 사람들에게 따뜻한 칭찬 한마디를 건네면 소중한 인간관계가 더욱 돈독해집니다."
+    ];
+
+    const HEALTH_DESCS = [
+        "몸과 마음에 활력이 넘치며 쾌적한 컨디션이 유지됩니다. 가벼운 유산소 운동이 활력을 더합니다.",
+        "충분한 수분 섭취와 비타민 충전이 피로를 씻어줍니다. 규칙적인 스트레칭으로 밸런스를 잡으세요.",
+        "숙면을 통해 쌓였던 피로가 말끔히 해소됩니다. 따뜻한 차 한 잔으로 마음의 여유를 챙기세요.",
+        "과로나 과식을 피하고 담백한 식단을 유지하면 몸이 가벼워지고 집중력이 크게 향상됩니다.",
+        "자연을 접하거나 가벼운 산책을 즐기면 머리가 맑아지고 긍정적인 에너지가 가득 찹니다."
+    ];
+
+    const COLORS = ['에메랄드 그린', '딥 네이비', '로얄 퍼플', '선셋 오렌지', '스카이 블루', '소프트 코랄', '클래식 화이트', '골드 옐로우'];
+    const DIRECTIONS = ['동남쪽 (행운 유입)', '남서쪽 (재물 상승)', '북동쪽 (귀인 조력)', '정동쪽 (활력 증진)', '서북쪽 (안정 평온)'];
+    const TIMES = ['09:00 ~ 11:00', '11:30 ~ 13:30', '14:00 ~ 16:00', '16:30 ~ 18:30', '19:00 ~ 21:00'];
+    const MINDFULNESS_LIST = [
+        "행운은 준비된 자에게 미소 짓습니다. 오늘 하루 나를 믿고 힘차게 나아가세요.",
+        "작은 감사가 큰 기적을 만듭니다. 오늘 내게 주어진 사소한 행복을 놓치지 마세요.",
+        "타인의 시선에 휘둘리지 않고 내 중심을 지킬 때 최고의 행운이 찾아옵니다.",
+        "어제의 후회와 내일의 걱정을 내려놓고, 가장 빛나는 지금 이 순간에 집중하세요.",
+        "당신이 베푼 작은 친절과 미소는 부메랑이 되어 더 큰 축복으로 돌아옵니다."
+    ];
+
+    // Seeded Random Helper
+    function getHash(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = (hash << 5) - hash + str.charCodeAt(i);
+            hash |= 0;
+        }
+        return Math.abs(hash);
+    }
+
+    function seededRandom(seed, max) {
+        const x = Math.sin(seed) * 10000;
+        return Math.floor((x - Math.floor(x)) * max);
+    }
+
+    // KST 오늘 날짜 구하기
+    function getKSTDateString() {
+        const now = new Date(Date.now() + 9 * 3600 * 1000);
+        return now.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+    }
+
+    function initTodayBadge() {
+        const now = new Date(Date.now() + 9 * 3600 * 1000);
+        const days = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+        const y = now.getUTCFullYear();
+        const m = now.getUTCMonth() + 1;
+        const d = now.getUTCDate();
+        const dayStr = days[now.getUTCDay()];
+        document.getElementById('todayDateBadge').textContent = `📅 오늘: ${y}년 ${m}월 ${d}일 (${dayStr})`;
+    }
+
+    // 칩 렌더링
+    function initChips() {
+        const zGrid = document.getElementById('zodiacChipsGrid');
+        zGrid.innerHTML = ZODIAC_LIST.map((z, idx) => `
+            <div class="chip-item ${idx === 0 ? 'active' : ''}" onclick="selectZodiac(${idx})">
+                <span class="chip-icon">${z.icon}</span>
+                <div class="chip-title">${z.name}</div>
+                <div class="chip-desc">${z.years.split(',')[0]}~</div>
+            </div>
+        `).join('');
+
+        const sGrid = document.getElementById('starChipsGrid');
+        sGrid.innerHTML = STAR_LIST.map((s, idx) => `
+            <div class="chip-item ${idx === 0 ? 'active' : ''}" onclick="selectStar(${idx})">
+                <span class="chip-icon">${s.icon}</span>
+                <div class="chip-title">${s.name}</div>
+                <div class="chip-desc">${s.dates}</div>
+            </div>
+        `).join('');
+    }
+
+    function selectZodiac(idx) {
+        document.getElementById('selectedZodiac').value = idx;
+        const chips = document.querySelectorAll('#zodiacChipsGrid .chip-item');
+        chips.forEach((c, i) => c.classList.toggle('active', i === idx));
+    }
+
+    function selectStar(idx) {
+        document.getElementById('selectedStar').value = idx;
+        const chips = document.querySelectorAll('#starChipsGrid .chip-item');
+        chips.forEach((c, i) => c.classList.toggle('active', i === idx));
+    }
+
+    function switchMode(mode) {
+        document.getElementById('currentMode').value = mode;
+        document.getElementById('tabBirth').classList.toggle('active', mode === 'birth');
+        document.getElementById('tabZodiac').classList.toggle('active', mode === 'zodiac');
+        document.getElementById('tabStar').classList.toggle('active', mode === 'star');
+
+        document.getElementById('sectionBirth').style.display = (mode === 'birth') ? 'block' : 'none';
+        document.getElementById('sectionZodiac').style.display = (mode === 'zodiac') ? 'block' : 'none';
+        document.getElementById('sectionStar').style.display = (mode === 'star') ? 'block' : 'none';
+    }
+
+    // 출생 연도로 띠 구하기
+    function getZodiacByYear(year) {
+        // 기준: 1900년 = 쥐띠 (0)
+        // 4년 = 쥐, 5년 = 소, 6년 = 호랑이, 7년 = 토끼, 8년 = 용, 9년 = 뱀, 10년 = 말, 11년 = 양, 0년 = 원숭이, 1년 = 닭, 2년 = 개, 3년 = 돼지
+        const zodiacOrder = [
+            '원숭이띠', '닭띠', '개띠', '돼지띠', '쥐띠', '소띠', '호랑이띠', '토끼띠', '용띠', '뱀띠', '말띠', '양띠'
+        ];
+        return zodiacOrder[year % 12];
+    }
+
+    // 운세 계산 및 렌더링
+    function executeFortune() {
+        const mode = document.getElementById('currentMode').value;
+        const todayStr = getKSTDateString().replace(/-/g, '');
+        let seedKey = todayStr;
+        let targetTitle = '';
+
+        if (mode === 'birth') {
+            const birthVal = document.getElementById('birthDate').value || '1995-07-07';
+            const gender = document.getElementById('genderSelect').value;
+            const cal = document.getElementById('calendarType').value;
+            const y = parseInt(birthVal.split('-')[0]) || 1995;
+            const zName = getZodiacByYear(y);
+            const genderKo = gender === 'male' ? '남성' : '여성';
+            const calKo = cal === 'solar' ? '양력' : '음력';
+            
+            targetTitle = `${y}년생 ${zName} · ${calKo} (${genderKo})`;
+            seedKey += `_b_${birthVal}_${gender}_${cal}`;
+        } else if (mode === 'zodiac') {
+            const zIdx = parseInt(document.getElementById('selectedZodiac').value) || 0;
+            const z = ZODIAC_LIST[zIdx];
+            targetTitle = `오늘의 띠별 운세: ${z.icon} ${z.name}`;
+            seedKey += `_z_${zIdx}`;
+        } else {
+            const sIdx = parseInt(document.getElementById('selectedStar').value) || 0;
+            const s = STAR_LIST[sIdx];
+            targetTitle = `오늘의 별자리 운세: ${s.icon} ${s.name} (${s.dates})`;
+            seedKey += `_s_${sIdx}`;
+        }
+
+        const baseHash = getHash(seedKey);
+
+        // 점수 산출 (78점 ~ 98점 사이의 긍정적이고 활력 있는 점수 분포)
+        const totalScore = 80 + seededRandom(baseHash + 1, 19);
+        const wealthScore = 75 + seededRandom(baseHash + 2, 24);
+        const careerScore = 76 + seededRandom(baseHash + 3, 23);
+        const loveScore = 78 + seededRandom(baseHash + 4, 21);
+        const healthScore = 74 + seededRandom(baseHash + 5, 25);
+
+        // 텍스트 선택
+        const headline = HEADLINES[seededRandom(baseHash + 10, HEADLINES.length)];
+        const wealthDesc = WEALTH_DESCS[seededRandom(baseHash + 11, WEALTH_DESCS.length)];
+        const careerDesc = CAREER_DESCS[seededRandom(baseHash + 12, CAREER_DESCS.length)];
+        const loveDesc = LOVE_DESCS[seededRandom(baseHash + 13, LOVE_DESCS.length)];
+        const healthDesc = HEALTH_DESCS[seededRandom(baseHash + 14, HEALTH_DESCS.length)];
+
+        // 부스터 아이템
+        const n1 = 1 + seededRandom(baseHash + 20, 15);
+        const n2 = n1 + 1 + seededRandom(baseHash + 21, 14);
+        const n3 = n2 + 1 + seededRandom(baseHash + 22, 14);
+        const boostNumStr = `${n1}, ${n2}, ${n3}`;
+        const boostCol = COLORS[seededRandom(baseHash + 23, COLORS.length)];
+        const boostDir = DIRECTIONS[seededRandom(baseHash + 24, DIRECTIONS.length)];
+        const boostTime = TIMES[seededRandom(baseHash + 25, TIMES.length)];
+        const mindfulness = MINDFULNESS_LIST[seededRandom(baseHash + 30, MINDFULNESS_LIST.length)];
+
+        // 별점
+        const starCount = totalScore >= 95 ? 5 : totalScore >= 88 ? 5 : 4;
+        const starsText = '⭐'.repeat(starCount) + (starCount < 5 ? '☆' : '');
+
+        // 태그
+        const tagsPool = ['#대길(大吉)', '#귀인도움', '#재물상승', '#계약성사', '#인연운', '#성과달성', '#기분전환', '#심신평온', '#행운가득'];
+        const tag1 = tagsPool[seededRandom(baseHash + 40, tagsPool.length)];
+        let tag2 = tagsPool[seededRandom(baseHash + 41, tagsPool.length)];
+        if (tag2 === tag1) tag2 = '#자신감';
+        let tag3 = tagsPool[seededRandom(baseHash + 42, tagsPool.length)];
+        if (tag3 === tag1 || tag3 === tag2) tag3 = '#행운부스터';
+
+        // DOM 업데이트
+        document.getElementById('resTargetPill').textContent = targetTitle;
+        document.getElementById('resScore').textContent = `${totalScore}점`;
+        document.getElementById('resStars').textContent = starsText;
+        document.getElementById('resHeadline').textContent = `"${headline}"`;
+
+        document.getElementById('resTags').innerHTML = `
+            <span class="hero-tag">${tag1}</span>
+            <span class="hero-tag">${tag2}</span>
+            <span class="hero-tag">${tag3}</span>
+        `;
+
+        // 4대 운세 게이지 & 뱃지
+        document.getElementById('badgeWealth').textContent = `${wealthScore}점`;
+        document.getElementById('gaugeWealth').style.width = `${wealthScore}%`;
+        document.getElementById('descWealth').textContent = wealthDesc;
+
+        document.getElementById('badgeCareer').textContent = `${careerScore}점`;
+        document.getElementById('gaugeCareer').style.width = `${careerScore}%`;
+        document.getElementById('descCareer').textContent = careerDesc;
+
+        document.getElementById('badgeLove').textContent = `${loveScore}점`;
+        document.getElementById('gaugeLove').style.width = `${loveScore}%`;
+        document.getElementById('descLove').textContent = loveDesc;
+
+        document.getElementById('badgeHealth').textContent = `${healthScore}점`;
+        document.getElementById('gaugeHealth').style.width = `${healthScore}%`;
+        document.getElementById('descHealth').textContent = healthDesc;
+
+        // 부스터
+        document.getElementById('boostNumber').textContent = boostNumStr;
+        document.getElementById('boostColor').textContent = boostCol;
+        document.getElementById('boostDirection').textContent = boostDir;
+        document.getElementById('boostTime').textContent = boostTime;
+        document.getElementById('mindfulnessText').textContent = `"${mindfulness}"`;
+
+        // 결과창 표시 및 스크롤
+        const resEl = document.getElementById('resultSection');
+        resEl.style.display = 'block';
+        resEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function scrollToTopForm() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function copyFortune() {
+        const target = document.getElementById('resTargetPill').textContent;
+        const score = document.getElementById('resScore').textContent;
+        const headline = document.getElementById('resHeadline').textContent;
+        const wealth = document.getElementById('descWealth').textContent;
+        const career = document.getElementById('descCareer').textContent;
+        const love = document.getElementById('descLove').textContent;
+        const health = document.getElementById('descHealth').textContent;
+        const num = document.getElementById('boostNumber').textContent;
+        const color = document.getElementById('boostColor').textContent;
+        const dir = document.getElementById('boostDirection').textContent;
+        const time = document.getElementById('boostTime').textContent;
+        const todayDate = document.getElementById('todayDateBadge').textContent;
+
+        const text = `[오늘의 운세 결과]\n` +
+            `${todayDate}\n` +
+            `- 대상: ${target}\n` +
+            `- 오늘의 종합 행운 지수: ${score}\n\n` +
+            `🌟 총운 요약:\n${headline}\n\n` +
+            `💰 재물운: ${wealth.trim()}\n` +
+            `💼 직업운: ${career.trim()}\n` +
+            `❤️ 애정운: ${love.trim()}\n` +
+            `🩺 건강운: ${health.trim()}\n\n` +
+            `🍀 오늘의 행운 부스터:\n` +
+            `- 행운의 숫자: ${num}\n` +
+            `- 행운의 색상: ${color}\n` +
+            `- 행운의 방향: ${dir}\n` +
+            `- 골든 타임: ${time}\n\n` +
+            `📌 출처: Barcode128 오늘의 운세 (https://barcode128.mycafe24.com/today-fortune/)`;
+
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('📋 오늘의 운세가 클립보드에 복사되었습니다!');
+        }).catch(() => {
+            showToast('복사에 실패했습니다.');
+        });
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    // Auto-resize for iframe embed
+    function notifyParentHeight() {
+        if (window.parent && window.parent !== window) {
+            const height = document.documentElement.scrollHeight || document.body.scrollHeight;
+            window.parent.postMessage({ type: 'TOOL_RESIZE', height: height + 20 }, '*');
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        initTodayBadge();
+        initChips();
+        notifyParentHeight();
+    });
+    window.addEventListener('resize', notifyParentHeight);
+    if (window.ResizeObserver) {
+        new ResizeObserver(notifyParentHeight).observe(document.body);
+    }
+</script>
+
+</body>
+</html>
